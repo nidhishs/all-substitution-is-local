@@ -1,0 +1,81 @@
+\appendix
+
+\section{Piecewise-Linear Structure}
+\label{app:polyhedral}
+
+\begin{theoremA}[Piecewise-linearity of the interaction]
+\label{prop:polyhedral}
+For finite $|A|$, $|O_i|$, $|O_j|$, and $K$, the function $b \mapsto \Delta\VoI(j \mid i, b)$ is piecewise-linear on $\Delta^{K-1}$.
+\end{theoremA}
+
+\begin{proof}
+For any channel~$k$ with outcome set~$O_k$, the unnormalized posterior-value product satisfies
+\[
+  P(o \mid b)\, V(\bpost(k, o))
+  \;=\; \max_{a \in A}\; \sum_s R(a,s)\, P(o \mid s, k)\, b(s),
+\]
+where the normalizing denominator $P(o \mid b)$ cancels against the posterior formula.
+The right-hand side is the maximum of $|A|$ functions, each linear in~$b$.
+Summing over outcomes,
+\[
+  \E_o\bigl[V(\bpost(k, o))\bigr]
+  \;=\;
+  \sum_{o \in O_k} \max_{a \in A}\; \sum_s R(a,s)\, P(o \mid s, k)\, b(s),
+\]
+a sum of piecewise-linear convex (PWLC) functions of~$b$.
+By the same cancellation applied to the joint channel $(i,j)$ under conditional independence, and to channels $i$ and $j$ individually, the interaction decomposes as
+\[
+  \Delta\VoI(j \mid i, b)
+  \;=\; F_{ij}(b) - F_i(b) - F_j(b) + V(b),
+\]
+where each term is a sum of maxima of finitely many linear functions of~$b$.
+Each term is therefore PWLC, and their sum is piecewise-linear.
+\end{proof}
+
+\section{Regret Interpretation}
+\label{app:regret}
+
+In the interior of decision region $\mathcal{R}_a$, where $h(b') = r_a \cdot b'$, the Bregman divergence of $h$ admits a clean interpretation:
+\[
+  \Dh(b', b)
+  \;=\; V(b') - r_a \cdot b'
+  \;=\; \operatorname{Regret}(a^*(b),\, b'),
+\]
+where $\operatorname{Regret}(a, b') = V(b') - r_a \cdot b'$ is the regret of committing to action~$a$ at belief~$b'$.
+The substitute force $\E[\Dh(\bpost, b)]$ is therefore the expected regret of sticking with the currently optimal action at the posterior belief.
+
+This connects the Bregman decomposition to a decision-theoretic quantity: substitution occurs when channel~$i$ resolves enough uncertainty that the agent's current action has low expected regret, leaving little room for channel~$j$ to improve the decision.
+
+\section{Lean Formalization}
+\label{app:lean}
+
+The Lean~4 source files provide machine-verified proofs of all results.
+The formalization uses the \emph{Jensen gap} $\E[f(X)] - f(\E[X])$ rather than explicit Bregman divergences, and abstracts the paper's geometric hypotheses (e.g., posteriors remain in the same decision region) to their algebraic consequences (\texttt{jensenGap h = 0} and \texttt{jensenGap g $\geq$ 0}).
+The geometric conditions imply the algebraic ones but not conversely, so the Lean statements are strictly more general.
+In particular, the algebraic conditions do not encode conditional independence.
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}ll@{}}
+\toprule
+Paper & Lean \\
+\midrule
+Belief $b \in \Delta^{K-1}$ & \texttt{Belief S} \\
+Channel likelihood & \texttt{ObsKernel S O} \\
+$P(o \mid b)$ & \texttt{marginalProb b k o} \\
+$\bpost(i,o)$ & \texttt{posterior b k o hmarg} \\
+$\E[D_f(\bpost, b)]$ & \texttt{jensenGap f b k hmarg} \\
+\midrule
+Prop.~\ref{prop:decomposition} & \texttt{bregman\_decomposition} \\
+Cor.~\ref{cor:cost} & \texttt{jensenGap\_add\_const} \\
+Martingale property & \texttt{jensenGap\_linear} \\
+Thm.~\ref{thm:interior} & \texttt{interior\_complementarity} \\
+Thm.~\ref{thm:converse} & \texttt{substitution\_requires\_boundary\_crossing} \\
+Jensen's inequality & \texttt{jensenGap\_nonneg\_of\_convexOn} \\
+Regret $\geq 0$ & \texttt{regret\_nonneg} \\
+Thm.~\ref{prop:polyhedral} cancellation & \texttt{unnorm\_posterior\_value} \\
+Thm.~\ref{prop:polyhedral} PWLC expansion & \texttt{expected\_value\_as\_sup\_linear} \\
+\bottomrule
+\end{tabular}
+\end{center}
+

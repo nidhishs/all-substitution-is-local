@@ -1,0 +1,72 @@
+\documentclass{article}
+
+\usepackage{neurips}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+% Math macros
+\DeclareMathOperator*{\argmax}{arg\,max}
+\newcommand{\VoI}{\operatorname{VoI}}
+\newcommand{\bpost}{\hat{b}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Dg}{D_g}
+\newcommand{\Dh}{D_h}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{theoremA}{Theorem}
+\renewcommand{\thetheoremA}{\Alph{theoremA}}
+
+\title{All Substitution Is Local}
+
+\author{
+    Nidhish Shah \\
+    Eindhoven University of Technology \\
+    \texttt{nidhishshahs@gmail.com} \\
+\And
+    Shaurjya Mandal \\
+    Harvard University \\
+    \texttt{shaurjya.manadal@harvard.edu} \\
+\And
+    Asfandyar Azhar \\
+    University of Oxford \\
+    \texttt{asfandyar.azhar@oxford.edu} \\
+}
+
+\raggedbottom
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+When does learning from one source make a second source more valuable, and when does it make it redundant? We show that the answer is geometric: information sources compete only when observations cross the boundaries where decisions change. Absent such a crossing, one source always amplifies the other's value, even when it cannot, on its own, shift the decision at all. We decompose the interaction between sources into two opposing forces, one that complements and one that substitutes, and prove that substitution is impossible unless an observation crosses a decision boundary. The result requires no independence between sources. A universe overflowing with correlated signals ought to breed redundancy. It does not. Substitution can arise only at the thin boundaries where decisions change. Everywhere else, information cooperates.
+\end{abstract}
+
+\input{chapters/introduction}
+\input{chapters/preliminaries}
+\input{chapters/methodology}
+\input{chapters/illustration}
+\input{chapters/related}
+\input{chapters/conclusion}
+
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\clearpage
+\input{chapters/appendix}
+
+\end{document}

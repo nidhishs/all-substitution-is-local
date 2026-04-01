@@ -1,0 +1,36 @@
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Information substitutes and complements.}
+\citet{ChenWaggoner2017} introduced both global and pointwise notions of information substitutes and complements, including the pointwise interaction term $\Delta\VoI(j \mid i, b)$ that we study.
+Their results characterize global conditions, holding across all beliefs, for the two regimes.
+Our contribution resolves the local geometry: we identify \emph{which beliefs} support each regime and show that the sign of $\Delta\VoI$ is determined by whether channel~$i$'s posteriors cross a decision boundary.
+\citet{Borgers2013} gave a universal characterization via Blackwell comparisons, requiring complementarity or substitutability to hold simultaneously across all decision problems.
+Our results are pointwise-in-belief for a fixed decision problem; the global ordering of \citeauthor{Borgers2013} and our local geometry describe complementary facets of the same relationship.
+\citet{BrooksFrankelKamenica2024} characterize signal comparisons via a \emph{reveal-or-refine} condition: one signal dominates another in value regardless of the agent's access to other information if and only if every realization of the dominant signal either reveals the state or refines a realization of the dominated signal.
+
+\paragraph{Geometry of the value function and single-channel VoI.}
+Several papers exploit the key geometric fact underlying our results: the value function $V$ is linear within each decision region, so VoI vanishes for channels whose posteriors remain in the current region.
+\citet{RadnerStiglitz1984} and \citet{ChadeSchlee2002} used this linearity to establish the first-order nonconcavity of VoI with respect to a single channel's precision.
+\citet{DeLaraGossner2020} study first-order VoI through convex duality and show that VoI is zero whenever posteriors stay in the interior of the current decision region, the first-order analogue of our Theorem~\ref{thm:interior}.
+\citet{Whitmeyer2024} applies the same decision-region linearity to recover a concavity result for single-channel VoI as a function of information quantity.
+\citet{KeppoMoscariniSmith2008} extend the \citeauthor{RadnerStiglitz1984} nonconcavity to continuous precision choice, showing that demand for information can be discontinuous and non-monotone.
+\citet{AtheyLevin2018} show that in monotone decision problems, where actions are ordered and payoffs supermodular, VoI respects the Blackwell order (a setting where our decision-region geometry reduces to a single threshold).
+These papers all study VoI as a function of a single channel's precision; we extend the same geometric engine to the second-order cross-channel interaction $\Delta\VoI(j \mid i, b)$.
+
+\paragraph{Bregman divergences and Bayesian persuasion.}
+The martingale identity relating Jensen gaps to expected Bregman divergences was introduced to economic theory by \citet{KamenicaGentzkow2011}, where it writes single-channel VoI as a single expected Bregman divergence.
+Applying the same identity to the cross-channel interaction $\Delta\VoI$ instead yields a difference of two such terms, one for each auxiliary value function, which is what gives the decomposition in Proposition~\ref{prop:decomposition} its complement-force-minus-substitute-force structure.
+\citet{Chodrow2025} establishes that Bregman divergences are the unique divergences with this information-equivalence property: they are characterized by the agreement between Jensen-gap and divergence-based notions of information content for arbitrary weighted collections, providing an axiomatic basis for the decomposition.
+\citet{Mu2021} show that in large samples Blackwell dominance is equivalent to comparisons of R\'{e}nyi divergences, connecting signal ordering to a related family of divergence measures.
+\citet{DentiMarinacciRustichini2022} and \citet{Pomatto2023} axiomatize information costs from complementary directions: the former identifies posterior-separable costs (structurally linked to Bregman divergences) as the class consistent with experimental rationality, while the latter characterizes costs with constant marginal returns as those based on R\'{e}nyi entropy.
+\citet{Gossner2021} study attention allocation under a posterior-separable capacity constraint, where the geometry of the decision problem determines which states the agent learns to distinguish.
+
+\paragraph{Sequential acquisition and complementarity in dynamic settings.}
+\citet{LiangMu2020} study sequential social learning where complementarity between information sources can create learning traps: agents' posteriors evolve into regions where a second source has low marginal value, causing the community to stop acquiring it prematurely.
+The mechanism driving their traps is the same boundary-crossing geometry we formalize, where a source is complementary at beliefs whose posteriors do not yet straddle a decision boundary.
+Our localization results provide the single-step geometric account of when and why those traps arise.
+\citet{GolovinKrause2011} established conditions for global adaptive submodularity of information acquisition policies.
+Our results localize that structure: substitution and complementarity depend on the agent's current position in belief space relative to decision boundaries, and global properties emerge from averaging over this local geometry.
+\citet{Che2019} study optimal dynamic attention allocation, showing that the optimal policy shifts from diversification to concentration as beliefs sharpen.
+\citet{LiangMuSyrgkanis2022} extend the \citeauthor{LiangMu2020} framework to settings with multiple heterogeneous sources, characterizing when delayed aggregation is optimal.

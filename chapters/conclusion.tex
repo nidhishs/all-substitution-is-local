@@ -1,0 +1,26 @@
+\section{Conclusion}
+\label{sec:discussion}
+
+The localization principle established in this paper says that information sources compete only when one source's posteriors straddle a decision boundary.
+Far from any boundary, sources always weakly help each other; substitution is a boundary phenomenon.
+
+\paragraph{Applications.}
+The localization principle provides a geometric criterion for information redundancy: two sources substitute only if they resolve the same decision boundary, and sources resolving different boundaries complement each other.
+In sequential testing problems (multi-arm clinical trials, multiclass triage), a decision-maker must choose which source to consult next.
+Our results yield a concrete heuristic: after observing a source that resolves boundary~$X$, sources targeting a different boundary~$Y$ retain or increase their value (Theorem~\ref{thm:interior}), while sources targeting the same boundary~$X$ lose value.
+This localizes the adaptive submodularity conditions of \citet{GolovinKrause2011}, which treat diminishing returns globally, to specific beliefs relative to decision boundaries.
+In active learning for multiclass classification, $K$ class labels and a finite classifier family produce exactly the piecewise-linear value structure we study.
+Feature redundancy corresponds to resolving the same classification boundary; a boundary-aware selection criterion would complement mutual-information-based approaches, which are agnostic to which boundary a feature resolves.
+The same logic applies to sensor placement and attention allocation under capacity constraints: diversifying across decision boundaries is more valuable than concentrating on a single one.
+
+\paragraph{Limitations.}
+Three modeling assumptions bound the scope.
+First, the economic interpretation of the complement and substitute forces requires conditional independence between channels, which ensures that $g(\bpost(i, o_i))$ equals the actual expected post-$j$ value; the decomposition and localization theorems themselves hold for arbitrarily correlated channels.
+Second, the results are specific to finite-action settings where the value function is piecewise-linear.
+Continuous actions yield a smooth, strictly convex~$V$ with no flat decision regions, so the interior complementarity mechanism (Theorem~\ref{thm:interior}) has no direct analogue; the boundary-crossing logic is specific to discrete decisions.
+Third, the decomposition requires the Bayesian martingale property $\E[\bpost] = b$; agents with miscalibrated updates break this identity.
+
+\paragraph{Open questions.}
+The gap between our necessary and sufficient conditions calls for a tighter characterization: the worked example (Section~\ref{sec:example}) suggests that channels crossing \emph{different} boundaries complement while channels crossing the \emph{same} boundary substitute, but a precise geometric criterion remains to be formulated.
+The interaction is generically asymmetric (channel~$i$ may substitute for~$j$ while $j$ complements~$i$), and characterizing when this asymmetry arises would clarify optimal ordering in sequential acquisition.
+Quantifying how the complementarity region scales with~$K$ is a natural direction.

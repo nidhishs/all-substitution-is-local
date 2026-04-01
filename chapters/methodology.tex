@@ -1,0 +1,100 @@
+\section{The Localization Principle}
+\label{sec:localization}
+
+\paragraph{Two Opposing Forces.}
+
+\begin{proposition}[Bregman decomposition]
+\label{prop:decomposition}
+\[
+  \Delta\VoI(j \mid i, b)
+  \;=\;
+  \E\bigl[\Dg(\bpost, b)\bigr]
+  \;-\;
+  \E\bigl[\Dh(\bpost, b)\bigr],
+\]
+where $\bpost = \bpost(i, o)$, the functions $g$ and $h$ are defined in \eqref{eq:g}--\eqref{eq:h}, and both expected Bregman divergences are non-negative.
+\end{proposition}
+
+\begin{proof}
+Since $\VoI(j \mid b') = g(b') - h(b')$ by \eqref{eq:g}--\eqref{eq:h}, expanding Definition~\ref{def:delta} gives
+\[
+  \Delta\VoI(j \mid i, b)
+  \;=\;
+  \bigl[\E[g(\bpost)] - g(b)\bigr]
+  \;-\;
+  \bigl[\E[h(\bpost)] - h(b)\bigr].
+\]
+By the martingale identity~\eqref{eq:bregman-jensen}, each bracketed expression equals the corresponding expected Bregman divergence.
+Non-negativity of $\E[\Dg(\bpost, b)]$ follows from convexity of $g$, and non-negativity of $\E[\Dh(\bpost, b)]$ from convexity of $h$, each by Jensen's inequality.
+\end{proof}
+
+The decomposition reveals a tug-of-war: the term $\E[\Dh(\bpost, b)]$ is the \emph{substitute force}, measuring how much channel~$i$ resolves the current decision by generating posteriors that straddle a decision boundary, while $\E[\Dg(\bpost, b)]$ is the \emph{complement force}, measuring how much channel~$i$ enhances the future relevance of channel~$j$.
+Under conditional independence, $g(\bpost(i, o_i))$ equals the actual expected post-$j$ value $\E_{o_j \mid o_i}[V(\bpost(i,j,o_i,o_j))]$, so Definition~\ref{def:delta} captures the real interaction and the forces have direct economic content. Without conditional independence, the algebra and localization theorems still hold, but the individual forces may not reflect the true conditional distributions.
+
+\begin{corollary}[Independence from channel ordering and costs]
+\label{cor:cost}
+The interaction $\Delta\VoI(j \mid i, b)$ is determined entirely by the two likelihood kernels and the reward structure; it does not depend on any separate per-use costs that might be attached to channels $i$ or $j$.
+\end{corollary}
+
+\begin{proof}
+No cost terms appear in Definition~\ref{def:delta}.
+Equivalently, adding a constant to $g$ or $h$ does not change the Bregman divergence, since $D_{\phi+c}(p,q) = D_\phi(p,q)$ for any constant~$c$.
+\end{proof}
+
+\paragraph{When Posteriors Stay Inside The Decision Region.}
+
+\begin{theorem}[Interior complementarity]
+\label{thm:interior}
+Suppose all posteriors $\bpost(i, o)$ lie in the closed decision region~$\mathcal{R}_a$.
+Then $\Delta\VoI(j \mid i, b) \geq 0$.
+This holds for arbitrarily correlated channels $i$ and $j$.
+\end{theorem}
+
+\begin{proof}
+Since $\mathcal{R}_a$ is convex and $b = \sum_o P(o \mid b)\, \bpost(i, o)$, the prior $b$ also lies in $\mathcal{R}_a$.
+Within $\mathcal{R}_a$, the value function satisfies $h(b') = r_a \cdot b'$ for all $b'$ in the region.
+Because $h$ is linear on $\mathcal{R}_a$, $\E[h(\bpost)] = h(\E[\bpost]) = h(b)$ by the martingale property, so the Jensen gap of $h$ vanishes.
+Meanwhile $g$ is convex, so $\E[\Dg(\bpost, b)] \geq 0$ by Jensen's inequality.
+By Proposition~\ref{prop:decomposition},
+\[
+  \Delta\VoI(j \mid i, b) = \E[\Dg(\bpost, b)] - 0 \geq 0. \qedhere
+\]
+\end{proof}
+
+\begin{remark}
+\label{rem:irrelevant}
+The proof above shows that when all posteriors remain in $\mathcal{R}_a$, channel~$i$ is decision-irrelevant: $\VoI(i \mid b) = 0$.
+Despite being unable to improve the current decision on its own, channel~$i$ weakly amplifies the value of channel~$j$.
+The mechanism is informational, not decisional: channel~$i$ may sharpen the posterior toward regions where $j$'s signals are more discriminating, even when no action change results from~$i$ alone.
+(The hypothesis uses the closed region $\mathcal{R}_a$, so the Jensen-gap argument extends to boundary faces.)
+\end{remark}
+
+\paragraph{When Posteriors Cross A Decision Boundary.}
+
+\begin{theorem}[Converse: substitution requires boundary-crossing]
+\label{thm:converse}
+If $\Delta\VoI(j \mid i, b) < 0$, then at least one posterior $\bpost(i, o)$ lies in a different
+decision region from~$b$.
+This holds for arbitrarily correlated channels $i$ and $j$.
+\end{theorem}
+
+\begin{proof}
+Since $g$ is convex (it is the expected maximum of linear functions),
+Proposition~\ref{prop:decomposition} and $\Delta\VoI < 0$ imply
+\[
+  \E[\Dh(\bpost, b)] \;>\; \E[\Dg(\bpost, b)] \;\geq\; 0,
+\]
+so $\E[\Dh(\bpost, b)] > 0$.
+By the martingale property~\eqref{eq:bregman-jensen},
+$\E[\Dh(\bpost, b)] = \E[h(\bpost)] - h(b)$.
+The linear correction term $\langle \xi, \E[\bpost] - b \rangle$ vanishes for any choice of subgradient $\xi \in \partial h(b)$, because $\E[\bpost] = b$.
+So $\E[h(\bpost)] > h(b)$.
+Since $h$ is PWLC, this strict inequality requires $h$ to be nonlinear on the convex hull
+of the posterior support.
+But $h$ is linear within each decision region, so the posterior support must span at least
+two distinct decision regions.
+\end{proof}
+
+
+These two conditions leave a gap: a channel can cross a decision boundary and still produce complementarity, so long as the complement force $\E[\Dg]$ dominates the substitute force $\E[\Dh]$.
+The worked example in the next section illustrates this.
