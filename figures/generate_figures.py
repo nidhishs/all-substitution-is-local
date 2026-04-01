@@ -4,12 +4,11 @@
 Usage:
     uv run --with numpy --with matplotlib generate_figures.py
 
-Outputs two PDFs into the same directory as this script:
+Outputs two PDFs into paper/figures/:
     interaction_decomposition.pdf  -- Three-panel figure (delta-VoI + complement/substitute forces)
     force_transition_ray.pdf       -- Phase transition along a belief ray
 """
 
-import math
 import os
 
 import matplotlib
@@ -18,34 +17,33 @@ import numpy as np
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from information_model import (
+    BELIEF_B1,
+    BELIEF_B2,
+    BELIEF_B3,
     bregman_forces,
-    delta_voi,
     verify_known_values,
 )
 from matplotlib.colors import TwoSlopeNorm
 from matplotlib.patches import Polygon
-from matplotlib.path import Path
 
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_DIR = SCRIPT_DIR
+OUTPUT_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), "paper", "figures")
 
 # ---------------------------------------------------------------------------
 # Simplex geometry
 # ---------------------------------------------------------------------------
 
+SQRT3_HALF = np.sqrt(3) / 2
+
 VERTEX_S1 = np.array([0.0, 0.0])
 VERTEX_S2 = np.array([1.0, 0.0])
-VERTEX_S3 = np.array([0.5, math.sqrt(3) / 2])
+VERTEX_S3 = np.array([0.5, SQRT3_HALF])
 
 SIMPLEX_VERTICES = [VERTEX_S1, VERTEX_S2, VERTEX_S3]
-SIMPLEX_PATH = Path(
-    [VERTEX_S1, VERTEX_S2, VERTEX_S3, VERTEX_S1],
-    [Path.MOVETO, Path.LINETO, Path.LINETO, Path.CLOSEPOLY],
-)
 
 # Decision boundaries: each runs from the triple point (1/3,1/3,1/3) to a simplex edge.
 TRIPLE_POINT = np.array([1 / 3, 1 / 3, 1 / 3])
@@ -57,44 +55,40 @@ BOUNDARY_ENDPOINTS = {
 
 EXTEND_T = 1.15  # fraction past simplex edge for boundary label placement
 
-# Decision region polygons (vertices in Cartesian space).
-_TP_XY = (0.5 * (1 / 3) + 0.5 * (1 / 3), (math.sqrt(3) / 2) * (1 / 3))
-_EP12_XY = (0.5, 0.0)
-_EP13_XY = (0.0 * 1 + 0.5 * (3 / 5), (math.sqrt(3) / 2) * (3 / 5))
-_EP23_XY = ((2 / 5) + 0.5 * (3 / 5), (math.sqrt(3) / 2) * (3 / 5))
-
-REGION_POLYS = {
-    0: [(0.0, 0.0), _EP12_XY, _TP_XY, _EP13_XY],  # R1
-    1: [_EP12_XY, (1.0, 0.0), _EP23_XY, _TP_XY],  # R2
-    2: [_EP13_XY, _TP_XY, _EP23_XY, (0.5, math.sqrt(3) / 2)],  # R3
-}
-REGION_COLORS = {0: "#e0e0e0", 1: "#ededed", 2: "#f8f8f8"}
-
-# Two sets of region-label positions (different visual weight per figure type).
-REGION_LABEL_POS_DEFAULT = [
-    ("$\\mathcal{R}_1$", (0.72, 0.08, 0.20)),
-    ("$\\mathcal{R}_2$", (0.08, 0.72, 0.20)),
-    ("$\\mathcal{R}_3$", (0.07, 0.07, 0.86)),
-]
-# Marked beliefs from the paper.
-BELIEF_B1 = np.array([1 / 11, 2 / 11, 8 / 11])  # Theorem 2 (interior)
-BELIEF_B2 = np.array([1 / 4, 1 / 6, 7 / 12])  # Decomposition (near boundary)
-BELIEF_B3 = np.array([5 / 12, 5 / 12, 1 / 6])  # Substitution (on boundary)
-
 
 def bary_to_xy(b1, b2, b3):
     """Barycentric coordinates -> Cartesian (x, y) on the equilateral triangle."""
     x = b2 + 0.5 * b3
-    y = (math.sqrt(3) / 2) * b3
+    y = SQRT3_HALF * b3
     return x, y
 
 
 def xy_to_bary(x, y):
     """Cartesian (x, y) -> barycentric coordinates (b1, b2, b3)."""
-    b3 = y / (math.sqrt(3) / 2)
+    b3 = y / SQRT3_HALF
     b2 = x - 0.5 * b3
     b1 = 1.0 - b2 - b3
     return b1, b2, b3
+
+
+# Decision region polygons (vertices in Cartesian space).
+_TP_XY = bary_to_xy(*TRIPLE_POINT)
+_EP12_XY = bary_to_xy(*BOUNDARY_ENDPOINTS["$a_1/a_2$"])
+_EP13_XY = bary_to_xy(*BOUNDARY_ENDPOINTS["$a_1/a_3$"])
+_EP23_XY = bary_to_xy(*BOUNDARY_ENDPOINTS["$a_2/a_3$"])
+
+REGION_POLYS = {
+    0: [(0.0, 0.0), _EP12_XY, _TP_XY, _EP13_XY],  # R1
+    1: [_EP12_XY, (1.0, 0.0), _EP23_XY, _TP_XY],  # R2
+    2: [_EP13_XY, _TP_XY, _EP23_XY, (0.5, SQRT3_HALF)],  # R3
+}
+REGION_COLORS = {0: "#e0e0e0", 1: "#ededed", 2: "#f8f8f8"}
+
+REGION_LABEL_POS_DEFAULT = [
+    ("$\\mathcal{R}_1$", (0.72, 0.08, 0.20)),
+    ("$\\mathcal{R}_2$", (0.08, 0.72, 0.20)),
+    ("$\\mathcal{R}_3$", (0.07, 0.07, 0.86)),
+]
 
 
 def clamp_to_interior(b1, b2, b3, margin=0.005):
@@ -108,28 +102,12 @@ def clamp_to_interior(b1, b2, b3, margin=0.005):
 # ---------------------------------------------------------------------------
 
 
-def evaluate_on_grid(func, resolution=300, margin=0.005):
-    """Evaluate a scalar function on a Cartesian meshgrid covering the simplex.
-
-    Points outside the simplex are clamped to the nearest interior point so
-    that contourf gets continuous data everywhere (no NaN holes). The caller
-    clips the rendered output to the triangle polygon.
-
-    Returns (grid_x, grid_y, values) -- 2D arrays for contourf.
-    """
-    pad = 0.08  # extend well past simplex edges so clipping has no gaps
+def _make_simplex_grid(resolution):
+    """Create a Cartesian meshgrid covering the simplex with padding."""
+    pad = 0.08
     xs = np.linspace(-pad, 1.0 + pad, resolution)
     ys = np.linspace(-pad, VERTEX_S3[1] + pad, resolution)
-    grid_x, grid_y = np.meshgrid(xs, ys)
-    values = np.empty(grid_x.shape)
-
-    for i in range(resolution):
-        for j in range(resolution):
-            b1, b2, b3 = xy_to_bary(grid_x[i, j], grid_y[i, j])
-            belief = clamp_to_interior(b1, b2, b3, margin)
-            values[i, j] = func(belief)
-
-    return grid_x, grid_y, values
+    return np.meshgrid(xs, ys)
 
 
 # ---------------------------------------------------------------------------
@@ -189,9 +167,7 @@ def draw_decision_boundaries(ax, linewidth=1.2, alpha=0.5, extend=0.0):
 
 def _simplex_interior_mask(grid_x, grid_y):
     """Boolean mask: True for grid points inside the simplex (all bary coords > 0)."""
-    b3 = grid_y / (math.sqrt(3) / 2)
-    b2 = grid_x - 0.5 * b3
-    b1 = 1.0 - b2 - b3
+    b1, b2, b3 = xy_to_bary(grid_x, grid_y)
     return (b1 > 0) & (b2 > 0) & (b3 > 0)
 
 
@@ -236,32 +212,9 @@ def draw_region_labels(ax, positions=None):
         )
 
 
-def draw_simplex_panel(ax, region_labels=None):
-    """Full simplex panel: shaded regions, boundaries, labels, and frame."""
-    for action_idx, verts in REGION_POLYS.items():
-        poly = Polygon(
-            verts, closed=True,
-            facecolor=REGION_COLORS[action_idx], edgecolor="none", zorder=0,
-        )
-        ax.add_patch(poly)
-    draw_decision_boundaries(ax, linewidth=0.8, alpha=0.8, extend=0.15)
-    draw_simplex_frame(ax)
-    draw_boundary_labels(ax)
-    draw_region_labels(ax, region_labels)
-    setup_simplex_axes(ax)
-
-
-# ---------------------------------------------------------------------------
-# Force grid evaluation
-# ---------------------------------------------------------------------------
-
-
 def _evaluate_forces_on_grid(resolution=500, margin=0.005):
     """Evaluate both Bregman forces in a single pass over the grid."""
-    pad = 0.08
-    xs = np.linspace(-pad, 1.0 + pad, resolution)
-    ys = np.linspace(-pad, VERTEX_S3[1] + pad, resolution)
-    grid_x, grid_y = np.meshgrid(xs, ys)
+    grid_x, grid_y = _make_simplex_grid(resolution)
     complement_grid = np.empty(grid_x.shape)
     substitute_grid = np.empty(grid_x.shape)
 
@@ -291,11 +244,11 @@ def render_force_transition_ray(save_path: str) -> None:
 
     # Find crossing point (interaction boundary)
     diff = complement_values - substitute_values
+    sign_change = (diff[:-1] >= 0) & (diff[1:] < 0)
     t_cross = None
-    for i in range(len(diff) - 1):
-        if diff[i] >= 0 and diff[i + 1] < 0:
-            t_cross = t[i] + (t[i + 1] - t[i]) * diff[i] / (diff[i] - diff[i + 1])
-            break
+    if sign_change.any():
+        sc_idx = np.argmax(sign_change)
+        t_cross = t[sc_idx] + (t[sc_idx + 1] - t[sc_idx]) * diff[sc_idx] / (diff[sc_idx] - diff[sc_idx + 1])
 
     t_db = 7 / 60  # Decision boundary
 
@@ -324,7 +277,7 @@ def render_force_transition_ray(save_path: str) -> None:
         label="$\\mathbb{E}[D_h]$ (substitute force)",
     )
 
-    # Boundary lines — visually distinct styles
+    # Boundary lines
     if t_cross is not None:
         ax.axvline(t_cross, color="0.3", linewidth=1.0, linestyle=":")
         ax.annotate(
@@ -350,7 +303,7 @@ def render_force_transition_ray(save_path: str) -> None:
         textcoords="offset points",
     )
 
-    # Mark starting belief b₂ at t=0
+    # Mark starting belief b2 at t=0
     ax.annotate(
         "$b_2$",
         (0, complement_values[0]),
@@ -442,20 +395,17 @@ def render_interaction_decomposition(save_path: str) -> None:
     import matplotlib.colors as mcolors
     import matplotlib.gridspec as gridspec
 
-    # ---- Compute grids ----
-    gx_a, gy_a, vals_a = evaluate_on_grid(delta_voi, resolution=800)
+    # ---- Compute grids (single pass: delta_voi = complement - substitute) ----
+    gx, gy, cg, sg = _evaluate_forces_on_grid(resolution=800)
+    vals_a = cg - sg
     vals_a = np.where(np.abs(vals_a) < 1e-6, 1e-6, vals_a)
 
-    gx_f, gy_f, cg, sg = _evaluate_forces_on_grid(resolution=500)
-
-    # Color norms
-    interior_a = _simplex_interior_mask(gx_a, gy_a)
-    cap_a = min(np.percentile(np.abs(vals_a[interior_a]), 97), 1.5)
+    interior = _simplex_interior_mask(gx, gy)
+    cap_a = min(np.percentile(np.abs(vals_a[interior]), 97), 1.5)
     norm_a = TwoSlopeNorm(vmin=-cap_a, vcenter=0, vmax=cap_a)
 
-    interior_f = _simplex_interior_mask(gx_f, gy_f)
     force_cap = min(
-        np.percentile(np.concatenate([cg[interior_f], sg[interior_f]]), 98), 3.5
+        np.percentile(np.concatenate([cg[interior], sg[interior]]), 98), 3.5
     )
     norm_f = mcolors.Normalize(vmin=0, vmax=force_cap)
 
@@ -480,8 +430,8 @@ def render_interaction_decomposition(save_path: str) -> None:
     # ---- Panel (a): Delta-VoI ----
     clip_a = add_simplex_clip(ax_a)
     mesh_a = ax_a.pcolormesh(
-        gx_a,
-        gy_a,
+        gx,
+        gy,
         vals_a,
         cmap="RdBu_r",
         norm=norm_a,
@@ -498,9 +448,9 @@ def render_interaction_decomposition(save_path: str) -> None:
 
     # Marked belief points
     for belief, color, label, offset in [
-        (BELIEF_B1, "#b2182b", "$b_1$", (0, 8)),  # dark red — complement
-        (BELIEF_B2, "#e08214", "$b_2$", (0, 8)),  # amber — boundary complement
-        (BELIEF_B3, "#6baed6", "$b_3$", (0, 8)),  # light blue — substitute
+        (BELIEF_B1, "#b2182b", "$b_1$", (0, 8)),
+        (BELIEF_B2, "#e08214", "$b_2$", (0, 8)),
+        (BELIEF_B3, "#6baed6", "$b_3$", (0, 8)),
     ]:
         x, y = bary_to_xy(*belief)
         ax_a.plot(
@@ -540,47 +490,29 @@ def render_interaction_decomposition(save_path: str) -> None:
         fontstyle="italic",
     )
 
-    # ---- Panel (b): Complement force ----
-    clip_b = add_simplex_clip(ax_b)
-    mesh_b = ax_b.pcolormesh(
-        gx_f,
-        gy_f,
-        cg,
-        cmap="YlOrRd",
-        norm=norm_f,
-        shading="auto",
-        rasterized=True,
-    )
-    mesh_b.set_clip_path(clip_b)
-    draw_decision_boundaries(ax_b, linewidth=0.8, alpha=0.8, extend=0.15)
-    draw_simplex_frame(ax_b)
-    setup_simplex_axes(ax_b)
-
-    # ---- Panel (c): Substitute force ----
-    clip_c = add_simplex_clip(ax_c)
-    mesh_c = ax_c.pcolormesh(
-        gx_f,
-        gy_f,
-        sg,
-        cmap="YlOrRd",
-        norm=norm_f,
-        shading="auto",
-        rasterized=True,
-    )
-    mesh_c.set_clip_path(clip_c)
-    draw_decision_boundaries(ax_c, linewidth=0.8, alpha=0.8, extend=0.15)
-    draw_simplex_frame(ax_c)
-    setup_simplex_axes(ax_c)
-
-    # Boundary labels on force panels
-    for ax in [ax_b, ax_c]:
+    # ---- Panels (b) and (c): Complement and Substitute forces ----
+    for ax, grid in [(ax_b, cg), (ax_c, sg)]:
+        clip = add_simplex_clip(ax)
+        mesh = ax.pcolormesh(
+            gx,
+            gy,
+            grid,
+            cmap="YlOrRd",
+            norm=norm_f,
+            shading="auto",
+            rasterized=True,
+        )
+        mesh.set_clip_path(clip)
+        draw_decision_boundaries(ax, linewidth=0.8, alpha=0.8, extend=0.15)
+        draw_simplex_frame(ax)
+        setup_simplex_axes(ax)
         draw_boundary_labels(ax, fontsize=8)
 
     # ---- Colorbars (horizontal, below panels) ----
     cb_a = fig.colorbar(mesh_a, cax=cax_a, orientation="horizontal")
     cb_a.set_label("$\\Delta\\mathrm{VoI}(j \\mid i,\\, b)$", fontsize=10)
 
-    cb_bc = fig.colorbar(mesh_b, cax=cax_bc, orientation="horizontal")
+    cb_bc = fig.colorbar(mesh, cax=cax_bc, orientation="horizontal")
     cb_bc.set_label("Force magnitude", fontsize=10)
 
     # ---- Panel labels and titles ----
@@ -606,6 +538,7 @@ if __name__ == "__main__":
     verify_known_values()
 
     print("Generating figures...")
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
     render_interaction_decomposition(os.path.join(OUTPUT_DIR, "interaction_decomposition.pdf"))
     render_force_transition_ray(os.path.join(OUTPUT_DIR, "force_transition_ray.pdf"))
     print("Done.")

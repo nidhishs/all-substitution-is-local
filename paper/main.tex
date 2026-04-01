@@ -1,0 +1,71 @@
+\documentclass{article}
+
+\usepackage{neurips}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+% Math macros
+\DeclareMathOperator*{\argmax}{arg\,max}
+\newcommand{\VoI}{\operatorname{VoI}}
+\newcommand{\bpost}{\hat{b}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Dg}{D_g}
+\newcommand{\Dh}{D_h}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{theoremA}{Theorem}
+\renewcommand{\thetheoremA}{\Alph{theoremA}}
+
+\title{All Substitution Is Local}
+
+\author{
+    Nidhish Shah \thanks{Equal contribution.} \\
+    Independent Researcher \\
+    \texttt{shah@nidhish.dev} \\
+\And
+    Shaurjya Mandal \footnotemark[1] \\
+    Harvard University \\
+    \texttt{smandal2@mgh.harvard.edu} \\
+\And
+    Asfandyar Azhar \\
+    University of Oxford \\
+    \texttt{asfandyar.azhar@st-annes.ox.ac.uk} \\
+}
+
+\raggedbottom
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+When does consulting one information source raise the value of another, and when does it diminish it? We study this question for Bayesian decision-makers facing finite actions. The interaction decomposes into two opposing forces: a complement force, measuring how one source moves beliefs to where the other becomes more useful, and a substitute force, measuring how much the current decision is resolved. Their balance obeys a localization principle: substitution requires an observation to cross a decision boundary, though crossing alone does not guarantee it. Whenever posteriors remain inside the current decision region, the substitute force vanishes and sources are guaranteed to complement each other, even when one source cannot, on its own, change the decision. The results hold for arbitrarily correlated sources and are formalized in Lean 4.\footnote{Code and proofs: \url{https://github.com/nidhishs/all-substitution-is-local}.} Substitution is confined to the thin boundaries where decisions change. Everywhere else, information cooperates.
+\end{abstract}
+
+\input{chapters/introduction}
+\input{chapters/preliminaries}
+\input{chapters/methodology}
+\input{chapters/illustration}
+\input{chapters/related}
+\input{chapters/conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\clearpage
+\input{chapters/appendix}
+
+\end{document}

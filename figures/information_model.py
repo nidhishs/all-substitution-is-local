@@ -53,6 +53,11 @@ PROBLEM = InformationProblem(
     ),
 )
 
+# Named beliefs from the paper's worked examples.
+BELIEF_B1 = np.array([1 / 11, 2 / 11, 8 / 11])  # Theorem 2 (interior)
+BELIEF_B2 = np.array([1 / 4, 1 / 6, 7 / 12])     # Decomposition example
+BELIEF_B3 = np.array([5 / 12, 5 / 12, 1 / 6])     # Substitution example
+
 
 # ---------------------------------------------------------------------------
 # Core computations
@@ -87,7 +92,7 @@ def compute_posteriors(
 
 
 def expected_value_after(belief: np.ndarray, kernel: np.ndarray) -> float:
-    """E[V(posterior)] = sum_s P(signal) * V(posterior), expected terminal value after observing a channel."""
+    """Expected terminal value after observing a channel."""
     posteriors, weights = compute_posteriors(belief, kernel)
     return sum(w * terminal_value(p) for w, p in zip(weights, posteriors))
 
@@ -148,26 +153,23 @@ def bregman_forces(belief: np.ndarray) -> tuple[float, float]:
 def verify_known_values() -> None:
     """Assert exact values from the paper's worked examples."""
 
-    # b1 = (1/11, 2/11, 8/11): Theorem 2 -- channel i is decision-irrelevant
-    belief_thm2 = np.array([1 / 11, 2 / 11, 8 / 11])
-    assert abs(delta_voi(belief_thm2) - 3 / 176) < EPS
-    voi_i = value_of_information(belief_thm2, PROBLEM.channel_i_kernel)
+    # b1: Theorem 2 -- channel i is decision-irrelevant
+    assert abs(delta_voi(BELIEF_B1) - 3 / 176) < EPS
+    voi_i = value_of_information(BELIEF_B1, PROBLEM.channel_i_kernel)
     assert abs(voi_i) < EPS, "VoI(i) should be 0"
-    complement, substitute = bregman_forces(belief_thm2)
+    complement, substitute = bregman_forces(BELIEF_B1)
     assert abs(substitute) < EPS, "E[D_h] should be 0"
     assert complement > 0, "E[D_g] should be > 0"
 
-    # b2 = (1/4, 1/6, 7/12): Decomposition example
-    belief_star = np.array([1 / 4, 1 / 6, 7 / 12])
-    assert abs(delta_voi(belief_star) - 5 / 64) < EPS
+    # b2: Decomposition example
+    assert abs(delta_voi(BELIEF_B2) - 5 / 64) < EPS
     assert (
-        abs(value_of_information(belief_star, PROBLEM.channel_j_kernel) - 1 / 16)
+        abs(value_of_information(BELIEF_B2, PROBLEM.channel_j_kernel) - 1 / 16)
         < EPS
     )
 
-    # b3 = (5/12, 5/12, 1/6): Substitution example
-    belief_sub = np.array([5 / 12, 5 / 12, 1 / 6])
-    assert abs(delta_voi(belief_sub) - (-77 / 32)) < EPS
+    # b3: Substitution example
+    assert abs(delta_voi(BELIEF_B3) - (-77 / 32)) < EPS
 
     # Triple point: all actions tied at (1/3, 1/3, 1/3)
     vals = PROBLEM.reward_matrix @ np.array([1 / 3, 1 / 3, 1 / 3])
