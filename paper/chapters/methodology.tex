@@ -1,10 +1,14 @@
-\section{The Localization Principle}
-\label{sec:localization}
+\section{Main Results}
+\label{sec:main}
 
-\paragraph{Two Opposing Forces.}
+Two queries can duplicate information or compound it, depending on where their posteriors fall relative to the current decision boundary. Proposition~\ref{prop:decomposition} decomposes the interaction $\Delta\VoI(j \mid i, b)$ into two non-negative forces (complement and substitute). The substitute force vanishes when channel~$i$'s posteriors stay inside one decision region (Theorem~\ref{thm:interior}); substitution requires at least one posterior to cross a boundary (Theorem~\ref{thm:converse}).
+
+\paragraph{Decomposition.}
 
 \begin{proposition}[Bregman decomposition]
 \label{prop:decomposition}
+Let $g(b') = \E_{o_j \sim P(\cdot \mid b', j)}\bigl[V(\bpost(j, o_j))\bigr]$ and $h(b') = V(b')$.
+Then
 \[
   \Delta\VoI(j \mid i, b)
   \;=\;
@@ -12,11 +16,11 @@
   \;-\;
   \E\bigl[\Dh(\bpost, b)\bigr],
 \]
-where $\bpost = \bpost(i, o)$, the functions $g$ and $h$ are defined in \eqref{eq:g}--\eqref{eq:h}, and both expected Bregman divergences are non-negative.
+where $\bpost = \bpost(i, o)$. Both expected Bregman divergences are non-negative.
 \end{proposition}
 
 \begin{proof}
-Since $\VoI(j \mid b') = g(b') - h(b')$ by \eqref{eq:g}--\eqref{eq:h}, expanding Definition~\ref{def:delta} gives
+Since $\VoI(j \mid b') = \E_{o_j}[V(\bpost(j, o_j))] - V(b') = g(b') - h(b')$, expanding Definition~\ref{def:delta} gives
 \[
   \Delta\VoI(j \mid i, b)
   \;=\;
@@ -25,76 +29,97 @@ Since $\VoI(j \mid b') = g(b') - h(b')$ by \eqref{eq:g}--\eqref{eq:h}, expanding
   \bigl[\E[h(\bpost)] - h(b)\bigr].
 \]
 By the martingale identity~\eqref{eq:bregman-jensen}, each bracketed expression equals the corresponding expected Bregman divergence.
-Non-negativity of $\E[\Dg(\bpost, b)]$ follows from convexity of $g$, and non-negativity of $\E[\Dh(\bpost, b)]$ from convexity of $h$, each by Jensen's inequality.
+Non-negativity of $\E[\Dg(\bpost, b)]$ follows from convexity of $g$, and of $\E[\Dh(\bpost, b)]$ from convexity of $h$, each by Jensen's inequality.
 \end{proof}
 
-The decomposition reveals a tug-of-war: the term $\E[\Dh(\bpost, b)]$ is the \emph{substitute force}, measuring how much channel~$i$ resolves the current decision by generating posteriors that straddle a decision boundary, while $\E[\Dg(\bpost, b)]$ is the \emph{complement force}, measuring how much channel~$i$ enhances the future relevance of channel~$j$.
-Under conditional independence, $g(\bpost(i, o_i))$ equals the actual expected post-$j$ value $\E_{o_j \mid o_i}[V(\bpost(i,j,o_i,o_j))]$, so Definition~\ref{def:delta} captures the real interaction and the forces have direct economic content. Without conditional independence, the algebra and localization theorems still hold, but the individual forces may not reflect the true conditional distributions.
+The decomposition exposes two opposing forces: $\E[\Dh(\bpost, b)]$ is the \emph{substitute force}, measuring how much channel~$i$ resolves the current decision by pushing posteriors across a decision boundary, while $\E[\Dg(\bpost, b)]$ is the \emph{complement force}, measuring how much channel~$i$ sharpens the posterior toward regions where channel~$j$ is more discriminating.
+Under conditional independence, $g(\bpost(i, o_i))$ equals the actual expected post-$j$ value $\E_{o_j \mid o_i}[V(\bpost(i,j,o_i,o_j))]$; the algebra and the theorems below hold without that assumption.
 
-\begin{corollary}[Independence from channel ordering and costs]
-\label{cor:cost}
-The interaction $\Delta\VoI(j \mid i, b)$ is determined entirely by the two likelihood kernels and the reward structure; it does not depend on any separate per-use costs that might be attached to channels $i$ or $j$.
-\end{corollary}
+\paragraph{Scope.}
 
-\begin{proof}
-No cost terms appear in Definition~\ref{def:delta}.
-Equivalently, adding a constant to $g$ or $h$ does not change the Bregman divergence, since $D_{\phi+c}(p,q) = D_\phi(p,q)$ for any constant~$c$.
-\end{proof}
+$V$ is piecewise linear, a consequence of $|A| < \infty$ alone; any Bayesian classifier with a finite label set produces a PWLC value function, with no constraint on the model class or loss. The prior belief $b$ enters only as a point on the simplex; its source is unrestricted.
 
-\paragraph{When Posteriors Stay Inside The Decision Region.}
+\paragraph{Interior Complementarity.}
 
 \begin{theorem}[Interior complementarity]
 \label{thm:interior}
-Suppose all posteriors $\bpost(i, o)$ lie in the closed decision region~$\mathcal{R}_a$.
-Then $\Delta\VoI(j \mid i, b) \geq 0$.
-This holds for arbitrarily correlated channels $i$ and $j$.
+If every posterior $\bpost(i, o)$ lies in a common closed decision region~$\mathcal{R}_a$, then $\Delta\VoI(j \mid i, b) \geq 0$. This holds for arbitrarily correlated channels $i$ and $j$.
 \end{theorem}
 
 \begin{proof}
 Since $\mathcal{R}_a$ is convex and $b = \sum_o P(o \mid b)\, \bpost(i, o)$, the prior $b$ also lies in $\mathcal{R}_a$.
-Within $\mathcal{R}_a$, the value function satisfies $h(b') = r_a \cdot b'$ for all $b'$ in the region.
-Because $h$ is linear on $\mathcal{R}_a$, $\E[h(\bpost)] = h(\E[\bpost]) = h(b)$ by the martingale property, so the Jensen gap of $h$ vanishes.
+Within $\mathcal{R}_a$, $h(b') = r_a \cdot b'$ is linear, so $\E[h(\bpost)] = h(\E[\bpost]) = h(b)$ by the martingale property, and the Jensen gap of $h$ vanishes.
 Meanwhile $g$ is convex, so $\E[\Dg(\bpost, b)] \geq 0$ by Jensen's inequality.
-By Proposition~\ref{prop:decomposition},
-\[
-  \Delta\VoI(j \mid i, b) = \E[\Dg(\bpost, b)] - 0 \geq 0. \qedhere
-\]
+Proposition~\ref{prop:decomposition} then gives $\Delta\VoI \geq 0$.
 \end{proof}
 
 \begin{remark}
 \label{rem:irrelevant}
-The proof above shows that when all posteriors remain in $\mathcal{R}_a$, channel~$i$ is decision-irrelevant: $\VoI(i \mid b) = 0$.
-Despite being unable to improve the current decision on its own, channel~$i$ weakly amplifies the value of channel~$j$.
-The mechanism is informational, not decisional: channel~$i$ may sharpen the posterior toward regions where $j$'s signals are more discriminating, even when no action change results from~$i$ alone.
-(The hypothesis uses the closed region $\mathcal{R}_a$, so the Jensen-gap argument extends to boundary faces.)
+When all posteriors stay in $\mathcal{R}_a$, channel~$i$ is decision-irrelevant on its own yet weakly amplifies channel~$j$.
 \end{remark}
 
-\paragraph{When Posteriors Cross A Decision Boundary.}
+\paragraph{Rival-Action Witness.}
 
-\begin{theorem}[Converse: substitution requires boundary-crossing]
+Write $a^*(b) \in \argmax_{a \in A} r_a \cdot b$ for an optimal action at belief~$b$.
+The \emph{regret} of action~$a$ at belief~$b'$ is $\operatorname{regret}(a, b') = V(b') - r_a \cdot b' \geq 0$.
+For $a, a' \in A$, the \emph{facet} $F_{a,a'} = \{b' : r_a \cdot b' = r_{a'} \cdot b'\}$ is the hyperplane where actions $a$ and $a'$ tie; a posterior $\bpost(i, o)$ \emph{activates $F_{a^*(b), a'}$} when $r_{a'} \cdot \bpost(i, o) > r_{a^*(b)} \cdot \bpost(i, o)$, i.e.\ when $a'$ strictly beats $a^*(b)$ on that posterior.
+The next proposition specializes the general-convex VoI characterization of~\citet{DeLaraGossner2020} to the finite-action PWLC setting.
+
+\begin{proposition}[Facet-activation bridge]
+\label{prop:bridge}
+$\VoI(i \mid b) > 0$ if and only if there exist $o \in O_i$ and a rival action $a' \neq a^*(b)$ with
+\[
+  r_{a'} \cdot \bpost(i, o) \;>\; r_{a^*(b)} \cdot \bpost(i, o).
+\]
+\end{proposition}
+
+\begin{proof}
+Using $r_{a^*(b)} \cdot b = V(b)$ and $\E[\bpost] = b$, the martingale correction vanishes, so
+\[
+  \VoI(i \mid b) \;=\; \E_o\bigl[\operatorname{regret}(a^*(b), \bpost(i, o))\bigr].
+\]
+Each term is non-negative, so the expectation is positive iff some term is positive.
+That term is positive iff $a^*(b)$ is suboptimal at the corresponding posterior, iff some rival action $a'$ beats $a^*(b)$ there.
+\end{proof}
+
+\paragraph{The Boundary-Crossing Converse.}
+
+\begin{theorem}[Converse]
 \label{thm:converse}
-If $\Delta\VoI(j \mid i, b) < 0$, then at least one posterior $\bpost(i, o)$ lies in a different
-decision region from~$b$.
+If $\Delta\VoI(j \mid i, b) < 0$, then at least one posterior $\bpost(i, o)$ lies in a different decision region from~$b$; equivalently, some rival action $a' \neq a^*(b)$ satisfies $r_{a'} \cdot \bpost(i, o) > r_{a^*(b)} \cdot \bpost(i, o)$.
 This holds for arbitrarily correlated channels $i$ and $j$.
 \end{theorem}
 
 \begin{proof}
-Since $g$ is convex (it is the expected maximum of linear functions),
-Proposition~\ref{prop:decomposition} and $\Delta\VoI < 0$ imply
-\[
-  \E[\Dh(\bpost, b)] \;>\; \E[\Dg(\bpost, b)] \;\geq\; 0,
-\]
-so $\E[\Dh(\bpost, b)] > 0$.
-By the martingale property~\eqref{eq:bregman-jensen},
-$\E[\Dh(\bpost, b)] = \E[h(\bpost)] - h(b)$.
-The linear correction term $\langle \xi, \E[\bpost] - b \rangle$ vanishes for any choice of subgradient $\xi \in \partial h(b)$, because $\E[\bpost] = b$.
-So $\E[h(\bpost)] > h(b)$.
-Since $h$ is PWLC, this strict inequality requires $h$ to be nonlinear on the convex hull
-of the posterior support.
-But $h$ is linear within each decision region, so the posterior support must span at least
-two distinct decision regions.
+Proposition~\ref{prop:decomposition} with $\E[\Dg(\bpost, b)] \geq 0$ and $\Delta\VoI < 0$ forces $\E[\Dh(\bpost, b)] > 0$.
+Since $h = V$, the martingale identity~\eqref{eq:bregman-jensen} gives $\E[\Dh(\bpost, b)] = \VoI(i \mid b) > 0$.
+Proposition~\ref{prop:bridge} then yields the rival-action witness.
 \end{proof}
 
+\begin{corollary}[Facet-Activation Dichotomy]
+\label{cor:facet-dichotomy}
+If channel~$i$ activates no facet against $a^*(b)$ at any posterior, then $\Delta\VoI(j \mid i, b) \geq 0$.
+Conversely, $\Delta\VoI(j \mid i, b) < 0$ requires some posterior $\bpost(i, o)$ to activate a facet against $a^*(b)$.
+\end{corollary}
 
-These two conditions leave a gap: a channel can cross a decision boundary and still produce complementarity, so long as the complement force $\E[\Dg]$ dominates the substitute force $\E[\Dh]$.
-The worked example in the next section illustrates this.
+Boundary-crossing and facet activation are the same event. A channel can cross a decision boundary and still produce complementarity when the complement force $\E[\Dg]$ dominates the substitute force $\E[\Dh]$; facet activation is necessary but not sufficient for substitution.
+
+\begin{corollary}[Interior guarantee for batch selection]
+\label{cor:interior-guarantee}
+If every posterior $\bpost(i, o)$ for candidate channel $i$ lies in $\mathcal{R}_{a^*(b)}$, then adding $i$ to a batch cannot make the batch substitutive against any other channel $j$ already in the batch.
+\end{corollary}
+
+\begin{proof}
+No posterior activates a facet, so Theorem~\ref{thm:interior} applies to every paired channel $j$.
+\end{proof}
+
+\paragraph{Active-Learning Correspondence.}
+
+Committee-based acquisition (QBC,~\citet{SeungOS1992}) is a sampled estimator of the rival-action witness event in Proposition~\ref{prop:bridge}.
+Each committee member is a posterior sample of the task model; committee members voting for different actions on a candidate input form a sampled realization of the event ``$a^*(b)$ is beatable at $\bpost(i, \cdot)$.''
+The expected vote margin, integrated over candidates, is a Monte Carlo estimate of $\E_o[\operatorname{regret}(a^*(b), \bpost(i, o))]$, which Proposition~\ref{prop:bridge} identifies with $\VoI(i \mid b)$.
+
+BatchBALD~\citep{Kirsch2019} penalizes candidates whose posteriors activate the same facet against $a^*(b)$.
+Two candidates that both drive the posterior across a shared boundary carry overlapping rival-action witnesses, and the joint mutual-information discount approximates this overlap in posterior-predictive space without enumerating the facet structure.
+Corollary~\ref{cor:interior-guarantee} then gives a sufficient condition under which a candidate is safe to append without triggering batch-level substitution.
+The correspondence rests only on $|A| < \infty$; the posterior-producing model is unrestricted.

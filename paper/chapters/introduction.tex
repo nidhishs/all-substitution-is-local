@@ -1,25 +1,30 @@
 \section{Introduction}
 \label{sec:intro}
 
-When an agent can consult multiple information sources before making a decision, a natural question is: does consulting one source make another more or less valuable?
-Sources that make each other more valuable are \emph{complements}; sources that diminish each other's value are \emph{substitutes}.
+In batch active learning the learner commits to a pool of queries before observing any labels.
+Two queries are \emph{redundant} when one answers the question the other would have answered; labeling both adds nothing.
+Query-by-Committee \citep{SeungOS1992} avoids this by diversifying committee disagreement; BALD \citep{Houlsby2011} by mutual information; BatchBALD \citep{Kirsch2019} and BADGE \citep{Ash2020} by gradient diversity.
+Each targets a different proxy for the same question: when are two queries substitutes?
+None gives a formal answer.
 
-\citet{ChenWaggoner2017} formalized this distinction via the pointwise interaction $\Delta\VoI(j \mid i, b)$: the change in channel~$j$'s value of information at belief~$b$ after observing channel~$i$.
-Their work established global conditions (across all beliefs) for substitution and complementarity. Our contribution is to localize these conditions: we characterize \emph{which beliefs} give rise to complementarity and which to substitution, for a fixed pair of channels and a fixed decision problem.
-Concretely, we establish three results:
+We characterize the answer geometrically: two queries substitute or complement depending on where the posteriors fall relative to the current decision boundary. Writing the pointwise interaction as $\Delta\VoI(j \mid i, b)$ (the change in channel~$j$'s value of information after observing channel~$i$ at belief~$b$) following \citet{ChenWaggoner2017}, we prove three results:
 \begin{enumerate}
-  \item \textbf{Bregman decomposition} (Proposition~\ref{prop:decomposition}): $\Delta\VoI(j \mid i, b)$ decomposes into a non-negative complement force $\E[D_g(\bpost, b)]$ minus a non-negative substitute force $\E[D_h(\bpost, b)]$, where $D_g$ and $D_h$ are Bregman divergences of auxiliary convex functions.
-  \item \textbf{Interior complementarity} (Theorem~\ref{thm:interior}): If all of channel~$i$'s posteriors lie within the current decision region, then $\Delta\VoI(j \mid i, b) \geq 0$.
-  \item \textbf{Converse} (Theorem~\ref{thm:converse}): If $\Delta\VoI(j \mid i, b) < 0$, at least one posterior of channel~$i$ lies in a different decision region from~$b$.
+  \item \textbf{Bregman decomposition} (Proposition~\ref{prop:decomposition}): $\Delta\VoI(j \mid i, b) = \E[D_g(\bpost, b)] - \E[D_h(\bpost, b)]$, where $D_g$ and $D_h$ are Bregman divergences of auxiliary convex functions. The complement force $\E[D_g]$ measures how much channel~$i$ sharpens channel~$j$'s value of information; the substitute force $\E[D_h]$ measures how much it resolves the current decision.
+  \item \textbf{Interior complementarity} (Theorem~\ref{thm:interior}): When all posteriors of channel~$i$ stay within the current decision region, the substitute force is zero and $\Delta\VoI(j \mid i, b) \geq 0$: the query complements everything else in the batch.
+  \item \textbf{Converse} (Theorem~\ref{thm:converse}): $\Delta\VoI(j \mid i, b) < 0$ only if at least one posterior of channel~$i$ crosses into a different decision region.
 \end{enumerate}
+The three results connect to active learning through a pointwise equivalence: $\VoI(i \mid b) > 0$ iff some posterior of channel~$i$ prefers a rival action over the prior-optimal one, a PWLC-computable specialization of \citet{DeLaraGossner2020}'s general-convex characterization.
+These yield an exact criterion for batch redundancy: two queries substitute iff at least one admits a posterior that changes the predicted label, and complement otherwise. Crossing a boundary is necessary for substitution but not sufficient, since channels can cross and still complement each other.
 
-Boundary crossing is necessary for substitution but not sufficient: channels can cross decision boundaries and still complement each other. Section~\ref{sec:setup} formalizes the setting; Section~\ref{sec:localization} presents the main results; Section~\ref{sec:example} illustrates them on a concrete example.
+The PWLC structure of the value function comes from having finitely many actions, not from any assumption on the model class, so the results apply to any Bayesian classifier.
+QBC disagreement, BatchBALD diversity, and BADGE gradient diversity all approximate this criterion on finite posterior draws; we state it exactly and prove it.
+
+Section~\ref{sec:setup} formalizes the setting; Section~\ref{sec:main} proves the results; Section~\ref{sec:example} works through a concrete example.
+The core theorems are formalized in Lean~4.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/interaction_decomposition.pdf}
-\caption{Belief-simplex geometry of the interaction.
-\textit{Left}: the sign of $\Delta\VoI$ partitions the simplex into complement and substitute regions.
-\textit{Middle, Right}: the two constituent forces; the complement force is diffuse across the interior while the substitute force concentrates sharply along decision boundaries. Their difference determines the sign of $\Delta\VoI$.}
+\caption{Belief-simplex geometry of the interaction. \textit{Left}: the sign of $\Delta\VoI$ partitions the simplex into complement and substitute regions. \textit{Middle, Right}: the two constituent forces; the complement force is diffuse across the interior while the substitute force concentrates sharply along decision boundaries. Their difference determines the sign of $\Delta\VoI$.}
 \label{fig:hero}
 \end{figure}

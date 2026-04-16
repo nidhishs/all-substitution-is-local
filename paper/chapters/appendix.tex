@@ -1,37 +1,5 @@
 \appendix
 
-\section{Piecewise-Linear Structure}
-\label{app:polyhedral}
-
-\begin{theoremA}[Piecewise-linearity of the interaction]
-\label{prop:polyhedral}
-For finite $|A|$, $|O_i|$, $|O_j|$, and $K$, the function $b \mapsto \Delta\VoI(j \mid i, b)$ is piecewise-linear on $\Delta^{K-1}$.
-\end{theoremA}
-
-\begin{proof}
-For any channel~$k$ with outcome set~$O_k$, the unnormalized posterior-value product satisfies
-\[
-  P(o \mid b)\, V(\bpost(k, o))
-  \;=\; \max_{a \in A}\; \sum_s R(a,s)\, P(o \mid s, k)\, b(s),
-\]
-where the normalizing denominator $P(o \mid b)$ cancels against the posterior formula.
-The right-hand side is the maximum of $|A|$ functions, each linear in~$b$.
-Summing over outcomes,
-\[
-  \E_o\bigl[V(\bpost(k, o))\bigr]
-  \;=\;
-  \sum_{o \in O_k} \max_{a \in A}\; \sum_s R(a,s)\, P(o \mid s, k)\, b(s),
-\]
-a sum of piecewise-linear convex (PWLC) functions of~$b$.
-By the same cancellation applied to the joint channel $(i,j)$ under conditional independence, and to channels $i$ and $j$ individually, the interaction decomposes as
-\[
-  \Delta\VoI(j \mid i, b)
-  \;=\; F_{ij}(b) - F_i(b) - F_j(b) + V(b),
-\]
-where each term is a sum of maxima of finitely many linear functions of~$b$.
-Each term is therefore PWLC, and their sum is piecewise-linear.
-\end{proof}
-
 \section{Regret Interpretation}
 \label{app:regret}
 
@@ -67,14 +35,14 @@ $\bpost(i,o)$ & \texttt{posterior b k o hmarg} \\
 $\E[D_f(\bpost, b)]$ & \texttt{jensenGap f b k hmarg} \\
 \midrule
 Prop.~\ref{prop:decomposition} & \texttt{bregman\_decomposition} \\
-Cor.~\ref{cor:cost} & \texttt{jensenGap\_add\_const} \\
+Prop.~\ref{prop:bridge} & \texttt{facet\_activation\_bridge} \\
 Martingale property & \texttt{jensenGap\_linear} \\
-Thm.~\ref{thm:interior} & \texttt{interior\_complementarity} \\
-Thm.~\ref{thm:converse} & \texttt{substitution\_requires\_boundary\_crossing} \\
+Thm.~\ref{thm:interior} & \texttt{interior\_complementarity\_geometric} \\
+Thm.~\ref{thm:converse} & \texttt{substitution\_requires\_boundary\_crossing\_geometric} \\
 Jensen's inequality & \texttt{jensenGap\_nonneg\_of\_convexOn} \\
 Regret $\geq 0$ & \texttt{regret\_nonneg} \\
-Thm.~\ref{prop:polyhedral} cancellation & \texttt{unnorm\_posterior\_value} \\
-Thm.~\ref{prop:polyhedral} PWLC expansion & \texttt{expected\_value\_as\_sup\_linear} \\
+Cancellation identity (\S\ref{sec:main}) & \texttt{unnorm\_posterior\_value} \\
+Sum-of-max-of-linears (\S\ref{sec:main}) & \texttt{expected\_value\_as\_sup\_linear} \\
 \bottomrule
 \end{tabular}
 \end{center}

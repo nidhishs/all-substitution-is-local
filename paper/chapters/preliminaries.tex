@@ -1,28 +1,28 @@
 \section{Preliminaries}
 \label{sec:setup}
 
-We consider a finite-action Bayesian decision problem and define the second-order interaction between information channels that is the object of study.
+Active learning with a finite label set is a finite-action Bayesian decision problem. We study the second-order interaction between information channels.
 
-\paragraph{Decision problem.}
+\paragraph{Decision Problem.}
 There are $K$ states $S = \{s_1, \ldots, s_K\}$, a finite action set $A$, and a reward function $R : A \times S \to \R$.
 A \emph{belief} $b \in \Delta^{K-1}$ is a probability distribution over states.
 The optimal expected reward at belief $b$ is
 \[
   V(b) = \max_{a \in A} \sum_s R(a, s)\, b(s),
 \]
-the upper envelope of $|A|$ linear functions.
-$V$ is piecewise-linear and convex (PWLC).
+the upper envelope of $|A|$ linear functions, so $V$ is piecewise-linear and convex (PWLC).
 Each \emph{decision region} $\mathcal{R}_a = \{b : a \in \argmax_{a'} \sum_s R(a', s)\, b(s)\}$ is a convex polytope; their interiors partition $\Delta^{K-1}$.
 Within region $\mathcal{R}_a$, the value function is linear: $V(b) = r_a \cdot b$ where $r_a = (R(a, s_1), \ldots, R(a, s_K))$.
 
 \paragraph{Channels.}
 A \emph{channel} $i$ has outcome set $O_i$ and likelihood kernel $P(\cdot \mid s, i)$.
+In active learning, channel $i$ is a candidate query and $O_i$ is its label space.
 The \emph{value of information} (VoI) of channel $i$ at belief $b$ is
 \[
   \VoI(i \mid b) = \E_{o \sim P(\cdot \mid b, i)}\bigl[V(\bpost(i, o))\bigr] - V(b),
 \]
 where $\bpost(i, o) \propto P(o \mid s, i)\, b(s)$ is the posterior after outcome $o$.
-Channels $i$ and $j$ are \emph{conditionally independent} given the state. This ensures that Definition~\ref{def:delta} captures the actual interaction; the mathematical results hold without this assumption.
+Channels $i$ and $j$ are \emph{conditionally independent} given the state, so $\bpost(i, o_i)$ is the correct prior for channel $j$; the mathematical results hold without this assumption.
 
 \begin{definition}[Second-order interaction]\label{def:delta}
 The \emph{interaction} between channels $i$ and $j$ at belief $b$ is
@@ -33,25 +33,15 @@ The \emph{interaction} between channels $i$ and $j$ at belief $b$ is
   \;-\;
   \VoI(j \mid b).
 \]
-When $\Delta\VoI > 0$, observing channel~$i$ \emph{increases} the value of subsequently observing channel~$j$ (complements); when $\Delta\VoI < 0$, it decreases it (substitutes).
+When $\Delta\VoI > 0$, observing channel~$i$ \emph{increases} the value of subsequently observing channel~$j$ (complements); when $\Delta\VoI < 0$, observing~$i$ decreases the value of observing~$j$ (substitutes).
 \end{definition}
 
-\paragraph{Auxiliary functions.}
-Define:
-\begin{align}
-  g(b) &= \E_{o_j}\bigl[V(\bpost(j, o_j))\bigr], \label{eq:g} \\
-  h(b) &= V(b). \label{eq:h}
-\end{align}
-Both $g$ and $h$ are convex: $g$ is an expectation of the convex function $V$, and $h = V$ is a maximum of linear functions (PWLC).
-Note that $\VoI(j \mid b) = g(b) - h(b)$ by definition.
-These two functions are the building blocks of the Bregman decomposition in Proposition~\ref{prop:decomposition}.
-
-\paragraph{Bregman divergence.}
+\paragraph{Bregman Divergence.}
 The Bregman divergence of a convex function $\phi$ is
 $D_\phi(p, q) = \phi(p) - \phi(q) - \langle \xi, p - q\rangle$,
 where $\xi \in \partial\phi(q)$ is any subgradient.
 
-\paragraph{Martingale identity.}
+\paragraph{Martingale Identity.}
 For any convex $\phi$,
 \begin{equation}
   \label{eq:bregman-jensen}
@@ -59,5 +49,4 @@ For any convex $\phi$,
   \;=\;
   \E\bigl[D_\phi(\bpost, b)\bigr],
 \end{equation}
-since $\E[\bpost] = b$ (Bayesian martingale) causes the linear correction term $\langle \nabla\phi(b),\, \E[\bpost] - b \rangle$ to vanish.
-At points where $\phi$ is non-differentiable (e.g., kinks of $h = V$ at decision boundaries), the identity holds for any choice of subgradient $\xi \in \partial\phi(b)$, since the correction $\langle \xi, \E[\bpost] - b \rangle = 0$ regardless.
+since $\E[\bpost] = b$ (Bayesian martingale). At points where $\phi$ is non-differentiable (e.g., kinks of $V$ at decision boundaries), the identity holds for any subgradient $\xi \in \partial\phi(b)$, since $\langle \xi, \E[\bpost] - b \rangle = 0$.
