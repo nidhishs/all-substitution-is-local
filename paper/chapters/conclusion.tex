@@ -2,26 +2,11 @@
 \label{sec:conclusion}
 
 We introduced boundary regret as the deployment estimand for human--AI complementarity, shifting the audit from ``does the human have residual predictive information?'' to ``does that information change the reward-relevant action?''
-The formal characterization---VoI equals expected boundary regret, with a Lean-verified geometric bridge---provides a principled basis for this shift.
-Empirically, on CheXpert across five readers and four conditions (20 pairs), residual expertise and decision value diverge in a reward-dependent manner precisely as the theory predicts: a mean of 95.9\% of top-expertise-decile cases have zero decision value under a false-positive-penalty reward.
-In review allocation on both synthetic and real CheXpert data, boundary regret outperforms standard baselines under asymmetric rewards while matching them under symmetric accuracy.
+The formal characterization---VoI equals expected boundary regret, with a Lean-verified geometric bridge---grounds this shift by making decision value local to the reward boundary induced by the deployed action set.
+On CheXpert across 25 reader--task pairs, residual expertise and decision value diverge in a reward-dependent manner precisely as the theory predicts: $96.0\%$ of top-expertise-decile cases carry zero decision value under a false-positive-penalty reward, and an ex ante boundary-regret score allocates review more efficiently than reward-aware and reward-agnostic baselines where boundary-regret mass is reachable, converging to reward-aware margin where it is not.
 
-\paragraph{Limitations.}
-Several limitations frame the contribution.
-\emph{Retrospective allocation:} Experiment~3 validates the allocation principle on both synthetic and real CheXpert data, but both evaluations are retrospective.
-Prospective evaluation with operational review protocols is required before deployment conclusions can be drawn; the L2D baseline is also trained on accuracy rather than reward-specific utility, which disadvantages it under asymmetric rewards.
-\emph{Dataset scope:} Experiment~2 covers five readers and four conditions (20 pairs) on a single dataset (CheXpert).
-Generalization to additional datasets, domains, and human-signal types beyond radiology is needed for a broad empirical claim.
-\emph{Potential vs.\ realized value:} boundary regret measures the decision value available in the joint distribution $(x, h, y)$, not whether a deployed human--AI workflow can extract it.
-Behavioral frictions---anchoring, overreliance, noncompliance---can prevent realization \citep{Vaccaro2024,BucinaEtAl2021}, and bridging from potential to realized value requires prospective studies beyond this paper.
-\emph{Estimation quality:} the ex ante estimator $\widehat\BR_{\mathrm{pre}}$ depends on a model of $P(h \mid x)$ whose quality directly affects allocation performance; poor conditional models will degrade the score, and the sample complexity of this estimator is not formally characterized.
+\paragraph{Limitations and future work.}
+Both Section~\ref{sec:exp3} evaluations are retrospective; prospective evaluation with operational review protocols is required before deployment claims, and the L2D baseline is trained on accuracy not reward-specific utility, disadvantaging it under asymmetric rewards. Section~\ref{sec:exp2} covers a single dataset (CheXpert) and modality; generalization to other domains and human-signal types remains open. Boundary regret measures decision value available in $(x, h, y)$, not whether a deployed workflow can extract it---behavioral frictions \citep{Vaccaro2024,BucinaEtAl2021} require prospective studies. Two natural extensions are integration with learning-to-defer, using boundary regret as an interpretable diagnostic for what learned deferral policies exploit, and prospective studies that test whether interfaces can elicit and use the decision-relevant human signal.
 
-\paragraph{Future work.}
-Three directions follow naturally.
-(1)~Prospective allocation experiments on clinical data, measuring whether boundary-regret-guided review improves realized decision utility under operational conditions and realistic human response models.
-(2)~Integration with learning-to-defer methods: boundary regret can serve as an interpretable diagnostic for understanding what learned deferral policies exploit---reward-local boundary crossings or other dataset correlations.
-When L2D outperforms boundary regret, the diagnostic can reveal whether the learned policy is capturing true decision-boundary information or overfitting to non-geometric signals.
-(3)~Extension to the multi-channel interaction identity (ASIL, Appendix~\ref{app:asil}), which decomposes the complement/substitute relationship between model and human signals into facet-specific contributions, enabling a richer theory of when acquiring a second expert opinion adds value beyond the first.
-
-\paragraph{Code and data availability.}
-The Lean~4 formalization and experiment code will be released upon publication. CheXpert data are publicly available \citep{Irvin2019}.
+\paragraph{Code and data.}
+Lean~4 formalization and experiment code will be released upon publication. CheXpert data are publicly available \citep{Irvin2019}.

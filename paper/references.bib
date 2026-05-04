@@ -1,37 +1,24 @@
 % ============================================================
-% references.bib — All Substitution Is Local
+% references.bib — Residual Expertise Is Not Decision Value
 % Last updated: 2026-04-25
 %
 % Organization:
 %   1. Information economics & VoI theory (original entries)
 %   2. Active learning & information acquisition (original entries)
-%   3. Partial information decomposition (original entries)
-%   4. Human expertise auditing (original entries + new)
-%   5. Learning-to-defer & selective prediction (new)
-%   6. Reject option & selective classification (new)
-%   7. Behavioral human-AI collaboration (new)
-%   8. Decision-focused ML & predict-then-optimize (new)
-%   9. Model calibration & semiparametric estimation (new)
-%  10. Medical AI datasets (new)
-%  11. VoI & Bayesian decision theory foundations (new)
+%   3. Human expertise auditing
+%   4. Learning-to-defer & selective prediction
+%   5. Reject option & selective classification
+%   6. Behavioral human-AI collaboration
+%   7. Decision-focused ML & predict-then-optimize
+%   8. Model calibration & semiparametric estimation
+%   9. Medical AI datasets
+%  10. VoI & Bayesian decision theory foundations
 % ============================================================
 
 
 % -------------------------------------------------------
 % 1. INFORMATION ECONOMICS & VALUE OF INFORMATION THEORY
 % -------------------------------------------------------
-
-% Cite in §ASIL: pairwise interaction identity, complement/substitute signs
-@article{Borgers2013,
-  author  = {B{\"o}rgers, Tilman and Hernando-Veciana, Angel and Kr{\"a}hmer, Daniel},
-  title   = {When are signals complements or substitutes?},
-  journal = {Journal of Economic Theory},
-  year    = {2013},
-  volume  = {148},
-  number  = {1},
-  pages   = {165--195},
-  doi     = {10.1016/j.jet.2012.12.012}
-}
 
 % Cite in §VoI theory: nonconcavity of VoI; motivates why decision-relevance matters
 @article{ChadeSchlee2002,
@@ -43,17 +30,6 @@
   number  = {2},
   pages   = {421--452},
   doi     = {10.1006/jeth.2001.2960}
-}
-
-% Cite in §ASIL: "Informational Substitutes" — closest economics precursor to ASIL identity
-@inproceedings{ChenWaggoner2017,
-  author    = {Chen, Yiling and Waggoner, Bo},
-  title     = {Informational Substitutes},
-  booktitle = {Proceedings of the 57th Annual {IEEE} Symposium on Foundations of Computer Science ({FOCS})},
-  year      = {2016},
-  pages     = {239--247},
-  publisher = {{IEEE}},
-  note      = {Full version: arXiv:1703.08636}
 }
 
 % Cite in §VoI theory: payoffs-beliefs duality connecting VoI to reward geometry
@@ -116,18 +92,6 @@
   pages   = {200--207},
   doi     = {10.1016/j.geb.2025.09.003},
   note    = {Preprint circulated 2024 as arXiv:2404.01190}
-}
-
-% Cite in §ASIL: comparing information structures under finite actions
-@article{BrooksFrankelKamenica2024,
-  author  = {Brooks, Benjamin and Frankel, Alexander and Kamenica, Emir},
-  title   = {Comparisons of Signals},
-  journal = {American Economic Review},
-  year    = {2024},
-  volume  = {114},
-  number  = {9},
-  pages   = {2981--3006},
-  doi     = {10.1257/aer.20230430}
 }
 
 % Cite in §geometry / proper scoring rules: Bregman divergences and equivalence of informations
@@ -309,6 +273,21 @@
   year      = {2020}
 }
 
+% Cite in §related work active learning: EPIG — prediction-oriented AL that measures info gain in
+% prediction space rather than parameter space; the active-learning analog of the paper's argument
+% that entropy/BALD are wrong objectives; contrast BR allocation against this approach
+@inproceedings{BickfordSmith2023,
+  author    = {{Bickford Smith}, Freddie and Kirsch, Andreas and Farquhar, Sebastian
+               and Gal, Yarin and Foster, Adam and Rainforth, Tom},
+  title     = {Prediction-Oriented {B}ayesian Active Learning},
+  booktitle = {Proceedings of the 26th International Conference on Artificial Intelligence
+               and Statistics (AISTATS)},
+  year      = {2023},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {206},
+  note      = {arXiv:2304.08151}
+}
+
 % Cite in §related work active learning: loss-driven Bayesian AL — most directly related to decision-value framing in active learning
 @article{Huang2026,
   author  = {Huang, Zhuoyue and {Bickford Smith}, Freddie and Rainforth, Tom},
@@ -349,42 +328,6 @@
 }
 
 
-% -------------------------------------------------------
-% 3. PARTIAL INFORMATION DECOMPOSITION
-% -------------------------------------------------------
-
-% Cite in §ASIL theory appendix: synergy/redundancy decomposition of mutual information
-@article{Chicharro2017,
-  author  = {Chicharro, Daniel and Panzeri, Stefano},
-  title   = {Synergy and Redundancy in Dual Decompositions of Mutual Information Gain and Information Loss},
-  journal = {Entropy},
-  year    = {2017},
-  volume  = {19},
-  number  = {2},
-  pages   = {71},
-  doi     = {10.3390/e19020071}
-}
-
-% Cite in §ASIL theory appendix: partial information decomposition framework
-@article{Kolchinsky2022,
-  author  = {Kolchinsky, Artemy},
-  title   = {A Novel Approach to the Partial Information Decomposition},
-  journal = {Entropy},
-  year    = {2022},
-  volume  = {24},
-  number  = {3},
-  pages   = {403},
-  doi     = {10.3390/e24030403}
-}
-
-% Cite in §ASIL theory appendix: original PID / nonnegative decomposition paper
-@article{WilliamsBeer2010,
-  author  = {Williams, Paul L. and Beer, Randall D.},
-  title   = {Nonnegative Decomposition of Multivariate Information},
-  journal = {arXiv preprint arXiv:1004.2515},
-  year    = {2010}
-}
-
 % Cite in §game theory / beliefs: repeated games with incomplete information
 @book{AumannMaschler1995,
   author    = {Aumann, Robert J. and Maschler, Michael B.},
@@ -398,6 +341,20 @@
 % -------------------------------------------------------
 % 4. HUMAN EXPERTISE AUDITING
 % -------------------------------------------------------
+
+% Cite in §expertise auditing: foundational selective-labels paper in a deployment/decision context;
+% shows human decisions on bail reveal gaps between algorithmic predictions and deployment outcomes
+@article{KleinbergEtAl2018,
+  author  = {Kleinberg, Jon and Lakkaraju, Himabindu and Leskovec, Jure
+             and Ludwig, Jens and Mullainathan, Sendhil},
+  title   = {Human Decisions and Machine Predictions},
+  journal = {Quarterly Journal of Economics},
+  year    = {2018},
+  volume  = {133},
+  number  = {1},
+  pages   = {237--293},
+  doi     = {10.1093/qje/qjx032}
+}
 
 % Cite everywhere — primary empirical precursor; setup for Experiment 2 follows their chest X-ray protocol
 % NOTE: Published at NeurIPS 2023 (Advances in NeurIPS 36, pp.69-82). Authors corrected from earlier arXiv metadata.
@@ -455,6 +412,17 @@
 % 5. LEARNING-TO-DEFER & SELECTIVE PREDICTION
 % -------------------------------------------------------
 
+% Cite in §related work L2D: foundational L2D paper — first formalizes deferral to human expert
+% as joint optimization; direct precursor to Mozannar & Sontag
+@inproceedings{MadraseEtAl2018,
+  author    = {Madras, David and Pitassi, Toniann and Zemel, Richard},
+  title     = {Predict Responsibly: Improving Fairness and Accuracy by Learning to Defer},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2018},
+  volume    = {31},
+  note      = {arXiv:1711.06664}
+}
+
 % Cite in §related work L2D: foundational consistent L2D paper; primary gap-table entry
 @inproceedings{MozannarSontag2020,
   author    = {Mozannar, Hussein and Sontag, David},
@@ -511,6 +479,18 @@
   title   = {One-Stage Top-$k$ Learning-to-Defer: Score-Based Surrogates with Theoretical Guarantees},
   journal = {arXiv preprint arXiv:2505.10160},
   year    = {2025}
+}
+
+% Cite in §related work L2D: cost-sensitive L2D under asymmetric type-I/II costs with workload constraints;
+% shows standard L2D fails under reward asymmetry — closest deployment competitor to BR allocation
+@article{AlvesEtAl2024,
+  author  = {Alves, Jean V. and Leit{\~a}o, Diogo and Jesus, S{\'e}rgio and Sampaio, Pedro
+             and Li{\'e}bana, Felipe and Saleiro, Pedro and Figueiredo, M{\'a}rio A. T.
+             and Bizarro, Pedro},
+  title   = {Cost-Sensitive Learning to Defer to Multiple Experts with Workload Constraints},
+  journal = {Transactions on Machine Learning Research},
+  year    = {2024},
+  note    = {arXiv:2403.06906}
 }
 
 % Cite in §Experiment 3 baselines: L2D competitor; use to analyze whether BR explains learned deferral gains
@@ -708,7 +688,6 @@
   booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
   year      = {2019},
   volume    = {33},
-  number    = {1},
   pages     = {1658--1665},
   doi       = {10.1609/aaai.v33i01.33011658},
   note      = {arXiv:1809.05504}
@@ -739,6 +718,19 @@
   year      = {2005},
   pages     = {625--632},
   doi       = {10.1145/1102351.1102430}
+}
+
+% Cite in §decision-focused framing: decision calibration — formally requires predictions to be
+% indistinguishable to downstream decision-makers; direct formal neighbor to boundary regret's argument
+% that calibration wrt prediction loss is insufficient for decision value
+@inproceedings{Zhao2021,
+  author    = {Zhao, Shengjia and Kim, Michael P. and Sahoo, Roshni
+               and Ma, Tengyu and Ermon, Stefano},
+  title     = {Calibrating Predictions to Decisions: A Novel Approach to Multi-Class Calibration},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2021},
+  volume    = {34},
+  note      = {arXiv:2107.05719}
 }
 
 % Cite in §estimation / proper scoring rules: strictly proper scoring rules connect to VoI via Bregman structure
@@ -806,6 +798,21 @@
   year    = {2019}
 }
 
+% Cite in §Experiment 2 / intro motivation: large-scale RCT (140 radiologists, 15 tasks) showing AI
+% assistance effects are highly heterogeneous and NOT predicted by conventional predictive accuracy
+% metrics — empirical confirmation that predictive factors ≠ decision benefit in radiology
+@article{YuEtAl2024,
+  author  = {Yu, Andrew and Moehring, Alex and Banerjee, Oishi and Salz, Tatiana
+             and Agarwal, Nikhil and Rajpurkar, Pranav},
+  title   = {Heterogeneity and Predictors of the Effects of {AI} Assistance on Radiologists},
+  journal = {Nature Medicine},
+  year    = {2024},
+  volume  = {30},
+  number  = {3},
+  pages   = {837--849},
+  doi     = {10.1038/s41591-024-02850-w}
+}
+
 % Cite in §datasets (Experiment 2): MIMIC-CXR — 377K images with free-text radiology reports;
 % use if needing a second dataset with clinical practice signal
 @article{Johnson2019,
@@ -870,4 +877,19 @@
   publisher = {Division of Research, Harvard Business School},
   address   = {Boston, MA},
   year      = {1961}
+}
+
+@inproceedings{Huang2017,
+  author    = {Huang, Gao and Liu, Zhuang and van der Maaten, Laurens and Weinberger, Kilian Q.},
+  title     = {Densely Connected Convolutional Networks},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  pages     = {4700--4708},
+  year      = {2017}
+}
+
+@inproceedings{Cohen2022,
+  author    = {Cohen, Joseph Paul and Viviano, Joseph D. and Bertin, Paul and Morrison, Paul and Brooks, Rupert and Bertrand, Hadrien and Hashir, Mohammad and Bhatt, Deepak},
+  title     = {{TorchXRayVision}: A Library of Chest {X}-ray Datasets and Models},
+  booktitle = {Proceedings of the International Conference on Medical Imaging with Deep Learning},
+  year      = {2022}
 }

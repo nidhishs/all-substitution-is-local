@@ -5,9 +5,9 @@
 \label{app:lean}
 % ============================================================
 
-All formal results are verified in Lean~4 using the Mathlib library.
-The \textsc{AllSubstitutionIsLocal} development consists of nine modules organized in three layers.
-Table~\ref{tab:lean-map} maps the paper's statements to Lean declarations.
+All formal results used in the paper are verified in Lean~4 using Mathlib.
+The development contains five modules: \texttt{Basics.lean}, \texttt{Regret.lean}, \texttt{JensenGap.lean}, \texttt{FacetActivation.lean}, and the umbrella import \texttt{AllSubstitutionIsLocal.lean}.
+Table~\ref{tab:lean-map} maps the paper's claims to Lean declarations.
 
 \begin{table}[ht]
 \centering
@@ -20,135 +20,168 @@ Paper & Type & Lean declaration & Module \\
 \midrule
 $V(b) = \max_a r_a \cdot b$ & Def & \texttt{terminalValue} & Regret \\
 $\operatorname{regret}(a,b) \geq 0$ & Lem & \texttt{regret\_nonneg} & Regret \\
-$\operatorname{regret} = 0 \Leftrightarrow a$ opt & Lem & \texttt{regret\_eq\_zero\_iff} & Regret \\
-$\E[b_{\text{post}}] = b$ (martingale) & Lem & \texttt{prior\_eq\_weighted\_posterior} & Basics \\
-Thm~\ref{thm:voi-br} (VoI $=$ E[BR]) & Thm & \texttt{jensenGap\_eq\_weighted\_regret} & FacetActivation \\
-Thm~\ref{thm:facet-bridge} ($\Leftrightarrow$) & Thm & \texttt{facet\_activation\_bridge} & FacetActivation \\
-Thm~\ref{thm:facet-bridge} ($\Rightarrow$) & Thm & \texttt{boundary\_crossing\_of\_strict\_} & FacetActivation \\
-& & \quad\texttt{jensenGap\_terminalValue} & \\
-Thm~\ref{thm:facet-bridge} ($\Leftarrow$) & Thm & \texttt{jensenGap\_terminalValue\_zero\_of\_} & FacetActivation \\
-& & \quad\texttt{posteriors\_optimal} & \\
+$\operatorname{regret}=0 \Leftrightarrow a$ optimal & Lem & \texttt{regret\_eq\_zero\_iff} & Regret \\
+$\E[b_{\mathrm{post}}]=b$ & Lem & \texttt{prior\_eq\_weighted\_posterior} & Basics \\
 Jensen gap $\geq 0$ & Thm & \texttt{jensenGap\_nonneg} & JensenGap \\
-Bregman decomposition & Thm & \texttt{bregman\_decomposition} & InteriorCompl \\
-\midrule
-Geom.\ substitute identity & Thm & \texttt{geometric\_substitute\_identity} & GeomSubstId \\
-Geom.\ complement identity & Thm & \texttt{geometric\_complement\_identity} & GeomComplId \\
-$\Delta$VoI local identity & Thm & \texttt{delta\_voi\_per\_posterior\_identity} & GeomComplId \\
+Thm~\ref{thm:voi-br} (VoI $=$ E[BR]) & Thm & \texttt{jensenGap\_eq\_weighted\_regret} & FacetActivation \\
+Thm~\ref{thm:facet-bridge} & Thm & \texttt{facet\_activation\_bridge} & FacetActivation \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{Primitives (\texttt{Basics.lean}, \texttt{Regret.lean}, \texttt{JensenGap.lean}).}
-\texttt{Basics.lean} defines \texttt{Belief} (a probability distribution over a finite type), \texttt{ObsKernel} (a likelihood kernel), \texttt{marginalProb}, and \texttt{posterior} via Bayes' rule.
-The two foundational identities are \texttt{marginalProb\_sum} ($\sum_o P(o \mid b) = 1$) and \texttt{prior\_eq\_weighted\_posterior} ($b = \sum_o P(o) \cdot b^o$, the Bayesian martingale).
-\texttt{Regret.lean} defines \texttt{terminalValue} and \texttt{regret} and proves non-negativity and the optimality characterization.
-\texttt{JensenGap.lean} defines the Jensen gap and proves it is non-negative for belief-convex functions, bridging to Mathlib's \texttt{ConvexOn} via the probability simplex.
+\paragraph{Primitives.}
+\texttt{Basics.lean} defines \texttt{Belief}, \texttt{ObsKernel}, \texttt{marginalProb}, and \texttt{posterior}, and proves the posterior martingale identity \texttt{prior\_eq\_weighted\_posterior}.
+\texttt{Regret.lean} defines \texttt{terminalValue} and \texttt{regret} and proves non-negativity and the zero-regret optimality characterization.
+\texttt{JensenGap.lean} defines Jensen gaps over posterior lotteries and proves non-negativity for belief-convex functions.
 
-\paragraph{Paper theorems (\texttt{FacetActivation.lean}, \texttt{InteriorComplementarity.lean}).}
-\texttt{FacetActivation.lean} contains the paper's two main results.
-The weighted-regret identity (Theorem~\ref{thm:voi-br}) is a direct algebraic manipulation: the Bayesian martingale cancels the prior-level reward, leaving only regret terms at the posteriors.
-The facet-activation bridge (Theorem~\ref{thm:facet-bridge}) combines the weighted-regret identity with the rival-action characterization of positive regret (\texttt{regret\_pos\_iff\_rival\_action}).
-\texttt{InteriorComplementarity.lean} proves the Bregman decomposition of Jensen gaps ($\text{gap}(g - h) = \text{gap}(g) - \text{gap}(h)$) and the linear-function zero-gap property.
-
-\paragraph{Geometric identities (\texttt{GeometricSubstituteIdentity.lean}, \texttt{GeometricComplementIdentity.lean}).}
-These modules develop the quantitative facet-by-facet decomposition of the Jensen gap of $V$, expressing it as a weighted sum of reward-gap norms times perpendicular crossing depths.
-\texttt{PiecewiseLinear.lean} establishes the unnormalized posterior value cancellation that makes each summand linear in $b$ for fixed action.
-See Appendix~\ref{app:asil} for the mathematical content.
-
-\paragraph{Measure-theoretic extension (\texttt{MeasureTheoreticBelief.lean}).}
-This module generalizes the framework to infinite state spaces via Mathlib's \texttt{ProbabilityMeasure}, \texttt{Kernel}, and \texttt{Measure.condKernel}, proving the disintegration theorem and Bayes formula pointwise.
-It is included for completeness but not used in the finite-state results of this paper.
-
+\paragraph{Paper theorems.}
+\texttt{FacetActivation.lean} contains the two formal claims used in the text.
+The weighted-regret identity \texttt{jensenGap\_eq\_weighted\_regret} rewrites the value of information as expected regret of retaining the prior-optimal action after the posterior update.
+The bridge theorem \texttt{facet\_activation\_bridge} states that this expected regret is strictly positive exactly when some reachable posterior strictly prefers a rival action.
 
 % ============================================================
-\section{All Substitution Is Local: Interaction Identity}
-\label{app:asil}
+\section{Section~\ref{sec:exp2}: Evaluation Protocol}
+\label{app:exp2-protocol}
 % ============================================================
 
-The boundary-regret results in the main text concern a single human channel.
-The broader \textsc{All Substitution Is Local} (ASIL) theory provides a pairwise interaction identity between model and human information channels, explaining when they are complements and when they are substitutes.
+\paragraph{Reader study.}
+The five board-certified radiologists (bc1, bc2, bc3, bc5, bc7) provided binary disease-presence ratings under the official CheXpert five-condition protocol (Atelectasis, Cardiomegaly, Consolidation, Edema, Pleural Effusion) on the 500-image frontal-view validation set.
+The held-out label $y$ is the majority vote of these five ratings; no label is uncertain (majority breaks ties for five raters).
 
-\paragraph{Setup.}
-Let channel $i$ (model) and channel $j$ (human) each produce posteriors from a common prior $b$.
-Define the \emph{complement force} as the Jensen gap of the look-ahead value
-\[
-  g(b') \;=\; \E_{o_j}[V(\text{post}_j(o_j \mid b'))]
-\]
-under channel $i$'s posterior lottery, and the \emph{substitute force} as the Jensen gap of the terminal value $V(b')$ under the same lottery.
+\paragraph{Model posterior.}
+Logit-space temperature scaling is applied per reader--task pair by minimising NLL on a 10\% held-out calibration split; the calibrated probability is used as $b_x$.
 
-\paragraph{Interaction identity.}
-The change in VoI from observing channel $j$ after channel $i$, versus observing $j$ alone, admits a per-outer-posterior decomposition.
-Define twisted rewards $\tilde{r}_{a,o_j}(s) := r_a(s) \cdot k_j(s, o_j)$ for each inner signal $o_j$.
-Then:
-\begin{equation}\label{eq:delta-voi-decomp}
-  \Delta\VoI(j \mid i, b)
-  \;=\;
-  \sum_{o_i} P(o_i \mid b, i) \left[
-    \sum_{o_j}
-      \operatorname{regret}_{\tilde{r}_{o_j}}\!\bigl(a^*,\, \hat{b}_{i,o_i}\bigr)
-    \;-\;
-    \operatorname{regret}_{r}\!\bigl(a^*,\, \hat{b}_{i,o_i}\bigr)
-  \right],
-\end{equation}
-where $a^*$ is optimal at $b$ and $\hat{b}_{i,o_i}$ is the outer posterior (formalized as \texttt{delta\_voi\_per\_posterior\_identity} in \texttt{GeometricComplementIdentity.lean}).
+\paragraph{Human-augmented posterior.}
+$\bpost_{x,h} \approx P(Y=1\mid x,h)$ is estimated via 5-fold cross-fitted logistic regression on the feature vector $[\operatorname{logit}(b_x),\,h,\,h\cdot\operatorname{logit}(b_x)]$, with folds stratified on $y$.
+Cross-fitting ensures that the estimated posterior and the held-out label are independent within each fold, eliminating $h$--$y$ contamination.
 
-\paragraph{Geometric decomposition.}
-Both forces decompose into facet-specific contributions.
-The substitute force equals a weighted sum of reward-gap norms $\|r_{a'} - r_{a^*}\|$ times perpendicular crossing depths $d_\perp$ at the model's decision facets (\texttt{geometric\_substitute\_identity}).
-The complement force equals a parallel sum at \emph{twisted} facets induced by the human channel's conditional likelihoods (\texttt{geometric\_complement\_identity}).
-
-\paragraph{Complement/substitute characterization.}
-$\Delta\VoI \geq 0$ (complementarity) when the complement force exceeds the substitute force---geometrically, when the model and human cross \emph{different} decision boundaries.
-$\Delta\VoI < 0$ (substitutability) when both channels cross the \emph{same} boundary and carry redundant information.
-The sign is determined locally, at the level of individual facet crossings.
-
-\begin{theoremA}[Interior Complementarity]\label{thm:interior-compl}
-If every reachable outer posterior $\hat{b}_{i,o_i}$ remains in $\mathcal{R}_{a^*}$ (no facet crossing), then the substitute force vanishes and $\Delta\VoI(j \mid i, b) \geq 0$.
-\end{theoremA}
-
-\begin{theoremA}[Substitution Requires Boundary Crossing]\label{thm:sub-requires-crossing}
-If $\Delta\VoI(j \mid i, b) < 0$ (channels are substitutes) and the complement force is non-negative, then some outer posterior lies outside $\mathcal{R}_{a^*}$: channel $i$ crosses a decision facet.
-\end{theoremA}
-
-\noindent
-Experiment~1, Conditions~C4 and~C5, verify these predictions: same-boundary channels are substitutes ($\Delta\VoI < 0$ in all configurations), different-boundary channels are complements ($\Delta\VoI > 0$ for $|\mathcal{A}| \geq 3$; $\Delta\VoI \leq 0$ for $|\mathcal{A}| = 2$, where only one boundary exists).
-
-\paragraph{Relation to the main text.}
-Corollary~\ref{cor:zero-dv} is the human-AI specialization of Theorem~\ref{thm:interior-compl} (Interior Complementarity): set $k_i$ to the model channel and ask only whether the model's posteriors remain inside $\mathcal{R}_{a_x}$.
-The main-text analysis drops $k_j$ from the interaction and retains only the boundary-regret quantity $\BR(x) = \E_h[\BR(x,h)]$, which is the substitute force evaluated at the model's posteriors.
-The ASIL identity retains both channels and characterizes when acquiring the human signal adds value beyond what the model already provides.
-
+\paragraph{Evaluation.}
+All correlations and boundary-regret estimates are computed on the held-out fold for each instance, then aggregated across folds.
+Pairs where $\BRhat\equiv 0$ across the entire evaluation set are excluded from the Spearman $\rho$ computation ($n$ valid).
 
 % ============================================================
-\section{Full Experiment~3 Results}
-\label{app:exp3-full}
+\section{Section~\ref{sec:exp1} Detail Tables}
+\label{app:exp1-detail}
 % ============================================================
 
-Table~\ref{tab:exp3-full} reports the complete utility gain over model-only baseline at all four review budgets.
+Table~\ref{tab:exp1-detail} reports per-configuration results across the three estimator-validation conditions.
 
 \begin{table}[ht]
 \centering
-\caption{Experiment~3: full results. Utility gain over model-only baseline on synthetic binary data ($N\!=\!2{,}000$).}
-\label{tab:exp3-full}
+\caption{Section~\ref{sec:exp1}: per-configuration results. $G$: decision groups; $K$: latent states; $|A|$: actions in the reward matrix. $\rho$ is omitted when true boundary regret is constant zero.}
+\label{tab:exp1-detail}
 \small
-\begin{tabular}{@{}l rrrr rrrr rrrr@{}}
+\begin{tabular}{@{}lrrrrrrr@{}}
 \toprule
-& \multicolumn{4}{c}{R1 (symmetric)} & \multicolumn{4}{c}{R2 (FP penalty)} & \multicolumn{4}{c}{R3 (FN penalty)} \\
-\cmidrule(lr){2-5}\cmidrule(lr){6-9}\cmidrule(lr){10-13}
-Policy & 5\% & 10\% & 20\% & 50\% & 5\% & 10\% & 20\% & 50\% & 5\% & 10\% & 20\% & 50\% \\
+Cond. & $G$ & $K$ & $|A|$ & $\rho(\BRhat,\BR)$ & FPR & \%$\BR>0$ & LL gain \\
 \midrule
-BR\textsubscript{pre} & .017 & .029 & .045 & .050 & .033 & .060 & .085 & .085 & .033 & .065 & .128 & .136 \\
-Entropy & .019 & .028 & .044 & .044 & .000 & .000 & .000 & .009 & .000 & .000 & .000 & .034 \\
-Margin & .019 & .028 & .044 & .044 & .018 & .030 & .065 & .078 & .010 & .024 & .050 & .116 \\
-Residual & .016 & .024 & .037 & .041 & .000 & .000 & .000 & .003 & .000 & .000 & .000 & .060 \\
-L2D & .000 & .000 & .002 & .040 & $-$.002 & .010 & .063 & .078 & $-$.007 & $-$.017 & .030 & .116 \\
-Random & .003 & .006 & .010 & .028 & .014 & .024 & .053 & .103 & .000 & .000 & .000 & .017 \\
+C1 & 2 & 2 & 2 & 0.969 & 0.000 & 35.5\% & 0.226 \\
+C1 & 2 & 4 & 2 & 0.984 & 0.000 & 36.4\% & 0.230 \\
+C1 & 3 & 3 & 3 & 0.941 & 0.000 & 37.9\% & 0.403 \\
+C1 & 3 & 6 & 3 & 0.903 & 0.000 & 38.2\% & 0.420 \\
+C1 & 5 & 5 & 5 & 0.862 & 0.000 & 39.8\% & 0.577 \\
+C1 & 5 & 10 & 5 & 0.745 & 0.000 & 39.8\% & 0.592 \\
 \midrule
-Oracle & .050 & .100 & .120 & .120 & .054 & .104 & .125 & .125 & .052 & .102 & .148 & .148 \\
+C2 & 2 & 2 & 2 & -- & 0.000 & 0.0\% & 0.006 \\
+C2 & 2 & 4 & 2 & -- & 0.000 & 0.0\% & 0.006 \\
+C2 & 3 & 3 & 3 & -- & 0.000 & 0.0\% & 0.015 \\
+C2 & 3 & 6 & 3 & -- & 0.000 & 0.0\% & 0.019 \\
+C2 & 5 & 5 & 5 & -- & 0.000 & 0.0\% & 0.035 \\
+C2 & 5 & 10 & 5 & -- & 0.000 & 0.0\% & 0.033 \\
+\midrule
+C3 & 2 & 2 & 3 & -- & 0.000 & 0.0\% & 0.447 \\
+C3 & 2 & 4 & 3 & -- & 0.000 & 0.0\% & 0.458 \\
+C3 & 3 & 3 & 4 & -- & 0.000 & 0.0\% & 0.592 \\
+C3 & 3 & 6 & 4 & -- & 0.000 & 0.0\% & 0.613 \\
+C3 & 5 & 5 & 6 & -- & 0.000 & 0.0\% & 0.723 \\
+C3 & 5 & 10 & 6 & -- & 0.000 & 0.0\% & 0.738 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-At $q = 5\%$, the advantage of BR\textsubscript{pre} under asymmetric rewards is most pronounced: under R2, BR\textsubscript{pre} achieves a utility gain of $0.033$ while entropy and residual expertise achieve exactly zero.
-At $q = 50\%$, the advantages diminish as the large review budget covers most decision-relevant cases regardless of allocation strategy.
-Under R2 at $q = 50\%$, random allocation ($0.103$) exceeds some targeted policies because the large budget indiscriminately covers enough instances near the distant $0.833$ threshold; this effect disappears at smaller budgets where allocation precision dominates.
+% ============================================================
+\section{Section~\ref{sec:exp3}: Full R2 Allocation Table}
+\label{app:exp3-r2}
+% ============================================================
+
+Table~\ref{tab:exp3-r2} reports the complete allocation utility gain under the FP-penalized reward (R2, threshold $5/6\approx 0.833$) at all four review budgets.
+The reward boundary sits in the low-density tail of model beliefs: only 14 of the 25 reader--task pairs carry any non-zero $\BRhat$ mass.
+Within those 14 pairs, $\BRhat$ and Margin converge within bootstrap noise at every budget; this convergence is the predicted consequence of Theorem~\ref{thm:facet-bridge} in the low-mass regime.
+
+\begin{table}[ht]
+\centering
+\caption{Section~\ref{sec:exp3}: R2 (FP-penalized, threshold $0.833$) full allocation results across all four budgets. Utility gain over model-only baseline on the 25 reader--task pairs from Section~\ref{sec:exp2}. W/L/T: wins/losses/ties of $\BRhat$ vs.\ Margin.}
+\label{tab:exp3-r2}
+\small
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+$q$ & $\BRhat$ & Margin & Entropy & Residual & L2D & W/L/T \\
+\midrule
+$5\%$  & $+0.0010$ & $+0.0017$ & $+0.0000$ & $-0.0002$ & $-0.0031$ & $4/6/15$ \\
+$10\%$ & $+0.0043$ & $+0.0057$ & $+0.0000$ & $+0.0007$ & $+0.0040$ & $3/4/18$ \\
+$20\%$ & $+0.0103$ & $+0.0104$ & $+0.0000$ & $+0.0007$ & $+0.0079$ & $3/2/20$ \\
+$50\%$ & $+0.0103$ & $+0.0103$ & $+0.0005$ & $+0.0023$ & $+0.0098$ & $0/0/25$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{Section~\ref{sec:exp2}: CheXpert Robustness Sweep (240 Pairs)}
+\label{app:robustness}
+% ============================================================
+
+Table~\ref{tab:robustness} extends the dissociation analysis of Section~\ref{sec:exp2} to all six DenseNet checkpoints and all eight CheXpert radiologists (240 reader--task pairs).
+The direction of the regime-conditional dissociation is preserved across checkpoints.
+Magnitude attenuates under off-domain pretraining (NIH, PadChest), consistent with calibration drift shifting model beliefs away from decision facets.
+
+\begin{table}[ht]
+\centering
+\caption{Section~\ref{sec:exp2} robustness: mean Spearman $\bar\rho$ between log-loss gain and $\BRhat$ by reward regime, across 6 DenseNet checkpoints $\times$ 8 readers $\times$ 5 conditions $=$ 240 pairs.}
+\label{tab:robustness}
+\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Checkpoint & R1 $\bar\rho$ & R2 $\bar\rho$ & R3 $\bar\rho$ \\
+\midrule
+\multicolumn{4}{l}{\textit{In-domain pretraining}} \\
+\texttt{densenet121-res224-chex}     & $+0.528$ & $-0.185$ & $+0.024$ \\
+\texttt{densenet121-res224-mimic\_ch}& $+0.528$ & $-0.118$ & $+0.233$ \\
+\texttt{densenet121-res224-mimic\_nb}& $+0.524$ & $-0.125$ & $+0.243$ \\
+\texttt{densenet121-res224-all}      & $+0.543$ & $-0.156$ & $+0.186$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Off-domain pretraining}} \\
+\texttt{densenet121-res224-nih}      & $+0.428$ & $+0.013$ & $+0.313$ \\
+\texttt{densenet121-res224-pc}       & $+0.453$ & $-0.055$ & $+0.296$ \\
+\midrule
+All 240 pairs & $+0.501$ & $-0.113$ & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ============================================================
+\section{CIFAR-10H: Theory-Confirming Negative Control}
+\label{app:exp3-cifar10h}
+% ============================================================
+
+CIFAR-10H evaluates seven pretrained CIFAR-10 classifiers against 50 human annotators across 10 one-vs-rest binary tasks (3{,}500 reader--task pairs).
+Pretrained CIFAR-10 classifiers are highly accurate; their softmax probabilities rarely straddle a decision boundary for a given annotator's image subset.
+Theorem~\ref{thm:facet-bridge} therefore predicts near-zero actionable boundary-regret mass everywhere --- a prediction the data confirm: only 47.7\% of pairs have any non-zero $\BRhat$ signal at all, and ${\geq}94\%$ of top-disagreement-decile instances show $\BRhat=0$.
+
+\begin{table}[ht]
+\centering
+\caption{CIFAR-10H negative control: mean Spearman $\bar\rho$ between log-loss gain and $\BRhat$ by reward regime across 3{,}500 pairs (7 models $\times$ 500 annotator--class pairs).}
+\label{tab:cifar10h}
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Reward & $\bar\rho$ (valid) & $\bar\rho$ (all) & $N$ valid & Top-decile $\BRhat=0$ \\
+\midrule
+R1 (thr.\ $0.500$) & $+0.015$ & $+0.007$ & 1{,}668 & $96.2\%$ \\
+R2 (thr.\ $0.833$) & $-0.008$ & $-0.004$ & 1{,}632 & $96.9\%$ \\
+R3 (thr.\ $0.167$) & $+0.044$ & $+0.024$ & 1{,}905 & $94.5\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The R1 dissociation signal ($\bar\rho=+0.015$) is roughly 25$\times$ weaker than the weakest CheXpert model ($+0.392$).
+$\BRhat$ allocation correspondingly degenerates to near-random (${\approx}2\%$ win rate vs.\ Margin under R1), confirming that the allocation advantage in Section~\ref{sec:exp3} depends on the model's beliefs straddling reward facets --- a condition that high-accuracy CIFAR-10 classifiers rarely satisfy.

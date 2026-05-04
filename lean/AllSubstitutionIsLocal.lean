@@ -1,8 +1,4 @@
 import AllSubstitutionIsLocal.Basics
 import AllSubstitutionIsLocal.JensenGap
 import AllSubstitutionIsLocal.Regret
-import AllSubstitutionIsLocal.PiecewiseLinear
 import AllSubstitutionIsLocal.FacetActivation
-import AllSubstitutionIsLocal.InteriorComplementarity
-import AllSubstitutionIsLocal.GeometricSubstituteIdentity
-import AllSubstitutionIsLocal.GeometricComplementIdentity

@@ -22,6 +22,7 @@
 \newcommand{\Dg}{D_g}
 \newcommand{\Dh}{D_h}
 \newcommand{\BR}{\operatorname{BR}}
+\newcommand{\BRhat}{\widehat{\BR}}
 
 % Theorem environments
 \newtheorem{theorem}{Theorem}
@@ -55,19 +56,16 @@
 \maketitle
 
 \begin{abstract}
-A human with residual predictive expertise beyond the model may still have zero decision value.
-Whether the human's information crosses a reward-relevant boundary---not whether it improves predictions---determines whether review is worth deploying.
+A human with residual predictive expertise beyond the model has zero decision value whenever that expertise does not move the posterior across a reward-induced decision boundary.
 We introduce \emph{boundary regret}: the regret of keeping the model's action under the human-updated posterior.
 In any finite-action Bayesian decision problem, the value of human review equals expected boundary regret (Lean-formalized); predictive signal that does not cross a reward-induced facet has zero decision value, regardless of log-loss gain.
-On CheXpert Cardiomegaly with a board-certified radiologist as the human signal, \textbf{97\%} of top-expertise-decile cases have zero boundary regret under a false-positive-penalty reward: the human is informative, the operative action is unchanged.
-On synthetic allocation tasks, an ex ante boundary-regret estimator allocates scarce review better than uncertainty, residual-expertise, and learning-to-defer baselines under asymmetric rewards at review budgets $q \in \{10\%,\, 20\%\}$, with up to $2.7\times$ higher utility gain per review than the best non-oracle alternative.
-The deployment estimand for human--AI complementarity is residual decision value, not residual predictive expertise.
+Across 20 CheXpert reader-task pairs---five board-certified radiologists read against four competition tasks---\textbf{95.9\%} of top-expertise-decile cases have zero boundary regret under a false-positive-penalty reward: the radiologist is informative, the operative action is unchanged.
+On synthetic allocation tasks (replicated on a CheXpert reader-task pair), an ex ante boundary-regret score allocates scarce review more efficiently than uncertainty-based, residual-expertise, and learning-to-defer baselines under asymmetric rewards at review budgets $q \in \{10\%,\, 20\%\}$.
+Human--AI complementarity audits that ignore reward geometry overestimate the deployment value of human review whenever deployment costs are asymmetric---a condition that is the norm, not the exception, in high-stakes clinical decisions.
 \end{abstract}
 
 \input{chapters/introduction}
-\input{chapters/preliminaries}
 \input{chapters/methodology}
-\input{chapters/illustration}
 \input{chapters/experiments}
 \input{chapters/related}
 \input{chapters/conclusion}
@@ -77,5 +75,7 @@ The deployment estimand for human--AI complementarity is residual decision value
 
 \clearpage
 \input{chapters/appendix}
+% \clearpage
+% \input{checklist.tex}
 
 \end{document}
