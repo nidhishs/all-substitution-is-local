@@ -1,99 +1,44 @@
-\section{Illustration}
-\label{sec:example}
+\section{Illustration: Same Expertise, Different Decision Value}
+\label{sec:illustration}
 
-We illustrate all three results with a single example. The same two channels and the same reward structure produce three qualitatively different interaction regimes at three different beliefs: interior complementarity, boundary complementarity, and substitution. The key distinction is not whether decision boundaries are crossed, but \emph{which} boundaries each channel is relevant to. Consider $K = 3$ states and $|A| = 3$ actions with the parameters in Table~\ref{tab:rewards}.
+To make the divergence between predictive expertise and decision value concrete, consider a binary classification problem ($K = 2$, $|\mathcal{A}| = 2$: discharge or admit) under two reward structures.
 
-The decision regions partition the 2-simplex: $\mathcal{R}_1$ (where $a_1$ is optimal) lies near the $s_1$ vertex, $\mathcal{R}_2$ near $s_2$, and $\mathcal{R}_3$ (the safe action) occupies a large central region near~$s_3$ (see Figure~\ref{fig:hero}, left, for the geometry).
+\paragraph{Setup.}
+The model produces belief $b_x = P(Y\!=\!1 \mid x)$.
+A human reviewer observes the instance and shifts the belief to $b_{x,h}$.
+We compare two reward matrices:
+\begin{itemize}[nosep]
+  \item \textbf{R1} (symmetric accuracy): $R = \bigl[\begin{smallmatrix}1&0\\0&1\end{smallmatrix}\bigr]$, threshold $b^* = 0.50$.
+  \item \textbf{R2} (FP penalty): $R = \bigl[\begin{smallmatrix}1&0\\{-4}&1\end{smallmatrix}\bigr]$, threshold $b^* = \tfrac{5}{6} \approx 0.833$.
+\end{itemize}
 
-\begin{table}[b]
-\centering
-\begin{tabular}{@{}lccc@{}}
-\toprule
-       & $s_1$ & $s_2$ & $s_3$ \\
-\midrule
-$a_1$  & 12    & 0     & 3     \\
-$a_2$  & 0     & 12    & 3     \\
-$a_3$  & 3     & 3     & 9     \\
-\bottomrule
-\end{tabular}
-\qquad
-\begin{tabular}{@{}lccc@{}}
-\toprule
-$P(o \mid s, i)$ & $s_1$ & $s_2$ & $s_3$ \\
-\midrule
-$o = 0$ & $3/4$ & $1/4$ & $1/4$ \\
-$o = 1$ & $1/4$ & $3/4$ & $3/4$ \\
-\bottomrule
-\end{tabular}
-\qquad
-\begin{tabular}{@{}lccc@{}}
-\toprule
-$P(o \mid s, j)$ & $s_1$ & $s_2$ & $s_3$ \\
-\midrule
-$o = 0$ & $1/4$ & $3/4$ & $1/4$ \\
-$o = 1$ & $3/4$ & $1/4$ & $3/4$ \\
-\bottomrule
-\end{tabular}
-\vspace{1em}
-\caption{Decision problem parameters. \textit{Left}: reward matrix $R(a, s)$; $a_3$ is a safe action, $a_1$ and $a_2$ specialize to $s_1$ and $s_2$. \textit{Middle, Right}: likelihood kernels for channels $i$ and $j$. Channel~$i$ partially identifies~$s_1$; channel~$j$ partially identifies~$s_2$. The channels are conditionally independent.}
-\label{tab:rewards}
-\end{table}
+\paragraph{Two cases.}
+\textbf{Case~A} (high expertise, low decision value): $b_x = 0.55$, $b_{x,h} = 0.70$.
+The physician shifts the belief by $+0.15$---a substantial probabilistic update.
 
-The left panel of Figure~\ref{fig:hero} shows $\Delta\VoI(j \mid i, b)$ across the belief simplex. Complements (red) fill region interiors; substitutes (blue) cluster along decision boundaries. The middle and right panels decompose the interaction: the complement force $\E[\Dg]$ spreads broadly across the simplex, while the substitute force $\E[\Dh]$ concentrates sharply along decision boundaries. The substitute force equals the expected regret of the currently optimal action at the posterior beliefs (Appendix~\ref{app:regret}). We walk through three marked beliefs that illustrate each main result.
+\textbf{Case~B} (low expertise, high decision value): $b_x = 0.80$, $b_{x,h} = 0.87$.
+The physician shifts the belief by only $+0.07$---half the absolute update of Case~A.
 
-\paragraph{Interior complementarity.}
-Consider $b_1 = (1/11,\; 2/11,\; 8/11)$, in the interior of $\mathcal{R}_3$. Theorem~\ref{thm:interior} applies directly. Channel~$i$ is decision-irrelevant: applying Bayes' rule, both posteriors $(3/13,\, 2/13,\, 8/13)$ and $(1/31,\, 6/31,\, 24/31)$ remain in $\mathcal{R}_3$, so $\VoI(i) = 0$ and $\E[\Dh] = 0$ exactly. The substitute force vanishes, exactly as Theorem~\ref{thm:interior} predicts.
+A residual-expertise audit (log-loss gain at $y\!=\!1$: $0.24$ for Case~A vs.\ $0.08$ for Case~B) ranks Case~A as the far more valuable human signal.
 
-Yet channel~$j$ is useful: its $o{=}0$ posterior crosses into $\mathcal{R}_2$, giving $\VoI(j) = 3/44$. After observing the ``useless'' channel~$i$, $j$'s value rises to $15/176$. The mechanism: channel~$i$'s ``probably not $s_1$'' signal ($o{=}1$, probability $31/44$) concentrates the remaining uncertainty on ``$s_2$ vs $s_3$'', which is exactly what channel~$j$ resolves.
+\paragraph{Boundary regret tells a different story.}
+Under \textbf{R1} (threshold $0.50$): both cases have the model action ``admit'' ($b_x > 0.5$), and neither human update changes the action.
+$\BR = 0$ for both.
 
-\paragraph{Boundary complementarity.}
-Consider $b_2 = (1/4,\; 1/6,\; 7/12)$, in $\mathcal{R}_3$ but closer to the decision boundaries. Both channels cross boundaries, so Theorem~\ref{thm:interior}'s hypothesis is violated. The decomposition (Proposition~\ref{prop:decomposition}) reveals what happens beyond the theorem.
+Under \textbf{R2} (threshold $0.833$): the model discharges in both cases ($b_x < 0.833$).
+In Case~A, $b_{x,h} = 0.70 < 0.833$: the human-updated belief remains below the threshold and $\BR = 0$.
+In Case~B, $b_{x,h} = 0.87 > 0.833$: the posterior crosses the decision boundary.
+Computing:
+\[
+  \BR_{\text{B}} = V(0.87) - r_{\text{discharge}} \cdot (1 - 0.87, \; 0.87)
+  = 0.35 - 0.13 = 0.22.
+\]
 
-Both channels have positive VoI; each crosses a decision boundary. Yet they complement: $\VoI(j)$ is amplified $2.25\times$ by observing~$i$ first. The substitute force $\E[\Dh] = 11/16$ is strictly positive (the boundary is crossed), but the complement force $\E[\Dg] = 49/64$ dominates. Channel~$i$ crosses the $a_3/a_1$ boundary while channel~$j$ crosses $a_3/a_2$, \emph{different} boundaries, orthogonal uncertainties.
+\noindent
+Case~A, with three times the log-loss improvement, has zero decision value under R2.
+Case~B, with modest predictive improvement, carries all the decision value---because its update is located near the reward-induced boundary.
 
-\paragraph{Substitution.}
-Consider $b_3 = (5/12,\; 5/12,\; 1/6)$, on the $b_1 = b_2$ boundary. Both channels cross the \emph{same} boundary ($a_1/a_2$). Channel~$i$'s posteriors $(15/22,\, 5/22,\, 2/22)$ and $(5/26,\, 15/26,\, 6/26)$ land in $\mathcal{R}_1$ and $\mathcal{R}_2$ respectively, straddling the same $a_1/a_2$ boundary. After $o{=}0$ (a strong $s_1$ signal), $j$'s VoI collapses to~$0$: channel~$i$ has resolved the very decision that~$j$ was relevant to. Table~\ref{tab:results} collects the numerical values at all three beliefs.
-
-\begin{table}[b]
-\centering
-\small
-\begin{tabular}{@{}lccc@{}}
-\toprule
- & $b_1 = (\tfrac{1}{11},\, \tfrac{2}{11},\, \tfrac{8}{11})$
- & $b_2 = (\tfrac{1}{4},\, \tfrac{1}{6},\, \tfrac{7}{12})$
- & $b_3 = (\tfrac{5}{12},\, \tfrac{5}{12},\, \tfrac{1}{6})$ \\
- & {\scriptsize interior of $\mathcal{R}_3$}
- & {\scriptsize near boundary}
- & {\scriptsize on $a_1/a_2$ boundary} \\
-\midrule
-$\VoI(i)$            & $0$       & $11/16$  & $5/2$    \\
-$\VoI(j)$            & $3/44$    & $1/16$   & $5/2$    \\
-$\VoI(j \mid i)$     & $15/176$  & $9/64$   & $3/32$   \\
-\addlinespace
-$\E[\Dg]$            & $3/176$   & $49/64$  & ---      \\
-$\E[\Dh]$            & $0$       & $11/16$  & ---      \\
-\addlinespace
-$\Delta\VoI$         & $+3/176$  & $+5/64$  & $-77/32$ \\
-\bottomrule
-\end{tabular}
-\vspace{1em}
-\caption{Summary of information values at three marked beliefs. $b_1$: interior complementarity (Theorem~\ref{thm:interior}); $b_2$: boundary complementarity (Proposition~\ref{prop:decomposition}); $b_3$: substitution (Theorem~\ref{thm:converse}). Entries marked~--- indicate that the individual forces are not separately defined at a boundary belief where $V$ has a kink.}
-\label{tab:results}
-\end{table}
-
-\begin{remark}[PWLC specificity]
-\label{rem:pwlc}
-The vanishing of $\E[\Dh]$ at $b_1$ relies on $V$ being linear within $\mathcal{R}_3$. This is specific to finite-action problems where decision regions create flat patches in the value function.
-\end{remark}
-
-\paragraph{Phase transition.}
-Figure~\ref{fig:ray} traces $\Delta\VoI$ along the ray $b(t) = (1/4+t,\; 1/6,\; 7/12-t)$, which walks from $b_2$ toward the $a_1/a_3$ decision boundary. Both forces grow as the boundary approaches, but the substitute force overtakes the complement force at the interaction boundary ($t \approx 0.10$), before the decision boundary itself is reached ($t = 7/60 \approx 0.117$). At $b_1$, action~$a_3$ remains optimal at both of~$i$'s posteriors, so regret is zero and $\E[\Dh] = 0$. At $b_3$, channel~$i$ pushes the belief into $\mathcal{R}_1$ or $\mathcal{R}_2$, where the prior-optimal action incurs large regret, and the substitute force dominates.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.85\textwidth]{figures/force_transition_ray.pdf}
-\caption{Phase transition along $b(t) = (1/4+t,\, 1/6,\, 7/12-t)$. Complement force (red) and substitute force (blue). Shading indicates the complement (red) and substitute (blue) regimes; the interaction boundary (where the forces cross) precedes the decision boundary.}
-\label{fig:ray}
-\end{figure}
-
-The example illustrates the gap between the necessary and sufficient conditions.
+\paragraph{Takeaway.}
+A deployment-focused audit must measure not how much the human improves the probability estimate, but whether that improvement is located near a decision facet.
+The same human signal can be high-expertise/zero-decision-value or modest-expertise/high-decision-value, depending entirely on the reward geometry.
+This is the distinction that boundary regret formalizes, and that Experiments~2 and~3 (Sections~\ref{sec:exp2} and~\ref{sec:exp3}) demonstrate at scale.

@@ -1,25 +1,43 @@
 \section{Introduction}
 \label{sec:intro}
 
-When an agent can consult multiple information sources before making a decision, a natural question is: does consulting one source make another more or less valuable?
-Sources that make each other more valuable are \emph{complements}; sources that diminish each other's value are \emph{substitutes}.
+When a deployed model is complemented by human review, the standard question is whether the human knows something the model does not.
+A physician examining a chest radiograph may detect subtle findings missed by a convolutional network; a clinician triaging emergency patients may integrate history unavailable to the risk score.
+Statistical audits can test for such \emph{residual expertise}---predictive information in the human signal beyond the model \citep{AlurEtAl2023,AlurRaghavanShah2024}.
+But for deployment, the sharper question is whether that information changes the decision.
 
-\citet{ChenWaggoner2017} formalized this distinction via the pointwise interaction $\Delta\VoI(j \mid i, b)$: the change in channel~$j$'s value of information at belief~$b$ after observing channel~$i$.
-Their work established global conditions (across all beliefs) for substitution and complementarity. Our contribution is to localize these conditions: we characterize \emph{which beliefs} give rise to complementarity and which to substitution, for a fixed pair of channels and a fixed decision problem.
-Concretely, we establish three results:
-\begin{enumerate}
-  \item \textbf{Bregman decomposition} (Proposition~\ref{prop:decomposition}): $\Delta\VoI(j \mid i, b)$ decomposes into a non-negative complement force $\E[D_g(\bpost, b)]$ minus a non-negative substitute force $\E[D_h(\bpost, b)]$, where $D_g$ and $D_h$ are Bregman divergences of auxiliary convex functions.
-  \item \textbf{Interior complementarity} (Theorem~\ref{thm:interior}): If all of channel~$i$'s posteriors lie within the current decision region, then $\Delta\VoI(j \mid i, b) \geq 0$.
-  \item \textbf{Converse} (Theorem~\ref{thm:converse}): If $\Delta\VoI(j \mid i, b) < 0$, at least one posterior of channel~$i$ lies in a different decision region from~$b$.
+Residual predictive information is not residual decision value.
+In a finite-action decision problem governed by a reward matrix, what matters is whether the human's signal moves the posterior across a \emph{decision boundary}.
+A physician who shifts the probability of disease from $0.55$ to $0.70$ improves predictions, but if the decision threshold is $0.50$ (the patient is already flagged for admission) or $0.83$ (neither estimate clears the high-confidence bar), the action is unchanged.
+The same human signal can carry decision value under one reward structure and none under another---not because the physician's expertise varies, but because the reward geometry determines which posterior movements are consequential.
+
+We formalize this observation through \emph{boundary regret}: the regret of keeping the model's action after observing the human signal (defined formally in Section~\ref{sec:methodology}).
+For model belief $b_x \in \Delta^{K-1}$, model-optimal action $a_x = \argmax_a r_a \cdot b_x$, and human-updated belief $b_{x,h} = P(Y \mid x, h)$:
+\begin{equation}\label{eq:BR-intro}
+  \BR(x, h) \;=\; V(b_{x,h}) \;-\; r_{a_x} \cdot b_{x,h},
+\end{equation}
+where $V(b) = \max_a r_a \cdot b$ is the terminal value function.
+Boundary regret is zero when the model's action remains optimal under the human-updated posterior, and positive when a rival action becomes preferred.
+
+The formal basis is immediate but consequential: in any finite-action Bayesian decision problem, the value of observing the human signal equals expected boundary regret (Theorem~\ref{thm:voi-br}):
+\[
+  \VoI(H \mid b_x) \;=\; \E_h\bigl[\BR(x, h)\bigr].
+\]
+The proof is a single application of the Bayesian martingale property; the contribution is not the proof technique but the choice of estimand and its consequences for human--AI audit design.
+A companion result (Theorem~\ref{thm:facet-bridge}) provides the geometric characterization: the value of review is strictly positive if and only if some reachable posterior crosses a reward-induced decision boundary.
+Signal that improves predictions without crossing any boundary has zero decision value---a formal consequence, not an empirical pattern.
+Both results are verified in Lean~4 (Appendix~\ref{app:lean}).
+
+Empirically, we validate this distinction on real and synthetic data across three experiments:
+\begin{itemize}[nosep,leftmargin=1.5em]
+  \item \textbf{Experiment~1} (synthetic validation): the boundary-regret estimator recovers known values with $\rho = 0.77$ average rank correlation in the boundary-crossing condition and zero false positives across all zero-BR conditions, even when a strong human signal produces large log-loss gains without crossing any decision boundary.
+  \item \textbf{Experiment~2} (CheXpert): among the top 10\% of instances by log-loss gain, \textbf{97\%} have zero boundary regret under a false-positive-penalty reward. The same radiologist signal has positive decision value under symmetric accuracy and zero value under asymmetric costs.
+  \item \textbf{Experiment~3} (synthetic allocation): on synthetic binary decision problems, an ex ante boundary-regret score allocates scarce review more efficiently than entropy, margin, residual-expertise, and learning-to-defer baselines under asymmetric rewards, while matching them under symmetric accuracy.
+\end{itemize}
+
+\noindent\textbf{Contributions.}
+\begin{enumerate}[nosep,leftmargin=1.5em]
+  \item Boundary regret as a deployment estimand for human--AI complementarity, with formal characterization (Theorems~\ref{thm:voi-br}--\ref{thm:facet-bridge}) and Lean~4 verification.
+  \item Empirical evidence that residual predictive expertise and residual decision value diverge substantially on a real medical AI dataset, in a reward-dependent manner predicted by the theory.
+  \item A synthetic allocation experiment showing that reward-aware review allocation outperforms uncertainty-based and expertise-based baselines under asymmetric utilities.
 \end{enumerate}
-
-Boundary crossing is necessary for substitution but not sufficient: channels can cross decision boundaries and still complement each other. Section~\ref{sec:setup} formalizes the setting; Section~\ref{sec:localization} presents the main results; Section~\ref{sec:example} illustrates them on a concrete example.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{figures/interaction_decomposition.pdf}
-\caption{Belief-simplex geometry of the interaction.
-\textit{Left}: the sign of $\Delta\VoI$ partitions the simplex into complement and substitute regions.
-\textit{Middle, Right}: the two constituent forces; the complement force is diffuse across the interior while the substitute force concentrates sharply along decision boundaries. Their difference determines the sign of $\Delta\VoI$.}
-\label{fig:hero}
-\end{figure}

@@ -1,0 +1,25 @@
+# data and environments
+**/data
+**/.venv
+**/.DS_Store
+
+
+# Python cache
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# experiment outputs
+source/results/
+
+# LaTeX build artifacts
+paper/*.pdf
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/*.blg
+paper/*.bbl

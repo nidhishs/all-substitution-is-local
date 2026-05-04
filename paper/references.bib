@@ -1,3 +1,27 @@
+% ============================================================
+% references.bib — All Substitution Is Local
+% Last updated: 2026-04-25
+%
+% Organization:
+%   1. Information economics & VoI theory (original entries)
+%   2. Active learning & information acquisition (original entries)
+%   3. Partial information decomposition (original entries)
+%   4. Human expertise auditing (original entries + new)
+%   5. Learning-to-defer & selective prediction (new)
+%   6. Reject option & selective classification (new)
+%   7. Behavioral human-AI collaboration (new)
+%   8. Decision-focused ML & predict-then-optimize (new)
+%   9. Model calibration & semiparametric estimation (new)
+%  10. Medical AI datasets (new)
+%  11. VoI & Bayesian decision theory foundations (new)
+% ============================================================
+
+
+% -------------------------------------------------------
+% 1. INFORMATION ECONOMICS & VALUE OF INFORMATION THEORY
+% -------------------------------------------------------
+
+% Cite in §ASIL: pairwise interaction identity, complement/substitute signs
 @article{Borgers2013,
   author  = {B{\"o}rgers, Tilman and Hernando-Veciana, Angel and Kr{\"a}hmer, Daniel},
   title   = {When are signals complements or substitutes?},
@@ -9,6 +33,7 @@
   doi     = {10.1016/j.jet.2012.12.012}
 }
 
+% Cite in §VoI theory: nonconcavity of VoI; motivates why decision-relevance matters
 @article{ChadeSchlee2002,
   author  = {Chade, Hector and Schlee, Edward},
   title   = {Another Look at the {R}adner--{S}tiglitz Nonconcavity in the Value of Information},
@@ -20,6 +45,7 @@
   doi     = {10.1006/jeth.2001.2960}
 }
 
+% Cite in §ASIL: "Informational Substitutes" — closest economics precursor to ASIL identity
 @inproceedings{ChenWaggoner2017,
   author    = {Chen, Yiling and Waggoner, Bo},
   title     = {Informational Substitutes},
@@ -30,6 +56,7 @@
   note      = {Full version: arXiv:1703.08636}
 }
 
+% Cite in §VoI theory: payoffs-beliefs duality connecting VoI to reward geometry
 @article{DeLaraGossner2020,
   author  = {de Lara, Michel and Gossner, Olivier},
   title   = {Payoffs-Beliefs Duality and the Value of Information},
@@ -41,6 +68,7 @@
   doi     = {10.1137/18M1230049}
 }
 
+% Cite in §active learning extension: adaptive submodularity for info acquisition
 @article{GolovinKrause2011,
   author  = {Golovin, Daniel and Krause, Andreas},
   title   = {Adaptive Submodularity: Theory and Applications in Active Learning and Stochastic Optimization},
@@ -51,6 +79,7 @@
   doi     = {10.1613/jair.3278}
 }
 
+% Cite in §information design: concavification perspective on optimal info structures
 @article{KamenicaGentzkow2011,
   author  = {Kamenica, Emir and Gentzkow, Matthew},
   title   = {Bayesian Persuasion},
@@ -62,6 +91,7 @@
   doi     = {10.1257/aer.101.6.2590}
 }
 
+% Cite in §VoI theory: original nonconcavity result motivating decision-local analysis
 @incollection{RadnerStiglitz1984,
   author    = {Radner, Roy and Stiglitz, Joseph E.},
   title     = {A Nonconcavity in the Value of Information},
@@ -76,6 +106,7 @@
   isbn      = {978-0-444-86502-1}
 }
 
+% Cite in §VoI theory: concavity result — counterpoint to Radner-Stiglitz
 @article{Whitmeyer2024,
   author  = {Whitmeyer, Mark},
   title   = {A Concavity in the Value of Information},
@@ -87,6 +118,7 @@
   note    = {Preprint circulated 2024 as arXiv:2404.01190}
 }
 
+% Cite in §ASIL: comparing information structures under finite actions
 @article{BrooksFrankelKamenica2024,
   author  = {Brooks, Benjamin and Frankel, Alexander and Kamenica, Emir},
   title   = {Comparisons of Signals},
@@ -98,6 +130,7 @@
   doi     = {10.1257/aer.20230430}
 }
 
+% Cite in §geometry / proper scoring rules: Bregman divergences and equivalence of informations
 @article{Chodrow2025,
   author  = {Chodrow, Philip S.},
   title   = {Equivalence of Informations Characterizes {B}regman Divergences},
@@ -110,6 +143,7 @@
   note    = {arXiv:2501.02104}
 }
 
+% Cite in §VoI: VoI in monotone decision problems — closely related to boundary regret for ordered actions
 @article{AtheyLevin2018,
   author  = {Athey, Susan and Levin, Jonathan},
   title   = {The Value of Information in Monotone Decision Problems},
@@ -121,6 +155,7 @@
   doi     = {10.1016/j.rie.2016.10.001}
 }
 
+% Cite in §review allocation: optimal dynamic allocation of attention under costs
 @article{Che2019,
   author  = {Che, Yeon-Koo and Mierendorff, Konrad},
   title   = {Optimal Dynamic Allocation of Attention},
@@ -132,6 +167,7 @@
   doi     = {10.1257/aer.20171000}
 }
 
+% Cite in §review cost: cost of information — useful for review-cost-adjusted utility
 @article{DentiMarinacciRustichini2022,
   author  = {Denti, Tommaso and Marinacci, Massimo and Rustichini, Aldo},
   title   = {Experimental Cost of Information},
@@ -143,6 +179,7 @@
   doi     = {10.1257/aer.20210879}
 }
 
+% Cite in §review allocation: attention allocation under limited capacity
 @article{Gossner2021,
   author  = {Gossner, Olivier and Steiner, Jakub and Stewart, Colin},
   title   = {Attention Please!},
@@ -154,6 +191,7 @@
   doi     = {10.3982/ECTA17173}
 }
 
+% Cite in §demand for information: heat-vs-light framing of info demand
 @article{KeppoMoscariniSmith2008,
   author  = {Keppo, Jussi and Moscarini, Giuseppe and Smith, Lones},
   title   = {The Demand for Information: More Heat than Light},
@@ -165,6 +203,7 @@
   doi     = {10.1016/j.jet.2007.01.008}
 }
 
+% Cite in §info complementarity: complementary information channels and learning traps
 @article{LiangMu2020,
   author  = {Liang, Annie and Mu, Xiaosheng},
   title   = {Complementary Information and Learning Traps},
@@ -176,6 +215,7 @@
   doi     = {10.1093/qje/qjz033}
 }
 
+% Cite in §info aggregation: dynamically aggregating diverse information channels
 @article{LiangMuSyrgkanis2022,
   author  = {Liang, Annie and Mu, Xiaosheng and Syrgkanis, Vasilis},
   title   = {Dynamically Aggregating Diverse Information},
@@ -187,6 +227,7 @@
   doi     = {10.3982/ECTA18324}
 }
 
+% Cite in §Blackwell theory: large-sample Blackwell dominance via Rényi divergences
 @article{Mu2021,
   author  = {Mu, Xiaosheng and Pomatto, Luciano and Strack, Philipp and Tamuz, Omer},
   title   = {From Blackwell Dominance in Large Samples to {R}\'{e}nyi Divergences and Back Again},
@@ -198,6 +239,7 @@
   doi     = {10.3982/ECTA17548}
 }
 
+% Cite in §review cost: cost of information with constant marginal costs
 @article{Pomatto2023,
   author  = {Pomatto, Luciano and Strack, Philipp and Tamuz, Omer},
   title   = {The Cost of Information: The Case of Constant Marginal Costs},
@@ -207,4 +249,625 @@
   number  = {5},
   pages   = {1360--1393},
   doi     = {10.1257/aer.20190185}
+}
+
+% Cite in §information design / persuasion: unified perspective on information design
+@article{Bergemann2019,
+  author  = {Bergemann, Dirk and Morris, Stephen},
+  title   = {Information Design: A Unified Perspective},
+  journal = {Journal of Economic Literature},
+  year    = {2019},
+  volume  = {57},
+  number  = {1},
+  pages   = {3--28},
+  doi     = {10.1257/jel.20181489}
+}
+
+
+% -------------------------------------------------------
+% 2. ACTIVE LEARNING & INFORMATION ACQUISITION
+% -------------------------------------------------------
+
+% Cite in §related work active learning: query-by-committee; connect to uncertainty-based review baselines
+@inproceedings{SeungOS1992,
+  author    = {Seung, H. Sebastian and Opper, Manfred and Sompolinsky, Haim},
+  title     = {Query by Committee},
+  booktitle = {Proceedings of the Fifth Annual Workshop on Computational
+               Learning Theory (COLT)},
+  year      = {1992},
+  pages     = {287--294},
+  publisher = {ACM}
+}
+
+% Cite in §related work active learning: BALD — Bayesian active learning by disagreement; contrast with BR allocation
+@article{Houlsby2011,
+  author  = {Houlsby, Neil and Husz\'{a}r, Ferenc and Ghahramani, Zoubin
+             and Lengyel, M\'{a}t\'{e}},
+  title   = {Bayesian Active Learning for Classification and Preference
+             Learning},
+  journal = {arXiv preprint arXiv:1112.5745},
+  year    = {2011},
+  note    = {Published at AISTATS 2012}
+}
+
+% Cite in §related work active learning: BatchBALD batch acquisition
+@inproceedings{Kirsch2019,
+  author    = {Kirsch, Andreas and van Amersfoort, Joost and Gal, Yarin},
+  title     = {{BatchBALD}: Efficient and Diverse Batch Acquisition for Deep
+               {B}ayesian Active Learning},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2019}
+}
+
+% Cite in §related work active learning: BADGE gradient-based batch active learning
+@inproceedings{Ash2020,
+  author    = {Ash, Jordan T. and Zhang, Chicheng and Krishnamurthy, Akshay
+               and Langford, John and Agarwal, Alekh},
+  title     = {Deep Batch Active Learning by Diverse, Uncertain Gradient
+               Lower Bounds},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2020}
+}
+
+% Cite in §related work active learning: loss-driven Bayesian AL — most directly related to decision-value framing in active learning
+@article{Huang2026,
+  author  = {Huang, Zhuoyue and {Bickford Smith}, Freddie and Rainforth, Tom},
+  title   = {Loss-Driven {B}ayesian Active Learning},
+  journal = {arXiv preprint arXiv:2604.11995},
+  year    = {2026}
+}
+
+% Cite in §related work active learning: agnostic active learning theory
+@inproceedings{BalcanBeygelzimerLangford2006,
+  author    = {Balcan, Maria-Florina and Beygelzimer, Alina and Langford, John},
+  title     = {Agnostic Active Learning},
+  booktitle = {Proceedings of the 23rd International Conference on Machine
+               Learning (ICML)},
+  year      = {2006},
+  pages     = {65--72}
+}
+
+% Cite in §related work active learning: label complexity of agnostic AL
+@inproceedings{Hanneke2007,
+  author    = {Hanneke, Steve},
+  title     = {A Bound on the Label Complexity of Agnostic Active Learning},
+  booktitle = {Proceedings of the 24th International Conference on Machine
+               Learning (ICML)},
+  year      = {2007},
+  pages     = {353--360}
+}
+
+% Cite in §related work active learning: original uncertainty sampling for text classification
+@inproceedings{LewisGale1994,
+  author    = {Lewis, David D. and Gale, William A.},
+  title     = {A Sequential Algorithm for Training Text Classifiers},
+  booktitle = {Proceedings of the 17th Annual International {ACM-SIGIR}
+               Conference on Research and Development in Information Retrieval},
+  year      = {1994},
+  pages     = {3--12},
+  publisher = {Springer}
+}
+
+
+% -------------------------------------------------------
+% 3. PARTIAL INFORMATION DECOMPOSITION
+% -------------------------------------------------------
+
+% Cite in §ASIL theory appendix: synergy/redundancy decomposition of mutual information
+@article{Chicharro2017,
+  author  = {Chicharro, Daniel and Panzeri, Stefano},
+  title   = {Synergy and Redundancy in Dual Decompositions of Mutual Information Gain and Information Loss},
+  journal = {Entropy},
+  year    = {2017},
+  volume  = {19},
+  number  = {2},
+  pages   = {71},
+  doi     = {10.3390/e19020071}
+}
+
+% Cite in §ASIL theory appendix: partial information decomposition framework
+@article{Kolchinsky2022,
+  author  = {Kolchinsky, Artemy},
+  title   = {A Novel Approach to the Partial Information Decomposition},
+  journal = {Entropy},
+  year    = {2022},
+  volume  = {24},
+  number  = {3},
+  pages   = {403},
+  doi     = {10.3390/e24030403}
+}
+
+% Cite in §ASIL theory appendix: original PID / nonnegative decomposition paper
+@article{WilliamsBeer2010,
+  author  = {Williams, Paul L. and Beer, Randall D.},
+  title   = {Nonnegative Decomposition of Multivariate Information},
+  journal = {arXiv preprint arXiv:1004.2515},
+  year    = {2010}
+}
+
+% Cite in §game theory / beliefs: repeated games with incomplete information
+@book{AumannMaschler1995,
+  author    = {Aumann, Robert J. and Maschler, Michael B.},
+  title     = {Repeated Games with Incomplete Information},
+  publisher = {MIT Press},
+  address   = {Cambridge, MA},
+  year      = {1995}
+}
+
+
+% -------------------------------------------------------
+% 4. HUMAN EXPERTISE AUDITING
+% -------------------------------------------------------
+
+% Cite everywhere — primary empirical precursor; setup for Experiment 2 follows their chest X-ray protocol
+% NOTE: Published at NeurIPS 2023 (Advances in NeurIPS 36, pp.69-82). Authors corrected from earlier arXiv metadata.
+@inproceedings{AlurEtAl2023,
+  author    = {Alur, Rohan and Laine, Loren and Li, Darrick K. and Raghavan, Manish
+               and Shah, Devavrat and Shung, Dennis},
+  title     = {Auditing for Human Expertise},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2023},
+  volume    = {36},
+  pages     = {69--82},
+  note      = {arXiv:2306.01646}
+}
+
+% Cite everywhere — defines residual expertise estimand that BR complements; "Human Expertise in Algorithmic Prediction"
+% Key precursor: algorithmic indistinguishability + multicalibration for human predictions
+@article{AlurRaghavanShah2024,
+  author  = {Alur, Rohan and Raghavan, Manish and Shah, Devavrat},
+  title   = {Human Expertise in Algorithmic Prediction},
+  journal = {arXiv preprint arXiv:2402.00793},
+  year    = {2024}
+}
+
+% Cite in §related work complementarity: action-set design for human-AI complementarity — "closely related motivation"
+% in gap table; Straitouri et al. 2025 is explicitly named in the proposal gap table
+@article{StraitouriEtAl2025,
+  author  = {Straitouri, Eleni and Tsirtsis, Stratis and Velasco, Ander Artola
+             and Gomez-Rodriguez, Manuel},
+  title   = {Narrowing Action Choices with {AI} Improves Human Sequential Decisions},
+  journal = {arXiv preprint arXiv:2510.16097},
+  year    = {2025}
+}
+
+% Cite in §related work / Experiment 2 baselines: multicalibration as a lens on human-AI forecasting
+@inproceedings{HebertJohnson2018,
+  author    = {H\'{e}bert-Johnson, Ursula and Kim, Michael P. and Reingold, Omer
+               and Rothblum, Guy N.},
+  title     = {Multicalibration: Calibration for the ({C}omputationally-Identifiable) Masses},
+  booktitle = {Proceedings of the 35th International Conference on Machine Learning (ICML)},
+  year      = {2018},
+  pages     = {1939--1948},
+  note      = {arXiv:1711.08513}
+}
+
+% Cite in §selective labels / observational bias in human data: affects estimation of P(Y|x,h)
+@article{DeArteaga2018,
+  author  = {De-Arteaga, Maria and Dubrawski, Artur and Chouldechova, Alexandra},
+  title   = {Learning under Selective Labels in the Presence of Expert Consistency},
+  journal = {arXiv preprint arXiv:1807.00905},
+  year    = {2018}
+}
+
+
+% -------------------------------------------------------
+% 5. LEARNING-TO-DEFER & SELECTIVE PREDICTION
+% -------------------------------------------------------
+
+% Cite in §related work L2D: foundational consistent L2D paper; primary gap-table entry
+@inproceedings{MozannarSontag2020,
+  author    = {Mozannar, Hussein and Sontag, David},
+  title     = {Consistent Estimators for Learning to Defer to an Expert},
+  booktitle = {Proceedings of the 37th International Conference on Machine Learning (ICML)},
+  year      = {2020},
+  pages     = {7076--7087},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {119},
+  note      = {arXiv:2006.01862}
+}
+
+% Cite in §related work L2D: limited expert predictions for deferral — closes missing BibTeX entry
+@inproceedings{HemmerEtAl2023,
+  author    = {Hemmer, Patrick and Thede, Lukas and V\"{o}ssing, Michael
+               and Jakubik, Johannes and K\"{u}hl, Niklas},
+  title     = {Learning to Defer with Limited Expert Predictions},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  year      = {2023},
+  volume    = {37},
+  pages     = {6002--6011},
+  doi       = {10.1609/aaai.v37i5.25742},
+  note      = {arXiv:2304.07306}
+}
+
+% Cite in §related work L2D: two-stage deferral with multiple experts — Mao et al. 2023 cited in gap table
+@inproceedings{MaoMohri2023,
+  author    = {Mao, Anqi and Mohri, Christopher and Mohri, Mehryar and Zhong, Yutao},
+  title     = {Two-Stage Learning to Defer with Multiple Experts},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2023},
+  note      = {arXiv:2310.06331}
+}
+
+% Cite in §related work L2D: regression with multi-expert deferral — Mao et al. 2024 cited in gap table
+@article{MaoMohri2024,
+  author  = {Mao, Anqi and Mohri, Mehryar and Zhong, Yutao},
+  title   = {Regression with Multi-Expert Deferral},
+  journal = {arXiv preprint arXiv:2403.19494},
+  year    = {2024}
+}
+
+% Cite in §related work L2D: differentiable learning under triage — Okati et al. cited in deferral literature
+@article{OkatiDeGomez2021,
+  author  = {Okati, Nastaran and De, Abir and Gomez-Rodriguez, Manuel},
+  title   = {Differentiable Learning Under Triage},
+  journal = {arXiv preprint arXiv:2103.08902},
+  year    = {2021}
+}
+
+% Cite in §related work L2D: one-stage top-k deferral — Montreuil et al. 2025 cited in gap table
+@article{MontreuilEtAl2025,
+  author  = {Montreuil, Yannis and Carlier, Axel and Ng, Lai Xing and Ooi, Wei Tsang},
+  title   = {One-Stage Top-$k$ Learning-to-Defer: Score-Based Surrogates with Theoretical Guarantees},
+  journal = {arXiv preprint arXiv:2505.10160},
+  year    = {2025}
+}
+
+% Cite in §Experiment 3 baselines: L2D competitor; use to analyze whether BR explains learned deferral gains
+@inproceedings{VermaEtAl2022,
+  author    = {Verma, Rajeev and Barrej\'{o}n, Daniel and Nalisnick, Eric},
+  title     = {Learning to Defer to Multiple Experts: Consistent Surrogate Losses,
+               Confidence Calibration, and Conformal Ensembles},
+  booktitle = {Proceedings of the 39th International Conference on Machine Learning (ICML)},
+  year      = {2022},
+  note      = {arXiv:2210.16955}
+}
+
+
+% -------------------------------------------------------
+% 6. REJECT OPTION & SELECTIVE CLASSIFICATION
+% -------------------------------------------------------
+
+% Cite in §related work reject option: seminal error-reject tradeoff paper — Ramaswamy cites this
+@article{Chow1970,
+  author  = {Chow, C. K.},
+  title   = {On Optimum Recognition Error and Reject Tradeoff},
+  journal = {IEEE Transactions on Information Theory},
+  year    = {1970},
+  volume  = {16},
+  number  = {1},
+  pages   = {41--46},
+  doi     = {10.1109/TIT.1970.1054406}
+}
+
+% Cite in §related work reject option: consistency theory for reject option via hinge loss
+@article{BartlettWegkamp2008,
+  author  = {Bartlett, Peter L. and Wegkamp, Marten H.},
+  title   = {Classification with a Reject Option Using a Hinge Loss},
+  journal = {Journal of Machine Learning Research},
+  year    = {2008},
+  volume  = {9},
+  pages   = {1823--1840}
+}
+
+% Cite in §related work reject option: Ramaswamy et al. — explicitly named in gap table as characterizing
+% optimal abstention using model uncertainty without human signal channel
+@article{RamaswamyEtAl2018,
+  author  = {Ramaswamy, Harish G. and Tewari, Ambuj and Agarwal, Shivani},
+  title   = {Consistent Algorithms for Multiclass Classification with an Abstain Option},
+  journal = {Electronic Journal of Statistics},
+  year    = {2018},
+  volume  = {12},
+  number  = {1},
+  pages   = {530--554},
+  doi     = {10.1214/17-EJS1388},
+  note    = {arXiv preprint 2015 (arXiv:1505.04137); cited in proposal as Ramaswamy et al. 2015}
+}
+
+% Cite in §related work reject option: Franc et al. — explicitly named in gap table
+% Unified theory showing optimal reject strategy under multiple formulations
+@article{FrancPrusa2023,
+  author  = {Franc, Vojtech and Prusa, Daniel and Voracek, Vladimir},
+  title   = {Optimal Strategies for Reject Option Classifiers},
+  journal = {Journal of Machine Learning Research},
+  year    = {2023},
+  volume  = {24},
+  number  = {11},
+  pages   = {1--47},
+  note    = {Cited in proposal as Franc et al. 2021; JMLR publication date is 2023}
+}
+
+% Cite in §related work selective classification: selective classification for deep neural networks (NeurIPS 2017)
+@inproceedings{GeifmanElYaniv2017,
+  author    = {Geifman, Yonatan and El-Yaniv, Ran},
+  title     = {Selective Classification for Deep Neural Networks},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2017},
+  volume    = {30}
+}
+
+% Cite in §related work selective classification: SelectiveNet — end-to-end learned rejection (ICML 2019)
+@inproceedings{GeifmanElYaniv2019,
+  author    = {Geifman, Yonatan and El-Yaniv, Ran},
+  title     = {{SelectiveNet}: A Deep Neural Network with an Integrated Reject Option},
+  booktitle = {Proceedings of the 36th International Conference on Machine Learning (ICML)},
+  year      = {2019},
+  pages     = {2151--2159},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {97}
+}
+
+
+% -------------------------------------------------------
+% 7. BEHAVIORAL HUMAN-AI COLLABORATION
+% -------------------------------------------------------
+
+% Cite in §related work behavioral/causal: McLaughlin & Spiess — explicitly named in gap table
+% "Explains why available human value may not be realized"; uses potential-outcomes framework
+% for recommendation-dependent preferences; causal formulation of human-AI complementarity
+@article{McLaughlinSpiess2024,
+  author  = {McLaughlin, Bryce and Spiess, Jann},
+  title   = {Designing Algorithmic Recommendations to Achieve Human-{AI} Complementarity},
+  journal = {arXiv preprint arXiv:2405.01484},
+  year    = {2024}
+}
+
+% Cite in §related work behavioral: meta-analysis of 106 studies showing human-AI combos often underperform
+% best-of-either; anchors "compliance gap" and realized vs. potential value discussion
+@article{Vaccaro2024,
+  author  = {Vaccaro, Michelle and Almaatouq, Abdullah and Malone, Thomas W.},
+  title   = {When Combinations of Humans and {AI} Are Useful: A Systematic Review and Meta-Analysis},
+  journal = {Nature Human Behaviour},
+  year    = {2024},
+  volume  = {8},
+  number  = {12},
+  pages   = {2293--2303},
+  doi     = {10.1038/s41562-024-02024-1},
+  note    = {arXiv:2405.06087}
+}
+
+% Cite in §related work behavioral: Schoeffer et al. — explicitly named in gap table under behavioral accounts
+% Shows explanations affect reliance but don't help humans distinguish correct AI advice
+@inproceedings{SchoefferEtAl2024,
+  author    = {Schoeffer, Jakob and De-Arteaga, Maria and K\"{u}hl, Niklas},
+  title     = {Explanations, Fairness, and Appropriate Reliance in Human-{AI} Decision-Making},
+  booktitle = {Proceedings of the {CHI} Conference on Human Factors in Computing Systems},
+  year      = {2024},
+  pages     = {1--21},
+  doi       = {10.1145/3613904.3642621},
+  note      = {arXiv:2209.11812; cited in proposal as Schoeffer et al. 2023}
+}
+
+% Cite in §related work behavioral: cognitive forcing functions reduce overreliance more than explanations alone
+@article{BucinaEtAl2021,
+  author  = {Bu{\c{c}}inca, Zana and Malaya, Maja Barbara and Gajos, Krzysztof Z.},
+  title   = {To Trust or to Think: Cognitive Forcing Functions Can Reduce Overreliance on {AI}
+             in {AI}-Assisted Decision-Making},
+  journal = {Proceedings of the ACM on Human-Computer Interaction},
+  year    = {2021},
+  volume  = {5},
+  number  = {CSCW1},
+  pages   = {1--21},
+  doi     = {10.1145/3449287},
+  note    = {arXiv:2102.09692}
+}
+
+% Cite in §related work behavioral: AI updates improving model performance can hurt team performance
+% (compatibility tradeoff) — relevant to compliance gap discussion
+@inproceedings{BansalEtAl2019,
+  author    = {Bansal, Gagan and Nushi, Besmira and Kamar, Ece and Weld, Daniel S.
+               and Lasecki, Walter S. and Horvitz, Eric},
+  title     = {Updates in Human-{AI} Teams: Understanding and Addressing the
+               Performance/Compatibility Tradeoff},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  year      = {2019},
+  volume    = {33},
+  number    = {1},
+  pages     = {2429--2437},
+  doi       = {10.1609/aaai.v33i01.3301590}
+}
+
+% Cite in §related work behavioral / Holstein et al. 2025 reference: theory of complementarity
+% based on information and capability asymmetries
+@article{HemmerEtAl2025,
+  author  = {Hemmer, Patrick and Schemmer, Max and K\"{u}hl, Niklas and V\"{o}ssing, Michael
+             and Satzger, Gerhard},
+  title   = {Complementarity in Human-{AI} Collaboration: Concept, Sources, and Evidence},
+  journal = {European Journal of Information Systems},
+  year    = {2025},
+  volume  = {34},
+  number  = {6},
+  doi     = {10.1080/0960085X.2025.2475962},
+  note    = {Cited in proposal as Holstein et al. 2025}
+}
+
+
+% -------------------------------------------------------
+% 8. DECISION-FOCUSED ML & PREDICT-THEN-OPTIMIZE
+% -------------------------------------------------------
+
+% Cite in §decision-focused learning: SPO+ loss — endogenizes downstream reward into prediction training
+% Closest ML precursor to "reward-aware" prediction; cite when motivating why accuracy != decision utility
+@article{Elmachtoub2022,
+  author  = {Elmachtoub, Adam N. and Grigas, Paul},
+  title   = {Smart ``{P}redict, then {O}ptimize''},
+  journal = {Management Science},
+  year    = {2022},
+  volume  = {68},
+  number  = {1},
+  pages   = {9--26},
+  doi     = {10.1287/mnsc.2020.3922},
+  note    = {arXiv:1710.08005}
+}
+
+% Cite in §decision-focused learning: decision-focused learning for combinatorial optimization
+@inproceedings{Wilder2019,
+  author    = {Wilder, Bryan and Dilkina, Bistra and Tambe, Milind},
+  title     = {Melding the Data-{D}ecisions Pipeline: {D}ecision-{F}ocused Learning
+               for Combinatorial Optimization},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  year      = {2019},
+  volume    = {33},
+  number    = {1},
+  pages     = {1658--1665},
+  doi       = {10.1609/aaai.v33i01.33011658},
+  note      = {arXiv:1809.05504}
+}
+
+
+% -------------------------------------------------------
+% 9. MODEL CALIBRATION & SEMIPARAMETRIC ESTIMATION
+% -------------------------------------------------------
+
+% Cite in §estimation / Experiment 1: standard calibration reference; temperature scaling
+@inproceedings{Guo2017,
+  author    = {Guo, Chuan and Pleiss, Geoff and Sun, Yu and Weinberger, Kilian Q.},
+  title     = {On Calibration of Modern Neural Networks},
+  booktitle = {Proceedings of the 34th International Conference on Machine Learning (ICML)},
+  year      = {2017},
+  pages     = {1321--1330},
+  volume    = {70},
+  series    = {Proceedings of Machine Learning Research},
+  note      = {arXiv:1706.04599}
+}
+
+% Cite in §estimation: classic calibration reference (Platt scaling, isotonic regression comparison)
+@inproceedings{NiculescuMizil2005,
+  author    = {Niculescu-Mizil, Alexandru and Caruana, Rich},
+  title     = {Predicting Good Probabilities with Supervised Learning},
+  booktitle = {Proceedings of the 22nd International Conference on Machine Learning (ICML)},
+  year      = {2005},
+  pages     = {625--632},
+  doi       = {10.1145/1102351.1102430}
+}
+
+% Cite in §estimation / proper scoring rules: strictly proper scoring rules connect to VoI via Bregman structure
+@article{Gneiting2007,
+  author  = {Gneiting, Tilmann and Raftery, Adrian E.},
+  title   = {Strictly Proper Scoring Rules, Prediction, and Estimation},
+  journal = {Journal of the American Statistical Association},
+  year    = {2007},
+  volume  = {102},
+  number  = {477},
+  pages   = {359--378},
+  doi     = {10.1198/016214506000001437}
+}
+
+% Cite in §estimation: double/debiased ML for cross-fitting b_{x,h} = P(Y|x,h) without overfitting
+@article{Chernozhukov2018,
+  author  = {Chernozhukov, Victor and Chetverikov, Denis and Demirer, Mert and Duflo, Esther
+             and Hansen, Christian B. and Newey, Whitney K. and Robins, James M.},
+  title   = {Double/Debiased Machine Learning for Treatment and Structural Parameters},
+  journal = {The Econometrics Journal},
+  year    = {2018},
+  volume  = {21},
+  number  = {1},
+  pages   = {C1--C68},
+  doi     = {10.1111/ectj.12097},
+  note    = {arXiv:1608.00060}
+}
+
+% Cite in §estimation: semiparametric doubly-robust review for cross-fitted estimators
+@article{Kennedy2023,
+  author  = {Kennedy, Edward H.},
+  title   = {Semiparametric Doubly Robust Targeted Double Machine Learning: A Review},
+  journal = {arXiv preprint arXiv:2203.06469},
+  year    = {2023}
+}
+
+
+% -------------------------------------------------------
+% 10. MEDICAL AI DATASETS
+% -------------------------------------------------------
+
+% Cite in §datasets (Experiment 2): CheXNet — radiologist-level pneumonia detection; motivates
+% chest X-ray as canonical domain where AI meets physician expertise
+@article{Rajpurkar2017,
+  author  = {Rajpurkar, Pranav and Irvin, Jeremy and Zhu, Kaylie and Yang, Brandon
+             and Mehta, Hershel and Duan, Tony and Ding, Daisy and Bagul, Aarti
+             and Langlotz, Curtis and Shpanskaya, Katie and Lungren, Matthew P.
+             and Ng, Andrew Y.},
+  title   = {{CheXNet}: Radiologist-Level Pneumonia Detection on Chest {X}-Rays
+             with Deep Learning},
+  journal = {arXiv preprint arXiv:1711.05225},
+  year    = {2017}
+}
+
+% Cite in §datasets (Experiment 2): CheXpert — 224K chest X-rays with 14 labels and 3-5 radiologist reads;
+% preferred dataset for Experiment 2 (multiple human labels per instance enables BR variance estimates)
+@article{Irvin2019,
+  author  = {Irvin, Jeremy and Rajpurkar, Pranav and Ko, Michael and Yu, Yifan
+             and Ciampi, Silviana and Chute, Chris and Marklund, Anna-Margrethe
+             and Haghgoo, Behzad and Ball, Robyn and Shpanskaya, Katie
+             and Seekins, Jayne and Langlotz, Curtis P. and Ng, Andrew Y.},
+  title   = {{CheXpert}: A Large Chest Radiograph Dataset with Uncertainty Labels
+             and Expert Comparison},
+  journal = {arXiv preprint arXiv:1901.07031},
+  year    = {2019}
+}
+
+% Cite in §datasets (Experiment 2): MIMIC-CXR — 377K images with free-text radiology reports;
+% use if needing a second dataset with clinical practice signal
+@article{Johnson2019,
+  author  = {Johnson, Alistair E. W. and Pollard, Tom J. and Berkowitz, Seth J.
+             and Greenbaum, Nathaniel R. and Lungren, Matthew P. and Deng, Chih-Ying
+             and Mark, Roger G. and Horng, Steven},
+  title   = {{MIMIC-CXR}, a De-Identified Publicly Available Database of Chest
+             Radiographs with Free-Text Reports},
+  journal = {Scientific Data},
+  year    = {2019},
+  volume  = {6},
+  pages   = {317},
+  doi     = {10.1038/s41597-019-0322-0}
+}
+
+
+% -------------------------------------------------------
+% 11. VOI & BAYESIAN DECISION THEORY FOUNDATIONS
+% -------------------------------------------------------
+
+% Cite in §formal setup / VoI identity: Blackwell's foundational comparison-of-experiments theorem;
+% the Bayesian martingale property used in the BR identity descends from this
+@inproceedings{Blackwell1951,
+  author    = {Blackwell, David},
+  title     = {Comparison of Experiments},
+  booktitle = {Proceedings of the Second {B}erkeley Symposium on Mathematical
+               Statistics and Probability},
+  publisher = {University of California Press},
+  pages     = {93--102},
+  year      = {1951}
+}
+
+% Cite in §VoI foundations: original information value theory paper — distinguishes VoI from Shannon entropy
+% by incorporating economic consequences; direct ancestor of boundary regret framing
+@article{Howard1966,
+  author  = {Howard, Ronald A.},
+  title   = {Information Value Theory},
+  journal = {IEEE Transactions on Systems Science and Cybernetics},
+  year    = {1966},
+  volume  = {2},
+  number  = {1},
+  pages   = {22--26},
+  doi     = {10.1109/TSSC.1966.300074}
+}
+
+% Cite in §VoI foundations: canonical Bayesian decision theory textbook;
+% finite-action Bayesian decision problems follow DeGroot's framework
+@book{DeGroot1970,
+  author    = {DeGroot, Morris H.},
+  title     = {Optimal Statistical Decisions},
+  publisher = {John Wiley \& Sons},
+  year      = {1970},
+  series    = {Wiley Classics Library},
+  note      = {Reprinted 2004}
+}
+
+% Cite in §VoI foundations: applied Bayesian decision theory with pre-posterior analysis;
+% cite when discussing review cost in utility matrices
+@book{RaiffaSchlaifer1961,
+  author    = {Raiffa, Howard and Schlaifer, Robert},
+  title     = {Applied Statistical Decision Theory},
+  publisher = {Division of Research, Harvard Business School},
+  address   = {Boston, MA},
+  year      = {1961}
 }

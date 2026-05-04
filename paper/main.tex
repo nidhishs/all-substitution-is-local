@@ -10,6 +10,8 @@
 \usepackage{enumitem}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tikz}
 
 % Math macros
 \DeclareMathOperator*{\argmax}{arg\,max}
@@ -19,6 +21,7 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Dg}{D_g}
 \newcommand{\Dh}{D_h}
+\newcommand{\BR}{\operatorname{BR}}
 
 % Theorem environments
 \newtheorem{theorem}{Theorem}
@@ -29,7 +32,7 @@
 \newtheorem{theoremA}{Theorem}
 \renewcommand{\thetheoremA}{\Alph{theoremA}}
 
-\title{All Substitution Is Local}
+\title{Residual Expertise Is Not Decision Value}
 
 \author{
     Nidhish Shah \thanks{Equal contribution.} \\
@@ -52,13 +55,20 @@
 \maketitle
 
 \begin{abstract}
-When does consulting one information source raise the value of another, and when does it diminish it? We study this question for Bayesian decision-makers facing finite actions. The interaction decomposes into two opposing forces: a complement force, measuring how one source moves beliefs to where the other becomes more useful, and a substitute force, measuring how much the current decision is resolved. Their balance obeys a localization principle: substitution requires an observation to cross a decision boundary, though crossing alone does not guarantee it. Whenever posteriors remain inside the current decision region, the substitute force vanishes and sources are guaranteed to complement each other, even when one source cannot, on its own, change the decision. The results hold for arbitrarily correlated sources and are formalized in Lean 4.\footnote{Code and proofs: \url{https://github.com/nidhishs/all-substitution-is-local}.} Substitution is confined to the thin boundaries where decisions change. Everywhere else, information cooperates.
+A human with residual predictive expertise beyond the model may still have zero decision value.
+Whether the human's information crosses a reward-relevant boundary---not whether it improves predictions---determines whether review is worth deploying.
+We introduce \emph{boundary regret}: the regret of keeping the model's action under the human-updated posterior.
+In any finite-action Bayesian decision problem, the value of human review equals expected boundary regret (Lean-formalized); predictive signal that does not cross a reward-induced facet has zero decision value, regardless of log-loss gain.
+On CheXpert Cardiomegaly with a board-certified radiologist as the human signal, \textbf{97\%} of top-expertise-decile cases have zero boundary regret under a false-positive-penalty reward: the human is informative, the operative action is unchanged.
+On synthetic allocation tasks, an ex ante boundary-regret estimator allocates scarce review better than uncertainty, residual-expertise, and learning-to-defer baselines under asymmetric rewards at review budgets $q \in \{10\%,\, 20\%\}$, with up to $2.7\times$ higher utility gain per review than the best non-oracle alternative.
+The deployment estimand for human--AI complementarity is residual decision value, not residual predictive expertise.
 \end{abstract}
 
 \input{chapters/introduction}
 \input{chapters/preliminaries}
 \input{chapters/methodology}
 \input{chapters/illustration}
+\input{chapters/experiments}
 \input{chapters/related}
 \input{chapters/conclusion}
 

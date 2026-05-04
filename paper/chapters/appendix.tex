@@ -1,81 +1,154 @@
 \appendix
 
-\section{Piecewise-Linear Structure}
-\label{app:polyhedral}
-
-\begin{theoremA}[Piecewise-linearity of the interaction]
-\label{prop:polyhedral}
-For finite $|A|$, $|O_i|$, $|O_j|$, and $K$, the function $b \mapsto \Delta\VoI(j \mid i, b)$ is piecewise-linear on $\Delta^{K-1}$.
-\end{theoremA}
-
-\begin{proof}
-For any channel~$k$ with outcome set~$O_k$, the unnormalized posterior-value product satisfies
-\[
-  P(o \mid b)\, V(\bpost(k, o))
-  \;=\; \max_{a \in A}\; \sum_s R(a,s)\, P(o \mid s, k)\, b(s),
-\]
-where the normalizing denominator $P(o \mid b)$ cancels against the posterior formula.
-The right-hand side is the maximum of $|A|$ functions, each linear in~$b$.
-Summing over outcomes,
-\[
-  \E_o\bigl[V(\bpost(k, o))\bigr]
-  \;=\;
-  \sum_{o \in O_k} \max_{a \in A}\; \sum_s R(a,s)\, P(o \mid s, k)\, b(s),
-\]
-a sum of piecewise-linear convex (PWLC) functions of~$b$.
-By the same cancellation applied to the joint channel $(i,j)$ under conditional independence, and to channels $i$ and $j$ individually, the interaction decomposes as
-\[
-  \Delta\VoI(j \mid i, b)
-  \;=\; F_{ij}(b) - F_i(b) - F_j(b) + V(b),
-\]
-where each term is a sum of maxima of finitely many linear functions of~$b$.
-Each term is therefore PWLC, and their sum is piecewise-linear.
-\end{proof}
-
-\section{Regret Interpretation}
-\label{app:regret}
-
-In the interior of decision region $\mathcal{R}_a$, where $h(b') = r_a \cdot b'$, the Bregman divergence of $h$ admits a clean interpretation:
-\[
-  \Dh(b', b)
-  \;=\; V(b') - r_a \cdot b'
-  \;=\; \operatorname{Regret}(a^*(b),\, b'),
-\]
-where $\operatorname{Regret}(a, b') = V(b') - r_a \cdot b'$ is the regret of committing to action~$a$ at belief~$b'$.
-The substitute force $\E[\Dh(\bpost, b)]$ is therefore the expected regret of sticking with the currently optimal action at the posterior belief.
-
-This connects the Bregman decomposition to a decision-theoretic quantity: substitution occurs when channel~$i$ resolves enough uncertainty that the agent's current action has low expected regret, leaving little room for channel~$j$ to improve the decision.
-
-\section{Lean Formalization}
+% ============================================================
+\section{Lean~4 Formalization}
 \label{app:lean}
+% ============================================================
 
-The Lean~4 source files provide machine-verified proofs of all results.
-The formalization uses the \emph{Jensen gap} $\E[f(X)] - f(\E[X])$ rather than explicit Bregman divergences, and abstracts the paper's geometric hypotheses (e.g., posteriors remain in the same decision region) to their algebraic consequences (\texttt{jensenGap h = 0} and \texttt{jensenGap g $\geq$ 0}).
-The geometric conditions imply the algebraic ones but not conversely, so the Lean statements are strictly more general.
-In particular, the algebraic conditions do not encode conditional independence.
+All formal results are verified in Lean~4 using the Mathlib library.
+The \textsc{AllSubstitutionIsLocal} development consists of nine modules organized in three layers.
+Table~\ref{tab:lean-map} maps the paper's statements to Lean declarations.
 
-\begin{center}
-\footnotesize
-\begin{tabular}{@{}ll@{}}
+\begin{table}[ht]
+\centering
+\caption{Map from paper statements to Lean~4 declarations.}
+\label{tab:lean-map}
+\small
+\begin{tabular}{@{}llll@{}}
 \toprule
-Paper & Lean \\
+Paper & Type & Lean declaration & Module \\
 \midrule
-Belief $b \in \Delta^{K-1}$ & \texttt{Belief S} \\
-Channel likelihood & \texttt{ObsKernel S O} \\
-$P(o \mid b)$ & \texttt{marginalProb b k o} \\
-$\bpost(i,o)$ & \texttt{posterior b k o hmarg} \\
-$\E[D_f(\bpost, b)]$ & \texttt{jensenGap f b k hmarg} \\
+$V(b) = \max_a r_a \cdot b$ & Def & \texttt{terminalValue} & Regret \\
+$\operatorname{regret}(a,b) \geq 0$ & Lem & \texttt{regret\_nonneg} & Regret \\
+$\operatorname{regret} = 0 \Leftrightarrow a$ opt & Lem & \texttt{regret\_eq\_zero\_iff} & Regret \\
+$\E[b_{\text{post}}] = b$ (martingale) & Lem & \texttt{prior\_eq\_weighted\_posterior} & Basics \\
+Thm~\ref{thm:voi-br} (VoI $=$ E[BR]) & Thm & \texttt{jensenGap\_eq\_weighted\_regret} & FacetActivation \\
+Thm~\ref{thm:facet-bridge} ($\Leftrightarrow$) & Thm & \texttt{facet\_activation\_bridge} & FacetActivation \\
+Thm~\ref{thm:facet-bridge} ($\Rightarrow$) & Thm & \texttt{boundary\_crossing\_of\_strict\_} & FacetActivation \\
+& & \quad\texttt{jensenGap\_terminalValue} & \\
+Thm~\ref{thm:facet-bridge} ($\Leftarrow$) & Thm & \texttt{jensenGap\_terminalValue\_zero\_of\_} & FacetActivation \\
+& & \quad\texttt{posteriors\_optimal} & \\
+Jensen gap $\geq 0$ & Thm & \texttt{jensenGap\_nonneg} & JensenGap \\
+Bregman decomposition & Thm & \texttt{bregman\_decomposition} & InteriorCompl \\
 \midrule
-Prop.~\ref{prop:decomposition} & \texttt{bregman\_decomposition} \\
-Cor.~\ref{cor:cost} & \texttt{jensenGap\_add\_const} \\
-Martingale property & \texttt{jensenGap\_linear} \\
-Thm.~\ref{thm:interior} & \texttt{interior\_complementarity} \\
-Thm.~\ref{thm:converse} & \texttt{substitution\_requires\_boundary\_crossing} \\
-Jensen's inequality & \texttt{jensenGap\_nonneg\_of\_convexOn} \\
-Regret $\geq 0$ & \texttt{regret\_nonneg} \\
-Thm.~\ref{prop:polyhedral} cancellation & \texttt{unnorm\_posterior\_value} \\
-Thm.~\ref{prop:polyhedral} PWLC expansion & \texttt{expected\_value\_as\_sup\_linear} \\
+Geom.\ substitute identity & Thm & \texttt{geometric\_substitute\_identity} & GeomSubstId \\
+Geom.\ complement identity & Thm & \texttt{geometric\_complement\_identity} & GeomComplId \\
+$\Delta$VoI local identity & Thm & \texttt{delta\_voi\_per\_posterior\_identity} & GeomComplId \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
+\paragraph{Primitives (\texttt{Basics.lean}, \texttt{Regret.lean}, \texttt{JensenGap.lean}).}
+\texttt{Basics.lean} defines \texttt{Belief} (a probability distribution over a finite type), \texttt{ObsKernel} (a likelihood kernel), \texttt{marginalProb}, and \texttt{posterior} via Bayes' rule.
+The two foundational identities are \texttt{marginalProb\_sum} ($\sum_o P(o \mid b) = 1$) and \texttt{prior\_eq\_weighted\_posterior} ($b = \sum_o P(o) \cdot b^o$, the Bayesian martingale).
+\texttt{Regret.lean} defines \texttt{terminalValue} and \texttt{regret} and proves non-negativity and the optimality characterization.
+\texttt{JensenGap.lean} defines the Jensen gap and proves it is non-negative for belief-convex functions, bridging to Mathlib's \texttt{ConvexOn} via the probability simplex.
+
+\paragraph{Paper theorems (\texttt{FacetActivation.lean}, \texttt{InteriorComplementarity.lean}).}
+\texttt{FacetActivation.lean} contains the paper's two main results.
+The weighted-regret identity (Theorem~\ref{thm:voi-br}) is a direct algebraic manipulation: the Bayesian martingale cancels the prior-level reward, leaving only regret terms at the posteriors.
+The facet-activation bridge (Theorem~\ref{thm:facet-bridge}) combines the weighted-regret identity with the rival-action characterization of positive regret (\texttt{regret\_pos\_iff\_rival\_action}).
+\texttt{InteriorComplementarity.lean} proves the Bregman decomposition of Jensen gaps ($\text{gap}(g - h) = \text{gap}(g) - \text{gap}(h)$) and the linear-function zero-gap property.
+
+\paragraph{Geometric identities (\texttt{GeometricSubstituteIdentity.lean}, \texttt{GeometricComplementIdentity.lean}).}
+These modules develop the quantitative facet-by-facet decomposition of the Jensen gap of $V$, expressing it as a weighted sum of reward-gap norms times perpendicular crossing depths.
+\texttt{PiecewiseLinear.lean} establishes the unnormalized posterior value cancellation that makes each summand linear in $b$ for fixed action.
+See Appendix~\ref{app:asil} for the mathematical content.
+
+\paragraph{Measure-theoretic extension (\texttt{MeasureTheoreticBelief.lean}).}
+This module generalizes the framework to infinite state spaces via Mathlib's \texttt{ProbabilityMeasure}, \texttt{Kernel}, and \texttt{Measure.condKernel}, proving the disintegration theorem and Bayes formula pointwise.
+It is included for completeness but not used in the finite-state results of this paper.
+
+
+% ============================================================
+\section{All Substitution Is Local: Interaction Identity}
+\label{app:asil}
+% ============================================================
+
+The boundary-regret results in the main text concern a single human channel.
+The broader \textsc{All Substitution Is Local} (ASIL) theory provides a pairwise interaction identity between model and human information channels, explaining when they are complements and when they are substitutes.
+
+\paragraph{Setup.}
+Let channel $i$ (model) and channel $j$ (human) each produce posteriors from a common prior $b$.
+Define the \emph{complement force} as the Jensen gap of the look-ahead value
+\[
+  g(b') \;=\; \E_{o_j}[V(\text{post}_j(o_j \mid b'))]
+\]
+under channel $i$'s posterior lottery, and the \emph{substitute force} as the Jensen gap of the terminal value $V(b')$ under the same lottery.
+
+\paragraph{Interaction identity.}
+The change in VoI from observing channel $j$ after channel $i$, versus observing $j$ alone, admits a per-outer-posterior decomposition.
+Define twisted rewards $\tilde{r}_{a,o_j}(s) := r_a(s) \cdot k_j(s, o_j)$ for each inner signal $o_j$.
+Then:
+\begin{equation}\label{eq:delta-voi-decomp}
+  \Delta\VoI(j \mid i, b)
+  \;=\;
+  \sum_{o_i} P(o_i \mid b, i) \left[
+    \sum_{o_j}
+      \operatorname{regret}_{\tilde{r}_{o_j}}\!\bigl(a^*,\, \hat{b}_{i,o_i}\bigr)
+    \;-\;
+    \operatorname{regret}_{r}\!\bigl(a^*,\, \hat{b}_{i,o_i}\bigr)
+  \right],
+\end{equation}
+where $a^*$ is optimal at $b$ and $\hat{b}_{i,o_i}$ is the outer posterior (formalized as \texttt{delta\_voi\_per\_posterior\_identity} in \texttt{GeometricComplementIdentity.lean}).
+
+\paragraph{Geometric decomposition.}
+Both forces decompose into facet-specific contributions.
+The substitute force equals a weighted sum of reward-gap norms $\|r_{a'} - r_{a^*}\|$ times perpendicular crossing depths $d_\perp$ at the model's decision facets (\texttt{geometric\_substitute\_identity}).
+The complement force equals a parallel sum at \emph{twisted} facets induced by the human channel's conditional likelihoods (\texttt{geometric\_complement\_identity}).
+
+\paragraph{Complement/substitute characterization.}
+$\Delta\VoI \geq 0$ (complementarity) when the complement force exceeds the substitute force---geometrically, when the model and human cross \emph{different} decision boundaries.
+$\Delta\VoI < 0$ (substitutability) when both channels cross the \emph{same} boundary and carry redundant information.
+The sign is determined locally, at the level of individual facet crossings.
+
+\begin{theoremA}[Interior Complementarity]\label{thm:interior-compl}
+If every reachable outer posterior $\hat{b}_{i,o_i}$ remains in $\mathcal{R}_{a^*}$ (no facet crossing), then the substitute force vanishes and $\Delta\VoI(j \mid i, b) \geq 0$.
+\end{theoremA}
+
+\begin{theoremA}[Substitution Requires Boundary Crossing]\label{thm:sub-requires-crossing}
+If $\Delta\VoI(j \mid i, b) < 0$ (channels are substitutes) and the complement force is non-negative, then some outer posterior lies outside $\mathcal{R}_{a^*}$: channel $i$ crosses a decision facet.
+\end{theoremA}
+
+\noindent
+Experiment~1, Conditions~C4 and~C5, verify these predictions: same-boundary channels are substitutes ($\Delta\VoI < 0$ in all configurations), different-boundary channels are complements ($\Delta\VoI > 0$ for $|\mathcal{A}| \geq 3$; $\Delta\VoI \leq 0$ for $|\mathcal{A}| = 2$, where only one boundary exists).
+
+\paragraph{Relation to the main text.}
+Corollary~\ref{cor:zero-dv} is the human-AI specialization of Theorem~\ref{thm:interior-compl} (Interior Complementarity): set $k_i$ to the model channel and ask only whether the model's posteriors remain inside $\mathcal{R}_{a_x}$.
+The main-text analysis drops $k_j$ from the interaction and retains only the boundary-regret quantity $\BR(x) = \E_h[\BR(x,h)]$, which is the substitute force evaluated at the model's posteriors.
+The ASIL identity retains both channels and characterizes when acquiring the human signal adds value beyond what the model already provides.
+
+
+% ============================================================
+\section{Full Experiment~3 Results}
+\label{app:exp3-full}
+% ============================================================
+
+Table~\ref{tab:exp3-full} reports the complete utility gain over model-only baseline at all four review budgets.
+
+\begin{table}[ht]
+\centering
+\caption{Experiment~3: full results. Utility gain over model-only baseline on synthetic binary data ($N\!=\!2{,}000$).}
+\label{tab:exp3-full}
+\small
+\begin{tabular}{@{}l rrrr rrrr rrrr@{}}
+\toprule
+& \multicolumn{4}{c}{R1 (symmetric)} & \multicolumn{4}{c}{R2 (FP penalty)} & \multicolumn{4}{c}{R3 (FN penalty)} \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}\cmidrule(lr){10-13}
+Policy & 5\% & 10\% & 20\% & 50\% & 5\% & 10\% & 20\% & 50\% & 5\% & 10\% & 20\% & 50\% \\
+\midrule
+BR\textsubscript{pre} & .017 & .029 & .045 & .050 & .033 & .060 & .085 & .085 & .033 & .065 & .128 & .136 \\
+Entropy & .019 & .028 & .044 & .044 & .000 & .000 & .000 & .009 & .000 & .000 & .000 & .034 \\
+Margin & .019 & .028 & .044 & .044 & .018 & .030 & .065 & .078 & .010 & .024 & .050 & .116 \\
+Residual & .016 & .024 & .037 & .041 & .000 & .000 & .000 & .003 & .000 & .000 & .000 & .060 \\
+L2D & .000 & .000 & .002 & .040 & $-$.002 & .010 & .063 & .078 & $-$.007 & $-$.017 & .030 & .116 \\
+Random & .003 & .006 & .010 & .028 & .014 & .024 & .053 & .103 & .000 & .000 & .000 & .017 \\
+\midrule
+Oracle & .050 & .100 & .120 & .120 & .054 & .104 & .125 & .125 & .052 & .102 & .148 & .148 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At $q = 5\%$, the advantage of BR\textsubscript{pre} under asymmetric rewards is most pronounced: under R2, BR\textsubscript{pre} achieves a utility gain of $0.033$ while entropy and residual expertise achieve exactly zero.
+At $q = 50\%$, the advantages diminish as the large review budget covers most decision-relevant cases regardless of allocation strategy.
+Under R2 at $q = 50\%$, random allocation ($0.103$) exceeds some targeted policies because the large budget indiscriminately covers enough instances near the distant $0.833$ threshold; this effect disappears at smaller budgets where allocation precision dominates.

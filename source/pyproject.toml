@@ -1,0 +1,17 @@
+[project]
+name = "all-substitution-is-local"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "torch",
+    "torchvision",
+    "torchxrayvision",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "scipy",
+    "matplotlib",
+    "pillow",
+    "scikit-image",
+    "ray[default]==2.54.1",
+]

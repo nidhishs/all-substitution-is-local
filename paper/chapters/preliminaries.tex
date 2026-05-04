@@ -1,63 +1,57 @@
 \section{Preliminaries}
-\label{sec:setup}
+\label{sec:prelim}
 
-We consider a finite-action Bayesian decision problem and define the second-order interaction between information channels that is the object of study.
+We work within finite-action Bayesian decision problems \citep{DeGroot1970,Howard1966}.
 
 \paragraph{Decision problem.}
-There are $K$ states $S = \{s_1, \ldots, s_K\}$, a finite action set $A$, and a reward function $R : A \times S \to \R$.
-A \emph{belief} $b \in \Delta^{K-1}$ is a probability distribution over states.
-The optimal expected reward at belief $b$ is
-\[
-  V(b) = \max_{a \in A} \sum_s R(a, s)\, b(s),
-\]
-the upper envelope of $|A|$ linear functions.
-$V$ is piecewise-linear and convex (PWLC).
-Each \emph{decision region} $\mathcal{R}_a = \{b : a \in \argmax_{a'} \sum_s R(a', s)\, b(s)\}$ is a convex polytope; their interiors partition $\Delta^{K-1}$.
-Within region $\mathcal{R}_a$, the value function is linear: $V(b) = r_a \cdot b$ where $r_a = (R(a, s_1), \ldots, R(a, s_K))$.
+An instance with features $x$ arrives from an input space $\mathcal{X}$.
+The unknown state is $y \in \mathcal{Y} = \{1, \ldots, K\}$, $K \geq 2$.
+The decision-maker chooses an action $a$ from a finite set $\mathcal{A}$, $|\mathcal{A}| \geq 2$, and receives reward $r_a(y)$ specified by a reward matrix $R \in \R^{|\mathcal{A}| \times K}$.
 
-\paragraph{Channels.}
-A \emph{channel} $i$ has outcome set $O_i$ and likelihood kernel $P(\cdot \mid s, i)$.
-The \emph{value of information} (VoI) of channel $i$ at belief $b$ is
-\[
-  \VoI(i \mid b) = \E_{o \sim P(\cdot \mid b, i)}\bigl[V(\bpost(i, o))\bigr] - V(b),
-\]
-where $\bpost(i, o) \propto P(o \mid s, i)\, b(s)$ is the posterior after outcome $o$.
-Channels $i$ and $j$ are \emph{conditionally independent} given the state. This ensures that Definition~\ref{def:delta} captures the actual interaction; the mathematical results hold without this assumption.
-
-\begin{definition}[Second-order interaction]\label{def:delta}
-The \emph{interaction} between channels $i$ and $j$ at belief $b$ is
-\[
-  \Delta\VoI(j \mid i, b)
-  \;=\;
-  \E_{o_i}\bigl[\VoI(j \mid \bpost(i, o_i))\bigr]
-  \;-\;
-  \VoI(j \mid b).
-\]
-When $\Delta\VoI > 0$, observing channel~$i$ \emph{increases} the value of subsequently observing channel~$j$ (complements); when $\Delta\VoI < 0$, it decreases it (substitutes).
-\end{definition}
-
-\paragraph{Auxiliary functions.}
-Define:
-\begin{align}
-  g(b) &= \E_{o_j}\bigl[V(\bpost(j, o_j))\bigr], \label{eq:g} \\
-  h(b) &= V(b). \label{eq:h}
-\end{align}
-Both $g$ and $h$ are convex: $g$ is an expectation of the convex function $V$, and $h = V$ is a maximum of linear functions (PWLC).
-Note that $\VoI(j \mid b) = g(b) - h(b)$ by definition.
-These two functions are the building blocks of the Bregman decomposition in Proposition~\ref{prop:decomposition}.
-
-\paragraph{Bregman divergence.}
-The Bregman divergence of a convex function $\phi$ is
-$D_\phi(p, q) = \phi(p) - \phi(q) - \langle \xi, p - q\rangle$,
-where $\xi \in \partial\phi(q)$ is any subgradient.
-
-\paragraph{Martingale identity.}
-For any convex $\phi$,
-\begin{equation}
-  \label{eq:bregman-jensen}
-  \E[\phi(\bpost)] - \phi(b)
-  \;=\;
-  \E\bigl[D_\phi(\bpost, b)\bigr],
+\paragraph{Belief and terminal value.}
+A \emph{belief} $b \in \Delta^{K-1}$ is a probability vector over states.
+A calibrated model produces $b_x = P(Y \mid x) \in \Delta^{K-1}$.
+The \emph{terminal value} at belief $b$ is
+\begin{equation}\label{eq:terminal-value}
+  V(b) \;=\; \max_{a \in \mathcal{A}}\; r_a \cdot b,
+  \qquad r_a \cdot b \;:=\; \textstyle\sum_y r_a(y)\, b(y).
 \end{equation}
-since $\E[\bpost] = b$ (Bayesian martingale) causes the linear correction term $\langle \nabla\phi(b),\, \E[\bpost] - b \rangle$ to vanish.
-At points where $\phi$ is non-differentiable (e.g., kinks of $h = V$ at decision boundaries), the identity holds for any choice of subgradient $\xi \in \partial\phi(b)$, since the correction $\langle \xi, \E[\bpost] - b \rangle = 0$ regardless.
+$V$ is piecewise-linear and convex on $\Delta^{K-1}$ as the pointwise maximum of affine functions (formalized as \texttt{terminalValue} in \texttt{Regret.lean}).
+The \emph{model-optimal action} is $a_x = \argmax_{a \in \mathcal{A}} r_a \cdot b_x$.
+
+\paragraph{Decision regions and facets.}
+For each action $a$, the \emph{decision region} is
+\[
+  \mathcal{R}_a \;=\; \bigl\{ b \in \Delta^{K-1} : r_a \cdot b \geq r_{a'} \cdot b \;\text{ for all } a' \in \mathcal{A} \bigr\}.
+\]
+Each $\mathcal{R}_a$ is a convex polytope; the regions tile $\Delta^{K-1}$.
+The relative boundary $\mathcal{R}_a \cap \mathcal{R}_{a'}$ is a \emph{decision facet}: the locus of beliefs at which the optimal action changes.
+
+\paragraph{Human signal and updated belief.}
+A recorded human signal $h$ (a radiology read, triage code, confidence rating, or expert prediction) is associated with instance $x$ in the dataset.
+After observing $h$, the belief updates to $b_{x,h} = P(Y \mid x, h)$ via Bayes' rule (formalized as \texttt{posterior} in \texttt{Basics.lean}).
+Because $h$ is recorded rather than freshly elicited, review costs can in principle be absorbed into the reward matrix as a constant offset; in our experiments (Section~\ref{sec:experiments}) we set review cost to zero to isolate the informational value of human review from its operational cost.
+
+\paragraph{Value of information.}
+The value of observing $h$ before acting, relative to acting on $b_x$ alone, is
+\begin{equation}\label{eq:voi-def}
+  \VoI(H \mid b_x) \;=\; \E_{h \mid x}\bigl[V(b_{x,h})\bigr] - V(b_x).
+\end{equation}
+By Jensen's inequality and the convexity of $V$, $\VoI \geq 0$.
+
+\paragraph{Regret.}
+The regret of action $a$ at belief $b$ is
+\begin{equation}\label{eq:regret-def}
+  \operatorname{regret}(a, b) \;=\; V(b) - r_a \cdot b \;\geq\; 0,
+\end{equation}
+with equality if and only if $a$ is optimal at $b$ (formalized as \texttt{regret\_eq\_zero\_iff} in \texttt{Regret.lean}).
+
+\begin{remark}[Bayesian martingale]\label{rem:martingale}
+The posterior is an unbiased estimate of the prior: $\E_{h \mid x}[b_{x,h}] = b_x$.
+This is the law of total probability applied coordinate-wise (formalized as \texttt{prior\_eq\_weighted\_posterior} in \texttt{Basics.lean}).
+As a consequence, for any fixed action $a$:
+\begin{equation}\label{eq:martingale}
+  \E_{h \mid x}[r_a \cdot b_{x,h}] \;=\; r_a \cdot b_x.
+\end{equation}
+This identity is the sole algebraic ingredient behind Theorem~\ref{thm:voi-br}.
+\end{remark}
