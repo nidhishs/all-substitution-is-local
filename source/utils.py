@@ -7,9 +7,12 @@ import logging
 import sys
 from collections.abc import Callable
 from pathlib import Path
+from secrets import token_hex
 
 import click
 import numpy as np
+
+from paths import experiment_results
 
 _REQUIRED_DATA_META: dict[str, type] = {
     "n_classes": int,
@@ -112,3 +115,53 @@ def validate_pair_array(npz_path: Path, json_path: Path) -> None:
         raise ValueError(f"h values outside [0, {n_cls})")
     if not np.all((data["y"] >= 0) & (data["y"] < n_cls)):
         raise ValueError(f"y values outside [0, {n_cls})")
+
+
+def load_pair(
+    npz_path: Path,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, dict]:
+    """Load a pair artefact written by write_pair_file. Returns (b_x, b_xh, h, y, meta).
+
+    Assumes the artefact is already valid (validated at write time by write_pair_file).
+    """
+    data = np.load(npz_path)
+    meta = json.loads(npz_path.with_suffix(".json").read_text())
+    return data["b_x"], data["b_xh"], data["h"], data["y"], meta
+
+
+_LOGIT_EPS: float = 1e-7
+
+
+def logit(p: np.ndarray) -> np.ndarray:
+    """Logit of p, clipped to [_LOGIT_EPS, 1 - _LOGIT_EPS] to avoid ±inf."""
+    p = np.clip(p, _LOGIT_EPS, 1.0 - _LOGIT_EPS)
+    return np.log(p / (1.0 - p))
+
+
+def make_run_dir(experiment_name: str, output_dir: Path | None) -> Path:
+    """Return <override or RESULTS/<experiment_name>>/run_<hex6>. Does not mkdir."""
+    base = (
+        experiment_results(experiment_name) if output_dir is None else Path(output_dir)
+    )
+    return base / f"run_{token_hex(3)}"
+
+
+def start_run(out_dir: Path, logger_name: str, label: str) -> logging.Logger:
+    """mkdir + setup_logging + log experiment header + log_run_args. Returns the logger.
+
+    Must be called from inside a Click command context (log_run_args reads it).
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    logger = setup_logging(out_dir, logger_name)
+    logger.info(f"{logger_name}: {label}")
+    log_run_args(logger.info)
+    return logger
+
+
+def finalize_run(out_dir: Path, payload: dict, logger: logging.Logger) -> None:
+    """Write payload as results.json (no numpy fallback — caller must cast), update latest."""
+    results_path = out_dir / "results.json"
+    results_path.write_text(json.dumps(payload, indent=2))
+    logger.info(f"Results written to {results_path}")
+    update_latest_symlink(out_dir)
+    logger.info(f"latest -> {out_dir.name}")

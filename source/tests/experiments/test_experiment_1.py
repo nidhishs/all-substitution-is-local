@@ -100,9 +100,9 @@ def test_cli_writes_outputs(tmp_path):
     out = latest.resolve()
 
     assert (out / "results.json").exists()
-    assert (out / "summary.json").exists()
 
-    rows = json.loads((out / "results.json").read_text())
+    payload = json.loads((out / "results.json").read_text())
+    rows = payload["results"]
     assert len(rows) == 18
     assert set(rows[0].keys()) == {
         "condition",

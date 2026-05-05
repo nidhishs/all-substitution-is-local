@@ -232,6 +232,34 @@ def false_positive_rate(
     return float((br_hat[true_zero] > threshold).mean())
 
 
+def _bca_ci(
+    theta_hat: float,
+    boot: np.ndarray,
+    jack: np.ndarray,
+    ci: float,
+) -> tuple[float, float]:
+    """BCa bias-correction, acceleration, and percentile interval from boot/jack arrays."""
+    jack_mean = jack.mean()
+    diff = jack_mean - jack
+    denom = (diff**2).sum()
+    a = (diff**3).sum() / (6.0 * denom**1.5) if denom > _EPS else 0.0
+
+    frac = float(np.clip((boot < theta_hat).mean(), _EPS, 1.0 - _EPS))
+    z0 = float(sp_norm.ppf(frac))
+
+    alpha = 1.0 - ci
+    z_lo = float(sp_norm.ppf(alpha / 2.0))
+    z_hi = float(sp_norm.ppf(1.0 - alpha / 2.0))
+
+    def _p(z_a: float) -> float:
+        w = z0 + z_a  # BCa inner argument (Efron 1987)
+        return float(sp_norm.cdf(z0 + w / (1.0 - a * w)))
+
+    return float(np.percentile(boot, 100.0 * _p(z_lo))), float(
+        np.percentile(boot, 100.0 * _p(z_hi))
+    )
+
+
 def _batch_pearsonr(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     """Pearson r for each row pair in x (B, N) and y (B, N).
 
@@ -253,7 +281,9 @@ def spearman_bootstrap_ci(
 ) -> tuple[float, float]:
     """BCa bootstrap CI for Spearman rho, vectorized.
 
-    Drop-in replacement for bootstrap_ci(lambda a, b: spearman_corr(a, b)[0], x, y, ...).
+    Equivalent to bootstrap_ci(lambda a, b: spearman_corr(a, b)[0], x, y, ...) for
+    non-tied data. For tied data the bootstrap replicates use ordinal ranking while
+    the point estimate uses average ranking — the two may diverge slightly.
     Generates all bootstrap index rows in one call and computes Pearson r on
     re-ranked samples in batch. Jackknife LOO correlations are computed via a
     rank-adjustment matrix rather than N sequential scipy calls.
@@ -300,26 +330,7 @@ def spearman_bootstrap_ci(
     ry_loo = ry_adj[~eye].reshape(n, n - 1)
     jack = _batch_pearsonr(rx_loo, ry_loo)  # (n,)
 
-    # BCa acceleration and bias correction (identical algebra to bootstrap_ci).
-    jack_mean = jack.mean()
-    diff = jack_mean - jack
-    denom = (diff**2).sum()
-    a = (diff**3).sum() / (6.0 * denom**1.5) if denom > _EPS else 0.0
-
-    frac = float(np.clip((boot < theta_hat).mean(), _EPS, 1.0 - _EPS))
-    z0 = float(sp_norm.ppf(frac))
-
-    alpha = 1.0 - ci
-    z_lo = float(sp_norm.ppf(alpha / 2.0))
-    z_hi = float(sp_norm.ppf(1.0 - alpha / 2.0))
-
-    def _quantile(z_a: float) -> float:
-        num = z0 + z_a
-        return float(sp_norm.cdf(z0 + num / (1.0 - a * num)))
-
-    lo = float(np.percentile(boot, 100.0 * _quantile(z_lo)))
-    hi = float(np.percentile(boot, 100.0 * _quantile(z_hi)))
-    return lo, hi
+    return _bca_ci(theta_hat, boot, jack, ci)
 
 
 def mean_bootstrap_ci(
@@ -357,26 +368,7 @@ def mean_bootstrap_ci(
     # --- Closed-form jackknife LOO means ---
     jack = (n * theta_hat - x) / (n - 1)  # (n,)
 
-    # BCa acceleration and bias correction (identical algebra to bootstrap_ci).
-    jack_mean = jack.mean()
-    diff = jack_mean - jack
-    denom = (diff**2).sum()
-    a = (diff**3).sum() / (6.0 * denom**1.5) if denom > _EPS else 0.0
-
-    frac = float(np.clip((boot < theta_hat).mean(), _EPS, 1.0 - _EPS))
-    z0 = float(sp_norm.ppf(frac))
-
-    alpha = 1.0 - ci
-    z_lo = float(sp_norm.ppf(alpha / 2.0))
-    z_hi = float(sp_norm.ppf(1.0 - alpha / 2.0))
-
-    def _quantile(z_a: float) -> float:
-        num = z0 + z_a
-        return float(sp_norm.cdf(z0 + num / (1.0 - a * num)))
-
-    lo = float(np.percentile(boot, 100.0 * _quantile(z_lo)))
-    hi = float(np.percentile(boot, 100.0 * _quantile(z_hi)))
-    return lo, hi
+    return _bca_ci(theta_hat, boot, jack, ci)
 
 
 def bootstrap_ci(
@@ -412,28 +404,11 @@ def bootstrap_ci(
         idx = rng.integers(0, n, size=n)
         boot[b] = stat_fn(*[a[idx] for a in arrays])
 
-    # Jackknife influence values for acceleration
     jack = np.empty(n)
+    mask = np.ones(n, dtype=bool)
     for i in range(n):
-        keep = np.concatenate([np.arange(0, i), np.arange(i + 1, n)])
-        jack[i] = stat_fn(*[a[keep] for a in arrays])
-    jack_mean = jack.mean()
-    diff = jack_mean - jack
-    denom = (diff**2).sum()
-    a = (diff**3).sum() / (6.0 * denom**1.5) if denom > _EPS else 0.0
+        mask[i] = False
+        jack[i] = stat_fn(*[a[mask] for a in arrays])
+        mask[i] = True
 
-    # Bias correction
-    frac = float(np.clip((boot < theta_hat).mean(), _EPS, 1.0 - _EPS))
-    z0 = float(sp_norm.ppf(frac))
-
-    alpha = 1.0 - ci
-    z_lo = float(sp_norm.ppf(alpha / 2.0))
-    z_hi = float(sp_norm.ppf(1.0 - alpha / 2.0))
-
-    def _quantile(z_a: float) -> float:
-        num = z0 + z_a
-        return float(sp_norm.cdf(z0 + num / (1.0 - a * num)))
-
-    lo = float(np.percentile(boot, 100.0 * _quantile(z_lo)))
-    hi = float(np.percentile(boot, 100.0 * _quantile(z_hi)))
-    return lo, hi
+    return _bca_ci(theta_hat, boot, jack, ci)

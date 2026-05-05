@@ -2,42 +2,19 @@
 
 from __future__ import annotations
 
-import json
 import logging
 from pathlib import Path
-from secrets import token_hex
 
 import click
 import numpy as np
 
 import utils
-from paths import dataset_prepared, experiment_results
+from paths import dataset_prepared
 
 from .metrics import compute_pair_metrics
 from .rewards import REWARDS
 
 logger = logging.getLogger("experiment_2")
-
-
-def _json_default(obj):
-    if isinstance(obj, np.integer):
-        return int(obj)
-    if isinstance(obj, np.floating):
-        return float(obj)
-    if isinstance(obj, np.bool_):
-        return bool(obj)
-    if isinstance(obj, np.ndarray):
-        return obj.tolist()
-    raise TypeError(f"Not serializable: {type(obj)}")
-
-
-def load_pair(
-    npz_path: Path,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, dict]:
-    """Load a validated pair artefact. Returns (b_x, b_xh, h, y, meta)."""
-    data = np.load(npz_path)
-    meta = json.loads(npz_path.with_suffix(".json").read_text())
-    return data["b_x"], data["b_xh"], data["h"], data["y"], meta
 
 
 def run_pairs_dir(
@@ -55,7 +32,7 @@ def run_pairs_dir(
 
     results = []
     for i, npz_path in enumerate(npz_paths, 1):
-        b_x, b_xh, h, y, meta = load_pair(npz_path)
+        b_x, b_xh, h, y, meta = utils.load_pair(npz_path)
         metrics = compute_pair_metrics(b_x, b_xh, h, y, rng)
         r2 = metrics["R2"]
         logger.info(
@@ -119,12 +96,8 @@ def main(dataset: str, model: str | None, output_dir: Path | None, seed: int) ->
                 f"No model directories with pairs/ found under {prepared_root}"
             )
 
-    if output_dir is None:
-        output_dir = experiment_results("experiment_2") / f"run_{token_hex(3)}"
-    output_dir.mkdir(parents=True, exist_ok=True)
-    utils.setup_logging(output_dir, "experiment_2")
-    logger.info("Experiment 2: BR^ dissociation on real reader data")
-    utils.log_run_args(logger.info)
+    output_dir = utils.make_run_dir("experiment_2", output_dir)
+    utils.start_run(output_dir, "experiment_2", "BR^ dissociation on real reader data")
     rng = np.random.default_rng(seed)
 
     all_results: list[dict] = []
@@ -151,10 +124,4 @@ def main(dataset: str, model: str | None, output_dir: Path | None, seed: int) ->
         )
     logger.info("=" * 60)
 
-    out = {"results": all_results, "aggregate": agg}
-    results_path = output_dir / "results.json"
-    results_path.write_text(json.dumps(out, indent=2, default=_json_default))
-    logger.info(f"Results written to {results_path}")
-
-    utils.update_latest_symlink(output_dir)
-    logger.info(f"latest -> {output_dir.name}")
+    utils.finalize_run(output_dir, {"results": all_results, "aggregate": agg}, logger)

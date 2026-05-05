@@ -180,3 +180,101 @@ def test_validate_pair_array_rejects_y_out_of_range(valid_pair):
     np.savez(npz, **data)
     with pytest.raises(ValueError, match="y values outside"):
         validate_pair_array(npz, jpath)
+
+
+# ---------------------------------------------------------------------------
+# load_pair
+# ---------------------------------------------------------------------------
+
+
+def test_load_pair_returns_arrays_and_meta(valid_pair):
+    from utils import load_pair
+
+    npz, jpath = valid_pair
+    b_x, b_xh, h, y, meta = load_pair(npz)
+    assert b_x.shape == (10, 2)
+    assert b_xh.shape == (10, 2)
+    assert h.shape == (10,)
+    assert y.shape == (10,)
+    assert meta["dataset"] == "test"
+    assert meta["n_classes"] == 2
+
+
+# ---------------------------------------------------------------------------
+# make_run_dir
+# ---------------------------------------------------------------------------
+
+
+def test_make_run_dir_uses_default_when_override_none(tmp_path, monkeypatch):
+    import paths
+    from utils import make_run_dir
+
+    monkeypatch.setattr(paths, "RESULTS", tmp_path)
+    out = make_run_dir("experiment_X", None)
+    assert out.parent == tmp_path / "experiment_X"
+    assert out.name.startswith("run_") and len(out.name) == 10  # "run_" + 6 hex
+
+
+def test_make_run_dir_honours_override(tmp_path):
+    from utils import make_run_dir
+
+    out = make_run_dir("experiment_X", tmp_path / "custom")
+    assert out.parent == tmp_path / "custom"
+    assert out.name.startswith("run_") and len(out.name) == 10
+
+
+# ---------------------------------------------------------------------------
+# start_run / finalize_run
+# ---------------------------------------------------------------------------
+
+
+def test_start_run_creates_dir_and_logger_under_click_context(tmp_path):
+    import click
+    from click.testing import CliRunner
+
+    from utils import start_run
+
+    out = tmp_path / "run_abc"
+
+    @click.command()
+    @click.option("--foo", default=1)
+    def cmd(foo):
+        logger = start_run(out, "test_exp", "synthetic regime")
+        logger.info("payload-marker")
+
+    result = CliRunner().invoke(cmd, [], catch_exceptions=False)
+    assert result.exit_code == 0
+    log_text = (out / "test_exp.log").read_text()
+    assert "test_exp: synthetic regime" in log_text
+    assert "foo=1" in log_text  # log_run_args output
+    assert "payload-marker" in log_text
+
+
+def test_finalize_run_writes_json_and_symlink(tmp_path):
+    import logging
+
+    from utils import finalize_run
+
+    out = tmp_path / "run_xyz"
+    out.mkdir()
+    logger = logging.getLogger("test_finalize_run")
+    payload = {"foo": 1, "bar": [1.0, 2.0]}
+    finalize_run(out, payload, logger)
+    written = (out / "results.json").read_text()
+    assert '"foo": 1' in written
+    assert (tmp_path / "latest").is_symlink()
+    assert (tmp_path / "latest").readlink().name == "run_xyz"
+
+
+def test_finalize_run_rejects_numpy_payload(tmp_path):
+    import logging
+
+    import numpy as np
+
+    from utils import finalize_run
+
+    out = tmp_path / "run_np"
+    out.mkdir()
+    logger = logging.getLogger("test_finalize_np")
+    with pytest.raises(TypeError):
+        finalize_run(out, {"val": np.float32(1.0)}, logger)

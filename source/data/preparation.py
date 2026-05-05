@@ -18,18 +18,13 @@ from scipy.optimize import minimize_scalar
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold, StratifiedShuffleSplit
 
-from utils import validate_pair_array
+from utils import logit, validate_pair_array
 
 CAL_FRAC: float = 0.30
 CV_FOLDS: int = 5
 
 _EPS = 1e-7
 _RANDOM_STATE = 42
-
-
-def _logit(p: np.ndarray) -> np.ndarray:
-    p = np.clip(p, _EPS, 1 - _EPS)
-    return np.log(p / (1 - p))
 
 
 def make_cal_eval_masks(
@@ -66,7 +61,7 @@ def temperature_scale(
     Returns:
         (T_opt, b_x_calibrated) — scalar temperature and (N,) calibrated beliefs.
     """
-    logits = _logit(b_x_raw)
+    logits = logit(b_x_raw)
     y_cal = y[cal_mask].astype(float)
 
     def _nll(T: float) -> float:
@@ -97,7 +92,7 @@ def fit_augmented_beliefs(
     h_e = h[eval_mask].astype(float)
     y_e = y[eval_mask].astype(int)
 
-    logit_b = _logit(b_e)
+    logit_b = logit(b_e)
     X = np.column_stack([logit_b, h_e, logit_b * h_e])
 
     b_xh_e = np.full(len(y_e), np.nan)

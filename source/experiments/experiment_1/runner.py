@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from secrets import token_hex
 from typing import Callable
 
 import click
@@ -13,7 +12,6 @@ import pandas as pd
 
 import core
 import utils
-from paths import experiment_results
 
 from .conditions import design_c1, design_c2, design_c3
 from .estimator import estimate_br
@@ -92,32 +90,21 @@ def aggregate_summary(results: pd.DataFrame) -> pd.DataFrame:
 
 # fmt: off
 @click.command()
-@click.option("--output-dir", default=experiment_results("experiment_1"), show_default=True, type=click.Path(path_type=Path))
+@click.option("--output-dir", default=None, type=click.Path(path_type=Path), help="Output directory.")
 @click.option("--n-samples", default=10_000, show_default=True)
 @click.option("--seed", default=0, show_default=True)
 # fmt: on
-def main(output_dir: Path, n_samples: int, seed: int) -> None:
-    run_id = f"run_{token_hex(3)}"
-    out = output_dir / run_id
-    out.mkdir(parents=True, exist_ok=True)
-    utils.setup_logging(out, "experiment_1")
-
-    logger.info("Experiment 1: synthetic estimator validation")
-    utils.log_run_args(logger.info)
+def main(output_dir: Path | None, n_samples: int, seed: int) -> None:
+    out = utils.make_run_dir("experiment_1", output_dir)
+    utils.start_run(out, "experiment_1", "synthetic estimator validation")
 
     rng = np.random.default_rng(seed)
     results = run_grid(N=n_samples, rng=rng)
     summary = aggregate_summary(results)
 
-    results_path = out / "results.json"
-    results.to_json(results_path, orient="records", indent=2)
-    logger.info(f"Wrote {results_path}")
-
-    summary_path = out / "summary.json"
-    summary.to_json(summary_path, orient="records", indent=2)
-    logger.info(f"Wrote {summary_path}")
-
-    utils.update_latest_symlink(out)
-    logger.info(f"latest -> {out.name}")
-
+    utils.finalize_run(
+        out,
+        {"results": results.to_dict("records"), "summary": summary.to_dict("records")},
+        logger,
+    )
     logger.info("\n" + summary.to_markdown(index=False, floatfmt=".3f"))
