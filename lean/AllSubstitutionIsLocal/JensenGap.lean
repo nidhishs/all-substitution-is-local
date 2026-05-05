@@ -19,9 +19,8 @@ variable {S : Type*} [Fintype S] [Nonempty S]
 variable {O : Type*} [Fintype O] [Nonempty O]
 
 /-- The Jensen gap of `f` under the posterior lottery: `E[f(b_post)] - f(b)`. -/
-noncomputable def jensenGap (f : Belief S → ℝ) (b : Belief S) (k : ObsKernel S O)
-    (hmarg : ∀ o, marginalProb b k o > 0) : ℝ :=
-  ∑ o : O, marginalProb b k o * f (posterior b k o (hmarg o)) - f b
+noncomputable def jensenGap (f : Belief S → ℝ) (b : Belief S) (k : ObsKernel S O) : ℝ :=
+  ∑ o : O, marginalProb b k o * f (posterior b k o) - f b
 
 /-- `f` is belief-convex over index type `I` if Jensen's inequality holds for all
 `I`-indexed convex combinations of beliefs. -/
@@ -34,12 +33,12 @@ def BeliefConvexOn (I : Type*) [Fintype I] {S : Type*} [Fintype S]
 
 /-- If `f` is belief-convex, the Jensen gap is non-negative. -/
 theorem jensenGap_nonneg (f : Belief S → ℝ) (b : Belief S) (k : ObsKernel S O)
-    (hmarg : ∀ o, marginalProb b k o > 0) (hconv : BeliefConvexOn O f) :
-    0 ≤ jensenGap f b k hmarg := by
+    (hconv : BeliefConvexOn O f) :
+    0 ≤ jensenGap f b k := by
   unfold jensenGap
-  linarith [hconv (fun o => marginalProb b k o) (fun o => posterior b k o (hmarg o)) b
-    (fun o => le_of_lt (hmarg o)) (marginalProb_sum b k)
-    (fun s => prior_eq_weighted_posterior b k hmarg s)]
+  linarith [hconv (fun o => marginalProb b k o) (fun o => posterior b k o) b
+    (fun o => marginalProb_nonneg b k o) (marginalProb_sum b k)
+    (fun s => prior_eq_weighted_posterior b k s)]
 
 /-- The probability simplex `{p : S → ℝ | p ≥ 0, ∑ p = 1}`. -/
 def probSimplex (S : Type*) [Fintype S] : Set (S → ℝ) :=
@@ -75,6 +74,6 @@ theorem convexOn_simplex_implies_beliefConvex {I : Type*} [Fintype I]
 theorem jensenGap_nonneg_of_convexOn
     {g : (S → ℝ) → ℝ} (hg : ConvexOn ℝ (probSimplex S) g)
     {f : Belief S → ℝ} (hfg : ∀ b, f b = g b.val)
-    (b : Belief S) (k : ObsKernel S O) (hmarg : ∀ o, marginalProb b k o > 0) :
-    0 ≤ jensenGap f b k hmarg :=
-  jensenGap_nonneg f b k hmarg (convexOn_simplex_implies_beliefConvex hg hfg)
+    (b : Belief S) (k : ObsKernel S O) :
+    0 ≤ jensenGap f b k :=
+  jensenGap_nonneg f b k (convexOn_simplex_implies_beliefConvex hg hfg)

@@ -71,12 +71,13 @@ The held-out label is the majority vote of these five readers' annotations; full
 Model beliefs are temperature-scaled per pair, and the human-augmented posterior $\bpost_{x,h}\approx P(Y=1\mid x,h)$ is estimated via 5-fold cross-fitted logistic regression on $[\operatorname{logit}(b_x),\,h,\,h{\cdot}\operatorname{logit}(b_x)]$, with folds stratified on $y$.
 Spearman correlations and bootstrap confidence intervals are computed over the 25 pairs.
 
-\paragraph{Reward regimes.}
+\paragraph{Reward Regimes.}
 We evaluate three reward matrices $r_{a,y}$.
 R1 is the identity ($+1$ for correct decisions, $0$ for errors), giving threshold $0.5$.
 R2 ($r_{0,0}=5$, $r_{1,1}=1$, errors $0$) penalises false positives five times as heavily as false negatives, shifting the threshold to $5/6\approx 0.833$.
 R3 mirrors R2 with the asymmetry reversed ($r_{0,0}=1$, $r_{1,1}=5$), threshold $1/6\approx 0.167$.
-The 5:1 asymmetry is clinically grounded via the threshold-probability framework of decision curve analysis \citep{Vickers2006}: R3 ($p_t=1/6$) corresponds to a screening-flag threshold and R2 ($p_t=5/6$) to a high-cost-of-intervention threshold, together bracketing the range commonly evaluated in clinical decision analysis for chest pathology.
+These regimes are chosen to position the decision threshold in qualitatively different regions of the model belief distribution: R1 in the dense bulk, R3 below it, and R2 in the low-density upper tail.
+R2 and R3 are geometric probes of the theory's central prediction: as the threshold moves into the tail, facet crossings become rare, boundary-regret mass collapses, and predictive expertise decouples from decision value.
 
 \begin{table}[t]
 \centering
