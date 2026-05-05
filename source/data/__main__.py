@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import click
+
 from paths import DATA_PREPARED
 from utils import validate_pair_array
 

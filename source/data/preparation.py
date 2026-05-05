@@ -17,6 +17,7 @@ import numpy as np
 from scipy.optimize import minimize_scalar
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold, StratifiedShuffleSplit
+
 from utils import validate_pair_array
 
 CAL_FRAC: float = 0.30

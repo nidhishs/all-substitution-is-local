@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import core
 import numpy as np
 from sklearn.model_selection import KFold
+
+import core
 
 from .conditions import Channel, DecisionProblem
 

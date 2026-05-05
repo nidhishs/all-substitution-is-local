@@ -59,8 +59,8 @@
 A human with residual predictive expertise beyond the model has zero decision value whenever that expertise does not move the posterior across a reward-induced decision boundary.
 We introduce \emph{boundary regret}: the regret of keeping the model's action under the human-updated posterior.
 In any finite-action Bayesian decision problem, the value of human review equals expected boundary regret (Lean-formalized); predictive signal that does not cross a reward-induced facet has zero decision value, regardless of log-loss gain.
-Across 20 CheXpert reader-task pairs---five board-certified radiologists read against four competition tasks---\textbf{95.9\%} of top-expertise-decile cases have zero boundary regret under a false-positive-penalty reward: the radiologist is informative, the operative action is unchanged.
-On synthetic allocation tasks (replicated on a CheXpert reader-task pair), an ex ante boundary-regret score allocates scarce review more efficiently than uncertainty-based, residual-expertise, and learning-to-defer baselines under asymmetric rewards at review budgets $q \in \{10\%,\, 20\%\}$.
+Across 25 CheXpert reader--task pairs---five board-certified radiologists across five conditions---\textbf{97.4\%} of top-expertise-decile cases have zero boundary regret under a false-positive-penalty reward: the radiologist is informative, the operative action is unchanged.
+On the same 25 reader--task pairs, an ex ante boundary-regret score allocates scarce review more efficiently than uncertainty-based, residual-expertise, and learning-to-defer baselines under asymmetric rewards at review budgets $q \in \{5\%,\, 10\%,\, 20\%\}$.
 Human--AI complementarity audits that ignore reward geometry overestimate the deployment value of human review whenever deployment costs are asymmetric---a condition that is the norm, not the exception, in high-stakes clinical decisions.
 \end{abstract}
 

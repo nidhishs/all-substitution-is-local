@@ -6,11 +6,13 @@ from pathlib import Path
 from typing import Literal
 
 import pandas as pd
+
 from paths import DATA_RAW
 
 GT_RADS = ("bc1", "bc2", "bc3", "bc5", "bc7")
 BENCHMARK_RADS = ("bc4", "bc6", "bc8")
 ALL_RADS = GT_RADS + BENCHMARK_RADS
+
 N_STUDIES = 500
 CONDITIONS = (
     "Atelectasis",
@@ -22,6 +24,11 @@ CONDITIONS = (
 
 _RAW_LABELS_DIR = DATA_RAW / "cheXpert-test-set-labels" / "radiologists" / "groundtruth"
 _RAW_IMAGES_DIR = DATA_RAW / "CheXpert"
+
+
+def loo_voters(h_rad: str) -> list[str]:
+    """GT voters for LOO majority: GT_RADS minus h_rad (4 for GT readers, 5 for benchmark)."""
+    return [r for r in GT_RADS if r != h_rad]
 
 
 def available_pairs(

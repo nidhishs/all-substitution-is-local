@@ -2,9 +2,10 @@
 
 import json
 
-import core
 import numpy as np
 from click.testing import CliRunner
+
+import core
 from experiments.experiment_1.conditions import design_c1, design_c2, design_c3
 from experiments.experiment_1.estimator import estimate_br
 from experiments.experiment_1.runner import main, run_grid

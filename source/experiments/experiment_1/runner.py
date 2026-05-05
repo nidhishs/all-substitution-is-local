@@ -8,9 +8,10 @@ from secrets import token_hex
 from typing import Callable
 
 import click
-import core
 import numpy as np
 import pandas as pd
+
+import core
 import utils
 from paths import experiment_results
 

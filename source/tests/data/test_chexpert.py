@@ -5,6 +5,7 @@ import json
 import numpy as np
 import pandas as pd
 import pytest
+
 from data.chexpert.labels import (
     ALL_RADS,
     BENCHMARK_RADS,
@@ -74,12 +75,12 @@ def groundtruth(labels_dir):
 
 @pytest.fixture(scope="module")
 def synthetic_inference_df(labels):
-    """Synthetic inference DataFrame matching label study_id order."""
+    """Synthetic inference DataFrame indexed by study_id (as fit_pair expects)."""
     rng = np.random.default_rng(1)
     df = pd.DataFrame({"study_id": labels["study_id"]})
     for c in CONDITIONS:
         df[f"b_x_raw_{c}"] = rng.uniform(0.05, 0.95, size=N_STUDIES).astype(np.float32)
-    return df
+    return df.set_index("study_id")
 
 
 # ---------------------------------------------------------------------------
@@ -190,34 +191,43 @@ def test_available_pairs_rejects_unknown_subset():
 # ---------------------------------------------------------------------------
 
 
-def test_make_pair_df_shape(labels, groundtruth):
-    df = make_pair_df(labels, groundtruth, "Cardiomegaly", "bc1")
+def test_make_pair_df_shape(labels):
+    df = make_pair_df(labels, "Cardiomegaly", "bc1")
     assert len(df) == N_STUDIES
     assert set(df.columns) >= {"study_id", "image_path", "h", "y"}
 
 
-def test_make_pair_df_y_from_groundtruth(labels, groundtruth):
-    """y must be taken verbatim from groundtruth regardless of which reader is held out."""
-    df = make_pair_df(labels, groundtruth, "Cardiomegaly", "bc1")
-    # Align groundtruth to the same row order as df
-    gt_aligned = (
-        groundtruth.set_index("study_id").loc[df["study_id"], "Cardiomegaly"].values
-    )
-    assert list(df["y"]) == list(gt_aligned.astype(int))
+def test_make_pair_df_y_is_loo_majority(labels):
+    """y for a GT reader must be the majority of the 4 remaining GT voters."""
+    df = make_pair_df(labels, "Cardiomegaly", "bc1")
+    voters = [r for r in GT_RADS if r != "bc1"]
+    expected_y = (
+        labels[[f"{r}_Cardiomegaly" for r in voters]].sum(axis=1) >= 3
+    ).astype(int)
+    np.testing.assert_array_equal(df["y"].values, expected_y.values)
 
 
-def test_make_pair_df_rejects_unknown_condition(labels, groundtruth):
+def test_make_pair_df_benchmark_uses_all_5_voters(labels):
+    """y for a benchmark reader must be the majority of all 5 GT voters."""
+    df = make_pair_df(labels, "Cardiomegaly", "bc4")
+    expected_y = (
+        labels[[f"{r}_Cardiomegaly" for r in GT_RADS]].sum(axis=1) >= 3
+    ).astype(int)
+    np.testing.assert_array_equal(df["y"].values, expected_y.values)
+
+
+def test_make_pair_df_rejects_unknown_condition(labels):
     with pytest.raises(ValueError, match="Unknown condition"):
-        make_pair_df(labels, groundtruth, "Pneumonia", "bc1")
+        make_pair_df(labels, "Pneumonia", "bc1")
 
 
-def test_make_pair_df_rejects_unknown_reader(labels, groundtruth):
+def test_make_pair_df_rejects_unknown_reader(labels):
     with pytest.raises(ValueError, match="Unknown radiologist"):
-        make_pair_df(labels, groundtruth, "Cardiomegaly", "bc99")
+        make_pair_df(labels, "Cardiomegaly", "bc99")
 
 
-def test_make_pair_df_accepts_benchmark_reader(labels, groundtruth):
-    df = make_pair_df(labels, groundtruth, "Cardiomegaly", "bc4")
+def test_make_pair_df_accepts_benchmark_reader(labels):
+    df = make_pair_df(labels, "Cardiomegaly", "bc4")
     assert len(df) == N_STUDIES
     assert set(df.columns) >= {"study_id", "image_path", "h", "y"}
 
@@ -252,14 +262,11 @@ def test_load_predictions(tmp_path):
 # ---------------------------------------------------------------------------
 
 
-def test_fit_pair_produces_valid_artefact(
-    tmp_path, labels, groundtruth, synthetic_inference_df
-):
+def test_fit_pair_produces_valid_artefact(tmp_path, labels, synthetic_inference_df):
     npz = fit_pair(
         condition="Cardiomegaly",
         h_rad="bc1",
         labels=labels,
-        groundtruth=groundtruth,
         inference_df=synthetic_inference_df,
         pairs_dir=tmp_path / "pairs",
     )
@@ -269,14 +276,13 @@ def test_fit_pair_produces_valid_artefact(
 
 
 def test_fit_pair_metadata_contains_required_keys(
-    tmp_path, labels, groundtruth, synthetic_inference_df
+    tmp_path, labels, synthetic_inference_df
 ):
     pairs_dir = tmp_path / "drnet_predictions" / "pairs"
     npz = fit_pair(
         condition="Atelectasis",
         h_rad="bc2",
         labels=labels,
-        groundtruth=groundtruth,
         inference_df=synthetic_inference_df,
         pairs_dir=pairs_dir,
     )
@@ -286,4 +292,5 @@ def test_fit_pair_metadata_contains_required_keys(
     assert meta["task"] == "Atelectasis"
     assert meta["annotator_id"] == "bc2"
     assert "T_opt" in meta["extra"]
+    assert "loo_voters" in meta["extra"]
     assert meta["model"] == "drnet_predictions"  # pairs_dir.parent.name

@@ -46,14 +46,16 @@ The bridge theorem \texttt{facet\_activation\_bridge} states that this expected 
 
 \paragraph{Reader study.}
 The five board-certified radiologists (bc1, bc2, bc3, bc5, bc7) provided binary disease-presence ratings under the official CheXpert five-condition protocol (Atelectasis, Cardiomegaly, Consolidation, Edema, Pleural Effusion) on the 500-image frontal-view validation set.
-The held-out label $y$ is the majority vote of these five ratings; no label is uncertain (majority breaks ties for five raters).
+The held-out label $y$ for each reader--task pair is computed by \emph{leave-one-out majority vote}: for GT reader $r_i$, $y = \mathbf{1}[\sum_{j \neq i} v_j \geq 3]$ where $v_j \in \{0,1\}$ are the remaining four GT readers' votes.
+This construction ensures $y \perp h$ by design: the test reader is never a voter in the ground truth they are evaluated against.
+Benchmark readers (bc4, bc6, bc8) were not voters in the original study, so their pairs use all five GT votes (equivalent to the official majority, no exclusion needed).
 
 \paragraph{Model posterior.}
-Logit-space temperature scaling is applied per reader--task pair by minimising NLL on a 10\% held-out calibration split; the calibrated probability is used as $b_x$.
+Logit-space temperature scaling is applied per reader--task pair by minimising NLL on a 30\% held-out calibration split; the calibrated probability is used as $b_x$.
 
 \paragraph{Human-augmented posterior.}
 $\bpost_{x,h} \approx P(Y=1\mid x,h)$ is estimated via 5-fold cross-fitted logistic regression on the feature vector $[\operatorname{logit}(b_x),\,h,\,h\cdot\operatorname{logit}(b_x)]$, with folds stratified on $y$.
-Cross-fitting ensures that the estimated posterior and the held-out label are independent within each fold, eliminating $h$--$y$ contamination.
+The LOO label construction ensures structural $h$--$y$ independence; cross-fitting additionally ensures that the augmented-belief estimator and the held-out label are independent within each fold, avoiding estimator overfitting.
 
 \paragraph{Evaluation.}
 All correlations and boundary-regret estimates are computed on the held-out fold for each instance, then aggregated across folds.
@@ -105,8 +107,8 @@ C3 & 5 & 10 & 6 & -- & 0.000 & 0.0\% & 0.738 \\
 % ============================================================
 
 Table~\ref{tab:exp3-r2} reports the complete allocation utility gain under the FP-penalized reward (R2, threshold $5/6\approx 0.833$) at all four review budgets.
-The reward boundary sits in the low-density tail of model beliefs: only 14 of the 25 reader--task pairs carry any non-zero $\BRhat$ mass.
-Within those 14 pairs, $\BRhat$ and Margin converge within bootstrap noise at every budget; this convergence is the predicted consequence of Theorem~\ref{thm:facet-bridge} in the low-mass regime.
+The reward boundary sits in the low-density tail of model beliefs: only 7 of the 25 reader--task pairs carry any non-zero $\BRhat$ mass.
+Within those 7 pairs, $\BRhat$ and Margin converge within bootstrap noise at every budget; this convergence is the predicted consequence of Theorem~\ref{thm:facet-bridge} in the low-mass regime.
 
 \begin{table}[ht]
 \centering
@@ -117,10 +119,10 @@ Within those 14 pairs, $\BRhat$ and Margin converge within bootstrap noise at ev
 \toprule
 $q$ & $\BRhat$ & Margin & Entropy & Residual & L2D & W/L/T \\
 \midrule
-$5\%$  & $+0.0010$ & $+0.0017$ & $+0.0000$ & $-0.0002$ & $-0.0031$ & $4/6/15$ \\
-$10\%$ & $+0.0043$ & $+0.0057$ & $+0.0000$ & $+0.0007$ & $+0.0040$ & $3/4/18$ \\
-$20\%$ & $+0.0103$ & $+0.0104$ & $+0.0000$ & $+0.0007$ & $+0.0079$ & $3/2/20$ \\
-$50\%$ & $+0.0103$ & $+0.0103$ & $+0.0005$ & $+0.0023$ & $+0.0098$ & $0/0/25$ \\
+$5\%$  & $+0.0035$ & $+0.0027$ & $+0.0000$ & $+0.0000$ & $-0.0003$ & $1/1/23$ \\
+$10\%$ & $+0.0029$ & $+0.0031$ & $+0.0000$ & $+0.0000$ & $+0.0013$ & $1/1/23$ \\
+$20\%$ & $+0.0029$ & $+0.0029$ & $+0.0000$ & $+0.0000$ & $+0.0017$ & $0/0/25$ \\
+$50\%$ & $+0.0029$ & $+0.0029$ & $+0.0000$ & $+0.0000$ & $+0.0018$ & $0/0/25$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -144,16 +146,16 @@ Magnitude attenuates under off-domain pretraining (NIH, PadChest), consistent wi
 Checkpoint & R1 $\bar\rho$ & R2 $\bar\rho$ & R3 $\bar\rho$ \\
 \midrule
 \multicolumn{4}{l}{\textit{In-domain pretraining}} \\
-\texttt{densenet121-res224-chex}     & $+0.528$ & $-0.185$ & $+0.024$ \\
-\texttt{densenet121-res224-mimic\_ch}& $+0.528$ & $-0.118$ & $+0.233$ \\
-\texttt{densenet121-res224-mimic\_nb}& $+0.524$ & $-0.125$ & $+0.243$ \\
-\texttt{densenet121-res224-all}      & $+0.543$ & $-0.156$ & $+0.186$ \\
+\texttt{densenet121-res224-chex}     & $+0.489$ & $-0.117$ & $-0.008$ \\
+\texttt{densenet121-res224-mimic\_ch}& $+0.496$ & $-0.040$ & $+0.197$ \\
+\texttt{densenet121-res224-mimic\_nb}& $+0.495$ & $-0.042$ & $+0.210$ \\
+\texttt{densenet121-res224-all}      & $+0.530$ & $-0.082$ & $+0.151$ \\
 \midrule
 \multicolumn{4}{l}{\textit{Off-domain pretraining}} \\
-\texttt{densenet121-res224-nih}      & $+0.428$ & $+0.013$ & $+0.313$ \\
-\texttt{densenet121-res224-pc}       & $+0.453$ & $-0.055$ & $+0.296$ \\
+\texttt{densenet121-res224-nih}      & $+0.373$ & $+0.007$ & $+0.313$ \\
+\texttt{densenet121-res224-pc}       & $+0.435$ & $-0.050$ & $+0.313$ \\
 \midrule
-All 240 pairs & $+0.501$ & $-0.113$ & --- \\
+All 240 pairs & $+0.470$ & $-0.056$ & $+0.196$ \\
 \bottomrule
 \end{tabular}
 \end{table}

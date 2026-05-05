@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import core
 import numpy as np
 import pytest
+
+import core
 from data.preparation import fit_augmented_beliefs, make_cal_eval_masks, write_pair_file
 from experiments.experiment_2.metrics import compute_pair_metrics
 from experiments.experiment_2.rewards import (

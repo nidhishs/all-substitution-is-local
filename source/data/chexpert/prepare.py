@@ -9,6 +9,7 @@ from typing import Literal
 import click
 import numpy as np
 import pandas as pd
+
 import utils
 from data.preparation import (
     fit_augmented_beliefs,
@@ -18,7 +19,7 @@ from data.preparation import (
 )
 from paths import dataset_prepared
 
-from .labels import ALL_RADS, CONDITIONS, available_pairs, load_groundtruth, load_labels
+from .labels import ALL_RADS, CONDITIONS, available_pairs, load_labels, loo_voters
 
 _PREPARED_ROOT = dataset_prepared("chexpert")
 
@@ -43,17 +44,20 @@ def load_predictions(path: Path) -> pd.DataFrame:
 
 def make_pair_df(
     labels: pd.DataFrame,
-    groundtruth: pd.DataFrame,
     condition: str,
     h_rad: str,
 ) -> pd.DataFrame:
     """Construct the (study_id, image_path, h, y) alignment DataFrame for one pair.
 
+    y is computed via leave-one-out majority over GT_RADS:
+    - if h_rad in GT reader, exclude from voter set (4 votes, threshold ≥ 3).
+    - if h_rad in BENCH reader, all 5 GT readers can be used (threshold ≥ 3).
+    - this eliminates structural h-y dependence for GT pairs.
+
     Args:
-        labels:      8-reader merged frame from load_labels() with columns study_id, image_path, {rad}_{condition} for all readers.
-        groundtruth: Official majority-of-5 frame from load_groundtruth() with columns study_id + one column per condition.
-        condition:   One of the 5 CheXpert conditions.
-        h_rad:       Radiologist identifier (one of ALL_RADS).
+        labels:    8-reader merged frame from load_labels()
+        condition: One of the 5 CheXpert conditions.
+        h_rad:     Radiologist identifier (one of ALL_RADS).
 
     Returns:
         DataFrame with columns: study_id, image_path, h, y.
@@ -66,22 +70,22 @@ def make_pair_df(
     if h_rad not in ALL_RADS:
         raise ValueError(f"Unknown radiologist {h_rad!r}. Valid: {ALL_RADS}")
 
-    h_col = f"{h_rad}_{condition}"
-    left = labels[["study_id", "image_path", h_col]]
-    right = groundtruth[["study_id", condition]]
+    voters = loo_voters(h_rad)
+    threshold = (len(voters) // 2) + 1
+    vote_cols = [f"{r}_{condition}" for r in voters]
+    y = (labels[vote_cols].sum(axis=1) >= threshold).astype(int)
 
-    merged = left.merge(right, on="study_id", how="inner")
-    merged = merged.rename(columns={h_col: "h", condition: "y"})
-    merged["h"] = merged["h"].astype(int)
-    merged["y"] = merged["y"].astype(int)
-    return merged.reset_index(drop=True)
+    h_col = f"{h_rad}_{condition}"
+    out = labels[["study_id", "image_path"]].copy()
+    out["h"] = labels[h_col].astype(int)
+    out["y"] = y.values
+    return out.reset_index(drop=True)
 
 
 def fit_pair(
     condition: str,
     h_rad: str,
     labels: pd.DataFrame,
-    groundtruth: pd.DataFrame,
     inference_df: pd.DataFrame,
     pairs_dir: Path,
 ) -> Path:
@@ -94,16 +98,14 @@ def fit_pair(
         condition:    One of the 5 CheXpert conditions.
         h_rad:        Radiologist identifier (one of ALL_RADS).
         labels:       8-reader merged frame from load_labels().
-        groundtruth:  Official majority-of-5 frame from load_groundtruth().
-        inference_df: Competition-format DataFrame after load_predictions(). columns: study_id, b_x_raw_{condition}, ...
+        inference_df: Competition-format DataFrame after load_predictions(), indexed by study_id.
         pairs_dir:    Output directory for .npz/.json pair artefacts.
 
     Returns:
         Path to the written .npz file.
     """
-    pair_df = make_pair_df(labels, groundtruth, condition, h_rad)
+    pair_df = make_pair_df(labels, condition, h_rad)
 
-    inference_df = inference_df.set_index("study_id")
     b_x_raw = inference_df.loc[
         pair_df["study_id"].values, f"b_x_raw_{condition}"
     ].values.astype(np.float32)
@@ -124,6 +126,7 @@ def fit_pair(
         "annotator_id": h_rad,
         "extra": {
             "T_opt": round(float(T_opt), 6),
+            "loo_voters": loo_voters(h_rad),
         },
     }
     return write_pair_file(Path(pairs_dir), tag, b_x, b_xh, h, y, meta)
@@ -146,8 +149,7 @@ def main(
     utils.log_run_args(logger.info)
 
     labels = load_labels()
-    groundtruth = load_groundtruth()
-    inference_df = load_predictions(predictions)
+    inference_df = load_predictions(predictions).set_index("study_id")
 
     pairs = available_pairs(subset=readers)
     if limit is not None:
@@ -157,6 +159,6 @@ def main(
     for i, (condition, h_rad) in enumerate(pairs, 1):
         tag = f"{condition.replace(' ', '_')}__{h_rad}"
         logger.info(f"[{i:2d}/{n}] {tag}")
-        fit_pair(condition, h_rad, labels, groundtruth, inference_df, pairs_dir)
+        fit_pair(condition, h_rad, labels, inference_df, pairs_dir)
 
     logger.info(f"Done. {n} pair artefact(s) written to {pairs_dir}")

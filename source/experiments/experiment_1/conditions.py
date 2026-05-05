@@ -8,8 +8,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-import core
 import numpy as np
+
+import core
 
 
 @dataclass

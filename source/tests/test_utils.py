@@ -5,6 +5,7 @@ import logging
 
 import numpy as np
 import pytest
+
 from utils import setup_logging, validate_pair_array
 
 # ---------------------------------------------------------------------------

@@ -9,6 +9,7 @@ from secrets import token_hex
 
 import click
 import numpy as np
+
 import utils
 from paths import dataset_prepared, experiment_results
 

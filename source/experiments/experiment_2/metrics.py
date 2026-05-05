@@ -6,8 +6,9 @@
 
 from __future__ import annotations
 
-import core
 import numpy as np
+
+import core
 from core import spearman_bootstrap_ci
 
 from .rewards import REWARDS
