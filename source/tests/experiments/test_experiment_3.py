@@ -58,7 +58,9 @@ def test_score_random_seeded_reproducibility():
     rng_a = np.random.default_rng(42)
     rng_b = np.random.default_rng(42)
     b_x, *_ = _toy_arrays(np.random.default_rng(0))
-    np.testing.assert_array_equal(policies.score_random(b_x, rng_a), policies.score_random(b_x, rng_b))
+    np.testing.assert_array_equal(
+        policies.score_random(b_x, rng_a), policies.score_random(b_x, rng_b)
+    )
 
 
 def test_score_br_hat_nonnegative():
@@ -81,8 +83,8 @@ def test_score_residual_nonnegative():
 
 def test_score_l2d_in_unit_interval():
     rng = np.random.default_rng(4)
-    b_x, _, h, y = _toy_arrays(rng, N=400)
-    s = policies.score_l2d(b_x, h, y, R1)
+    b_x, b_xh, h, y = _toy_arrays(rng, N=400)
+    s = policies.score_l2d(b_x, y, b_xh, R1)
     assert s.shape == (b_x.shape[0],)
     assert ((s >= 0) & (s <= 1)).all()
 
@@ -111,7 +113,15 @@ def test_compute_scores_returns_all_policies():
     rng = np.random.default_rng(0)
     b_x, b_xh, h, y = _toy_arrays(rng, N=400)
     scores = allocation.compute_scores(b_x, b_xh, h, y, R1, rng=rng, n_folds=5)
-    expected_keys = {"BR_hat", "Residual", "Margin", "Entropy", "L2D", "Random", "Oracle"}
+    expected_keys = {
+        "BR_hat",
+        "Residual",
+        "Margin",
+        "Entropy",
+        "L2D",
+        "Random",
+        "Oracle",
+    }
     assert set(scores.keys()) == expected_keys
     for k, v in scores.items():
         assert v.shape == (400,)
@@ -132,13 +142,33 @@ def test_evaluate_budget_yields_expected_keys():
     b_x, b_xh, h, y = _toy_arrays(rng, N=400)
     scores = allocation.compute_scores(b_x, b_xh, h, y, R1, rng=rng, n_folds=5)
     out = allocation.evaluate_budget(
-        scores, b_x, b_xh, y, R1, q=0.2, baseline_policy="Random",
-        rng=rng, n_boot=200,
+        scores,
+        b_x,
+        b_xh,
+        y,
+        R1,
+        q=0.2,
+        baseline_policy="Random",
+        rng=rng,
+        n_boot=200,
     )
-    for policy_name in ("BR_hat", "Residual", "Margin", "Entropy", "L2D", "Random", "Oracle"):
+    for policy_name in (
+        "BR_hat",
+        "Residual",
+        "Margin",
+        "Entropy",
+        "L2D",
+        "Random",
+        "Oracle",
+    ):
         entry = out[policy_name]
-        for key in ("utility_gain", "n_selected", "delta_vs_baseline",
-                    "delta_ci_lo", "delta_ci_hi"):
+        for key in (
+            "utility_gain",
+            "n_selected",
+            "delta_vs_baseline",
+            "delta_ci_lo",
+            "delta_ci_hi",
+        ):
             assert key in entry
 
 
@@ -152,7 +182,9 @@ def test_synthetic_configs_listed():
 
 def test_generate_synthetic_pair_shapes():
     rng = np.random.default_rng(0)
-    b_x, b_xh, h, y, meta = synthetic.generate_synthetic_pair("A_balanced", n=500, rng=rng)
+    b_x, b_xh, h, y, meta = synthetic.generate_synthetic_pair(
+        "A_balanced", n=500, rng=rng
+    )
     assert b_x.shape == (500, 2)
     assert b_xh.shape == (500, 2)
     assert h.shape == (500,)
@@ -167,14 +199,46 @@ def test_synthetic_off_threshold_high_zero_br_under_r2():
     """A_off_threshold under R2 should have very high zero-BR mass."""
     rng = np.random.default_rng(0)
     b_x, b_xh, _, _, _ = synthetic.generate_synthetic_pair(
-        "A_off_threshold", n=2000, rng=rng,
+        "A_off_threshold",
+        n=2000,
+        rng=rng,
     )
     br = core.boundary_regret(b_x, b_xh, R2)
     tol = core.reward_tolerance(R2)
     assert (br <= tol).mean() > 0.85  # loose floor; geometry guarantees ~all-zero
 
+
+# ---------------------------------------------------------------------------
+# Seed reproducibility — --seed must control fold splits + bootstrap jointly
+# ---------------------------------------------------------------------------
+
+
+def test_compute_scores_same_seed_identical():
+    rng_a = np.random.default_rng(7)
+    rng_b = np.random.default_rng(7)
+    b_x, b_xh, h, y = _toy_arrays(np.random.default_rng(0), N=400)
+    sa = allocation.compute_scores(b_x, b_xh, h, y, R1, rng=rng_a, n_folds=5)
+    sb = allocation.compute_scores(b_x, b_xh, h, y, R1, rng=rng_b, n_folds=5)
+    for k in sa:
+        np.testing.assert_array_equal(sa[k], sb[k])
+
+
+def test_compute_scores_different_seeds_diverge_on_cv_policies():
+    """BR_hat / Residual / L2D depend on fold splits — must differ across seeds."""
+    rng_a = np.random.default_rng(7)
+    rng_b = np.random.default_rng(8)
+    b_x, b_xh, h, y = _toy_arrays(np.random.default_rng(0), N=400)
+    sa = allocation.compute_scores(b_x, b_xh, h, y, R1, rng=rng_a, n_folds=5)
+    sb = allocation.compute_scores(b_x, b_xh, h, y, R1, rng=rng_b, n_folds=5)
+    for k in ("BR_hat", "Residual", "L2D"):
+        assert not np.array_equal(
+            sa[k], sb[k]
+        ), f"{k} did not change across seeds — CV folds are not seed-driven"
+
+
 import json
 from pathlib import Path
+
 from click.testing import CliRunner as ClickTestRunner
 
 
@@ -184,8 +248,15 @@ def test_cli_synthetic_smoke(tmp_path: Path):
     runner = ClickTestRunner()
     result = runner.invoke(
         main,
-        ["synthetic", "--n-samples", "300", "--seed", "0",
-         "--output-dir", str(tmp_path)],
+        [
+            "synthetic",
+            "--n-samples",
+            "300",
+            "--seed",
+            "0",
+            "--output-dir",
+            str(tmp_path),
+        ],
         catch_exceptions=False,
     )
     assert result.exit_code == 0, result.output
@@ -204,9 +275,9 @@ def test_cli_synthetic_smoke(tmp_path: Path):
 
 def test_cli_real_uses_dataset_prepared(tmp_path: Path, monkeypatch):
     """Smoke: write a fake pair artefact, monkeypatch dataset_prepared, invoke real."""
+    import experiments.experiment_3.runner as runner_mod
     from data.preparation import write_pair_file
     from experiments.experiment_3.runner import main
-    import experiments.experiment_3.runner as runner_mod
 
     rng = np.random.default_rng(0)
     n = 350
@@ -217,12 +288,17 @@ def test_cli_real_uses_dataset_prepared(tmp_path: Path, monkeypatch):
     pairs_dir = tmp_path / "fakeds" / "fakemodel" / "pairs"
     pairs_dir.mkdir(parents=True)
     meta = {
-        "dataset": "fakeds", "model": "fakemodel", "task": "T1",
-        "annotator_id": "A1", "n_classes": 2,
+        "dataset": "fakeds",
+        "model": "fakemodel",
+        "task": "T1",
+        "annotator_id": "A1",
+        "n_classes": 2,
     }
     write_pair_file(pairs_dir, "T1__A1", b_x_pos, b_xh_pos, h, y, meta)
 
-    monkeypatch.setattr(runner_mod, "dataset_prepared", lambda name: tmp_path / "fakeds")
+    monkeypatch.setattr(
+        runner_mod, "dataset_prepared", lambda name: tmp_path / "fakeds"
+    )
 
     out_dir = tmp_path / "out"
     runner = ClickTestRunner()
@@ -235,3 +311,24 @@ def test_cli_real_uses_dataset_prepared(tmp_path: Path, monkeypatch):
     run_subdir = next(out_dir.iterdir())
     payload = json.loads((run_subdir / "results.json").read_text())
     assert payload["aggregate"]["n_pairs"] == 1
+
+
+def test_evaluate_pair_and_aggregate_pairs_roundtrip():
+    from experiments.experiment_2.rewards import REWARDS
+
+    rng = np.random.default_rng(0)
+    b_x, b_xh, h, y = _toy_arrays(rng, N=400)
+    metrics = allocation.evaluate_pair(b_x, b_xh, h, y, REWARDS, rng=rng)
+    assert set(metrics.keys()) == set(REWARDS.keys())
+    assert "0.20" in metrics["R1"]
+    assert "BR_hat" in metrics["R1"]["0.20"]
+    # _baseline_policy must NOT leak into per-policy output anymore
+    assert "_baseline_policy" not in metrics["R1"]["0.20"]
+
+    agg = allocation.aggregate_pairs(
+        [{"tag": "x", "meta": {}, "metrics": metrics}],
+        REWARDS,
+    )
+    assert agg["n_pairs"] == 1
+    assert agg["baseline_policy"] == "Margin"
+    assert "BR_hat" in agg["policies"]["R1"]["0.20"]
