@@ -15,20 +15,20 @@ When audits treat residual predictive expertise as residual decision value, they
 
 We formalize the missing estimand as \emph{boundary regret}: the regret of keeping the model's action after observing the human signal.
 For model belief $b_x$, model-optimal action $a_x = \argmax_a r_a \cdot b_x$, human-updated belief $b_{x,h} = P(Y \mid x, h)$, and terminal value $V(b) = \max_a r_a \cdot b$,
-\begin{equation}\label{eq:BR-intro}
+\begin{equation}
   \BR(x, h) \;=\; V(b_{x,h}) \;-\; r_{a_x} \cdot b_{x,h},
 \end{equation}
 which is positive exactly when a rival action becomes preferred under $b_{x,h}$.
 In any finite-action Bayesian decision problem, the value of observing the human signal equals expected boundary regret (Theorem~\ref{thm:voi-br}):
-\[
+\begin{equation}
   \VoI(H \mid b_x) \;=\; \E_h\bigl[\BR(x, h)\bigr].
-\]
-The geometric takeaway is simple: predictive gain without a reachable boundary crossing has zero decision value for the deployed action set.
+\end{equation}
+Predictive gain without a reachable boundary crossing has zero decision value for the deployed action set.
 We formalize in Lean~4 both the zero-regret boundary condition and the value-of-information identity above.
-The rest of the paper develops this criterion in four steps:
+The paper develops this criterion in four steps:
 \begin{itemize}[nosep,leftmargin=1.5em]
   \item We define boundary regret and prove, in Lean~4, that $\VoI(H \mid b_x) = \E_h[\BR(x,h)]$, with a geometric facet-activation criterion that characterizes when boundary regret is strictly positive (Theorems~\ref{thm:voi-br}--\ref{thm:facet-bridge}).
   \item We validate the plug-in estimator $\BRhat$ on synthetic finite-action problems, including a strong-null condition where humans carry substantial predictive signal yet boundary regret is zero everywhere: predictive gain is not sufficient for decision value.
   \item We show on CheXpert that residual predictive expertise and residual decision value separate as a function of reward geometry, exactly as the theory predicts: the same model, the same readers, and the same conditions yield opposite-signed correlations under different rewards.
-  \item We show that ex ante $\BRhat$ improves scarce-review allocation over reward-aware margin, reward-agnostic uncertainty, residual-expertise, and learning-to-defer baselines where boundary-regret mass is reachable, and converges to reward-aware margin where it is not --- both outcomes predicted by Theorem~\ref{thm:facet-bridge}.
+  \item We show that ex ante $\BRhat$ improves scarce-review allocation over reward-aware margin, reward-agnostic uncertainty, residual-expertise, and learning-to-defer baselines where boundary-regret mass is reachable, and converges to reward-aware margin where it is not (Theorem~\ref{thm:facet-bridge}).
 \end{itemize}
