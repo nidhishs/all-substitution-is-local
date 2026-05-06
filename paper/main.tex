@@ -56,12 +56,18 @@
 \maketitle
 
 \begin{abstract}
-A human with residual predictive expertise beyond the model has zero decision value whenever that expertise does not move the posterior across a reward-induced decision boundary.
-We introduce \emph{boundary regret}: the regret of keeping the model's action under the human-updated posterior.
-In any finite-action Bayesian decision problem, the value of human review equals expected boundary regret (Lean-formalized); predictive signal that does not cross a reward-induced facet has zero decision value, regardless of log-loss gain.
-Across 25 CheXpert reader--task pairs---five board-certified radiologists across five conditions---\textbf{97.4\%} of top-expertise-decile cases have zero boundary regret under a false-positive-penalty reward: the radiologist is informative, the operative action is unchanged.
-On the same 25 reader--task pairs, an ex ante boundary-regret score allocates scarce review more efficiently than uncertainty-based, residual-expertise, and learning-to-defer baselines under asymmetric rewards at review budgets $q \in \{5\%,\, 10\%,\, 20\%\}$.
-Human--AI complementarity audits that ignore reward geometry overestimate the deployment value of human review whenever deployment costs are asymmetric---a condition that is the norm, not the exception, in high-stakes clinical decisions.
+Audits of human--AI complementarity target the wrong estimand.
+They ask whether the human knows more than the model; deployment asks whether what the human knows would change the action.
+Residual predictive expertise is not residual decision value.
+Deployment rewards actions, and a posterior movement that does not cross a reward-induced action boundary changes nothing about what gets done; a signal can be informative under log-loss and still leave the deployed action where it was.
+We formalize the missing quantity as \emph{boundary regret}: the regret of holding the model's action after observing the human.
+In any finite-action Bayesian decision problem, the value of consulting the human equals expected boundary regret (Lean-formalized).
+The identity turns the question of when humans help into a question about geometry: which decision facets does the human signal move belief across?
+Complementarity is therefore reward-relative.
+A given human signal can be valuable under one reward matrix and worthless under another with no change in what the human knows; the boundary moved, not the expertise.
+The asymmetric costs that govern high-stakes clinical and operational decisions are exactly the regime where this gap is widest.
+Audits built on residual predictive expertise overstate the value of human review and route scarce review toward cases where the human is informative but the action will not move.
+Boundary regret is what should be measured instead.
 \end{abstract}
 
 \input{chapters/introduction}
