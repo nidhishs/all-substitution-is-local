@@ -57,17 +57,17 @@
 
 \begin{abstract}
 Audits of human--AI complementarity target the wrong estimand.
-They ask whether the human knows more than the model; deployment asks whether what the human knows would change the action.
+They ask whether the human knows more than the model; deployment asks whether that knowledge would change the action.
 Residual predictive expertise is not residual decision value.
-Deployment rewards actions, and a posterior movement that does not cross a reward-induced action boundary changes nothing about what gets done; a signal can be informative under log-loss and still leave the deployed action where it was.
+Deployment rewards actions, and a posterior movement that does not cross a reward-induced action boundary changes nothing; a signal can be informative under log-loss and leave the deployed action unchanged.
 We formalize the missing quantity as \emph{boundary regret}: the regret of holding the model's action after observing the human.
-In any finite-action Bayesian decision problem, the value of consulting the human equals expected boundary regret (Lean-formalized).
-The identity turns the question of when humans help into a question about geometry: which decision facets does the human signal move belief across?
+In any finite-action Bayesian decision problem, the value of consulting the human equals expected boundary regret, formally verified in Lean 4.
+The identity turns when humans help into a geometric question: which decision facets does the human signal move belief across?
 Complementarity is therefore reward-relative.
-A given human signal can be valuable under one reward matrix and worthless under another with no change in what the human knows; the boundary moved, not the expertise.
-The asymmetric costs that govern high-stakes clinical and operational decisions are exactly the regime where this gap is widest.
+A given human signal can be valuable under one reward matrix and worthless under another, the human's knowledge unchanged; the boundary moved, not the expertise.
+The gap is widest precisely where asymmetric costs dominate: high-stakes clinical and operational decisions.
 Audits built on residual predictive expertise overstate the value of human review and route scarce review toward cases where the human is informative but the action will not move.
-Boundary regret is what should be measured instead.
+Boundary regret is the quantity to measure.
 \end{abstract}
 
 \input{chapters/introduction}

@@ -1,10 +1,10 @@
 \section{Experiments}
 \label{sec:experiments}
 
-The experiments are sequential.
-Section~\ref{sec:exp1} validates the boundary-regret estimator in synthetic settings where the ground truth is computable in closed form.
+We have three sequential experiments.
+Section~\ref{sec:exp1} validates the boundary-regret estimator in synthetic settings with closed-form ground truth.
 Section~\ref{sec:exp2} tests whether residual predictive expertise and residual decision value diverge on a real human--AI dataset across reward structures.
-Section~\ref{sec:exp3} asks whether an ex ante boundary-regret score can allocate scarce human review more efficiently than standard baselines under asymmetric rewards, validated on both synthetic and real data.
+Section~\ref{sec:exp3} asks whether an ex ante boundary-regret score allocates scarce human review better than standard baselines under asymmetric rewards.
 
 \subsection{Experiment 1: Estimator and Geometry Validation}
 \label{sec:exp1}
@@ -13,26 +13,20 @@ Section~\ref{sec:exp3} asks whether an ex ante boundary-regret score can allocat
 Does the plug-in estimator recover known boundary regret, and remain zero when a safe action dominates the reachable belief region?
 
 \paragraph{Setup.}
-We simulate finite-state Bayesian decision problems with known prior, reward matrix, model channel $P(m\mid y)$, and human channel $P(h\mid y)$, with $M \perp H \mid Y$.
-For each sampled triple $(y,m,h)$ we compute the exact posterior after the model signal, $b_m=P(y\mid m)$, the posterior after both signals, $b_{m,h}=P(y\mid m,h)$, the model-only action $a_m$, and instance-level boundary regret
+We simulate finite-state Bayesian decision problems with known prior, reward matrix, and channels $P(m\mid y), P(h\mid y)$ ($M \perp H \mid Y$).
+For each sampled $(y,m,h)$ we compute the exact posteriors $b_m=P(y\mid m)$ and $b_{m,h}=P(y\mid m,h)$, the model-only action $a_m$, and instance-level boundary regret
 \[
-  \BR(m,h) \;=\; V(b_{m,h}) - r_{a_m}\cdot b_{m,h}
+  \BR(m,h) \;=\; V(b_{m,h}) - r_{a_m}\cdot b_{m,h}.
 \]
-The estimator does not see the true channels: it estimates $\hat P(m\mid y)$, $\hat P(h\mid y)$, and $\hat p(y)$ from finite data using 5-fold cross-fitting and Laplace-smoothed counts, then computes the plug-in $\BRhat$ on held-out instances.
-Each condition uses $N=10{,}000$ samples.
+The estimator does not see the true channels: it estimates $\hat P(m\mid y), \hat P(h\mid y), \hat p(y)$ from finite data via 5-fold cross-fitting with Laplace smoothing, then computes plug-in $\BRhat$ on held-out instances ($N=10{,}000$ per condition).
 
 \paragraph{Conditions.}
-The configuration grid is derived from two axes: $G\in\{2,3,5\}$ decision groups and $K\in\{G,2G\}$ latent states.
-Thus $G=2$ is the minimal boundary case, $G=3$ is the smallest genuinely multi-action case, $G=5$ is a moderate stress test, and $K=2G$ checks that estimation quality does not degrade when multiple latent states map to the same decision group.
-We use three condition roles.
-C1 is a positive control: actions reward state groups and the human signal crosses decision boundaries.
-C2 is a weak null: the prior is deep inside one decision region and the human channel is weak.
-C3 is a strong null: the human channel is highly predictive, but a safe action remains optimal for every reachable posterior.
-In C3 we construct the threshold to guarantee safe-action dominance: for each configuration we compute the maximum reachable posterior mass on any decision group, $U$, under the exact channels, and set $\tau=(1+U)/2$. By construction $\tau>U$, so no reachable posterior can make a non-safe action optimal, while the human signal retains its predictive accuracy.
+The grid varies $G\in\{2,3,5\}$ decision groups and $K\in\{G,2G\}$ latent states, covering the minimal boundary case ($G=2$), the smallest genuinely multi-action case ($G=3$), and a moderate stress test ($G=5$); $K=2G$ checks that estimation does not degrade when multiple latent states share a decision group.
+Three roles: C1 is a positive control (actions reward state groups, human signal crosses boundaries), C2 a weak null (prior deep inside one decision region, weak human channel), and C3 a strong null (highly predictive human signal but a safe action dominates every reachable posterior).
+For C3 we set $\tau=(1+U)/2$, where $U$ is the maximum reachable posterior mass on any decision group under the exact channels; $\tau>U$ guarantees no reachable posterior can make a non-safe action optimal while the human signal retains its predictive accuracy.
 
 \paragraph{Results.}
-Table~\ref{tab:exp1-core} reports metrics averaged across the six configurations.
-Rank correlation is reported only where $\BR$ varies across instances; in both null conditions $\BR\equiv 0$, so we report false-positive rate instead.
+Table~\ref{tab:exp1-core} reports metrics averaged across the six configurations; rank correlation is reported only where $\BR$ varies (in both nulls $\BR\equiv 0$, so we report false-positive rate instead).
 
 \begin{table}[htbp]
 \centering
@@ -55,8 +49,8 @@ C3 & Strong null      & \text{n/a}   & 0.000 &  0.0 &  0.0 & \textbf{0.595} \\
 \end{table}
 
 The estimator separates predictive value from decision value.
-In C1, $\BRhat$ ranks true boundary regret well ($\rho=0.901$) across the 37.9\% of instances where crossings occur; per-configuration details in Appendix~\ref{app:exp1-detail}. In both nulls FPR is zero.
-C3 is the critical case: the human signal achieves a log-loss improvement of 0.595 (the highest across all conditions), yet $\BRhat$ assigns zero boundary regret to every instance, because no posterior crosses the certified threshold.
+In C1, $\BRhat$ ranks true boundary regret well ($\rho=0.901$) across the 37.9\% of instances where crossings occur (per-configuration details in Appendix~\ref{app:exp1-detail}); FPR is zero in both nulls.
+C3 is the critical case: the human signal achieves the highest log-loss improvement of any condition ($\Delta\mathrm{LL}=0.595$), yet $\BRhat$ assigns zero boundary regret to every instance because no posterior crosses the certified threshold.
 High predictive accuracy on task-relevant features does not imply decision value when a safe action dominates the reachable belief region.
 
 % ==============================================================
@@ -75,22 +69,17 @@ The human-augmented posterior $\bpost_{x,h} \approx P(Y=1 \mid x, h)$ is estimat
 Spearman correlations between residual predictive expertise (log-loss gain over $b_x$) and $\BRhat$ are reported across the 25 pairs under each reward regime; label protocol details in Appendix~\ref{app:exp2-protocol}.
 
 \paragraph{Reward Regimes.}
-We evaluate three reward matrices $r_{a,y}$.
-R1 is the identity ($+1$ for correct decisions, $0$ for errors), with decision threshold $1/2$.
-R2 ($r_{0,0}=1$, $r_{1,1}=5$, errors $0$) penalises false negatives five times as heavily as false positives, shifting the threshold to $1/6\approx 0.167$.
-R3 mirrors R2 with the asymmetry reversed ($r_{0,0}=5$, $r_{1,1}=1$), threshold $5/6\approx 0.833$.
-Each threshold equals $r_{0,0}/(r_{0,0}+r_{1,1})$, the treatment threshold for the corresponding FP/FN cost ratio~\citep{PaukerKassirer1980}.
-These regimes position the decision threshold in distinct regions of the model belief distribution: R1 at the bulk (threshold $1/2$), R2 below the bulk (threshold $1/6$), and R3 above it in the sparse upper tail (threshold $5/6$).
-R3 is the critical negative control: the facet-activation bridge predicts that when the threshold sits in the upper tail, facet crossings become rare, boundary-regret mass collapses to near zero, and residual predictive expertise decouples from decision value regardless of how much the reader improves the model's log-loss.
+We evaluate three reward matrices $r_{a,y}$, each placing the decision threshold $r_{0,0}/(r_{0,0}+r_{1,1})$~\citep{PaukerKassirer1980} in a distinct region of the model belief distribution.
+R1 is the identity ($r_{0,0}=r_{1,1}=1$, errors $0$), threshold $1/2$, in the bulk.
+R2 ($r_{0,0}=1$, $r_{1,1}=5$, errors $0$) penalises false negatives five times as heavily as false positives, threshold $1/6$, below the bulk.
+R3 mirrors R2 ($r_{0,0}=5$, $r_{1,1}=1$), threshold $5/6$, in the sparse upper tail.
+R3 is the critical negative control: Theorem~\ref{thm:facet-bridge} predicts that when the threshold sits in the tail, facet crossings become rare, boundary-regret mass collapses to near zero, and residual predictive expertise decouples from decision value regardless of how much the reader improves the model's log-loss.
 
 \begin{table}[htbp]
 \centering
-\caption{Boundary-regret diagnostics on $N=25$ reader--task pairs.
-  $n_{\mathrm{v}}$: pairs where $\BRhat\not\equiv 0$;
-  Top-decile zero-$\BRhat$: fraction of 90th-percentile disagreement cases where $\BRhat=0$;
-  $\bar\rho_{\mathrm{facet}}$: mean Spearman between facet distance and $\BRhat$.
-  $n_{\mathrm{v}}$ falls and top-decile zero-$\BRhat$ rises from R1 to R3, both tracking the collapse of actionable boundary-regret mass.
-  $\bar\rho_{\mathrm{facet}}<0$ in all regimes: boundary regret concentrates near the active facet.}
+\caption{Boundary-regret diagnostics on $N=25$ reader--task pairs: actionable BR mass collapses from R1 to R3 and BR concentrates near the active facet in all regimes.
+  $n_{\mathrm{v}}$: pairs where $\BRhat\not\equiv 0$; $\bar\rho_{\mathrm{facet}}$: mean Spearman between facet distance and $\BRhat$.
+}
 \label{tab:exp2}
 \small
 \begin{tabular}{@{}llrrrrr@{}}
@@ -99,30 +88,32 @@ Reward & Role & $\bar\rho_{\mathrm{LL}}$ & $\rho{>}0/n_{\mathrm{v}}$ & $\bar\rho
 \midrule
 R1 (thr.\ $1/2$) & Primary result    & $\mathbf{+0.477}$ & $25/25$ & $-0.599$ & $11.2\%$          & $25$ \\
 R2 (thr.\ $1/6$) & Intermediate      & $-0.051$          & $15/25$ & $-0.866$ & $28.3\%$          & $25$ \\
-R3 (thr.\ $5/6$) & Negative control  & $\mathbf{-0.112}$ & $0/7$   & $-0.221$ & $\mathbf{97.4\%}$ & $7$  \\
+R3 (thr.\ $5/6$) & Negative control  & $-0.112$          & $0/7$   & $-0.221$ & $\mathbf{97.4\%}$ & $7$  \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \paragraph{Reward-Conditional Dissociation.}
-The correlation between residual predictive expertise (log-loss gain over the model alone) and boundary regret inverts with the reward (Table~\ref{tab:exp2}): positive under R1 ($\bar\rho=+0.477$, 25/25 pairs), near zero under R2 ($\bar\rho=-0.051$, 15/25 positive), and negative under R3 ($\bar\rho=-0.112$, 0/7 positive; the remaining 18 of 25 pairs have $\BRhat\equiv 0$ across the entire R3 evaluation set).
+The correlation between residual predictive expertise (log-loss gain over the model alone) and boundary regret inverts with the reward (Table~\ref{tab:exp2}): $\bar\rho_{\mathrm{LL}}=+0.477$ under R1 (25/25 pairs positive), $-0.051$ under R2 (15/25), and $-0.112$ under R3 (0/7; sign test $p=0.008$, with the remaining 18 of 25 pairs structurally $\BRhat\equiv 0$).
 Same model, same readers, same data; only the reward changes.
 
 The mechanism is geometric.
-Under R1, the threshold $1/2$ sits in a dense region of model beliefs, so a single reader update routinely crosses a facet and predictive expertise aligns with decision value.
-Under R3 (threshold $5/6$), $97.4\%$ of top-expertise-decile cases (90th percentile of model--reader disagreement $1-b_x[h]$) carry zero boundary regret: the false-positive facet sits in the tail and no posterior update reaches it.
-R2 (threshold $1/6$) is intermediate ($28.3\%$ top-decile zero-$\BRhat$).
-Facet distance correlates negatively with $\BRhat$ under every reward ($-0.599$, $-0.866$, $-0.221$ for R1, R2, R3): boundary regret concentrates near the active facet independent of how predictive the reader is (Theorem~\ref{thm:facet-bridge}).
-We call this \emph{reward-conditional dissociation}: a consequence of reward geometry, not a calibration failure or model breakdown.
+Under R1, threshold $1/2$ sits in a dense region of model beliefs, so a single reader update routinely crosses a facet and predictive expertise aligns with decision value.
+Under R3, the false-positive facet sits in the tail and no posterior update reaches it: only 7 of 25 pairs carry any non-zero $\BRhat$, and $97.4\%$ of top-expertise-decile cases (90th percentile of model--reader disagreement $1-b_x[h]$) have $\BRhat=0$.
+The R3 correlation $\bar\rho=-0.112$ on these 7 pairs is directionally consistent with the geometric prediction; the collapse of $n_\mathrm{v}$ from 25 to 7 is the direct confirmation that boundary-regret mass has evacuated.
+R2 is intermediate ($28.3\%$ top-decile zero-$\BRhat$).
+Facet distance correlates negatively with $\BRhat$ under every reward ($-0.599, -0.866, -0.221$ for R1, R2, R3): boundary regret concentrates near the active facet regardless of how predictive the reader is (Theorem~\ref{thm:facet-bridge}).
+R2's stronger concentration follows from the same geometry: with the threshold at $1/6$ nearly all decisions default to treat, so the rare facet crossings come precisely from beliefs already near $1/6$. R1's centrally located threshold produces no such concentration.
+We call this \emph{reward-conditional dissociation}: a consequence of reward geometry, not a calibration failure.
 
-Appendix~\ref{app:exp2-robustness} shows the dissociation holds across in- and off-domain pretrained checkpoints (varying the belief geometry) and readers not involved in ground-truth labelling.
+Appendix~\ref{app:exp2-robustness} shows the inversion and dissociation hold across in- and off-domain pretrained checkpoints (varying the belief geometry) and readers not involved in ground-truth labelling.
 As a theory-confirming negative control, Appendix~\ref{app:exp2-cifar10h} evaluates CIFAR-10H: on highly accurate classifiers whose softmax probabilities rarely straddle a reward facet, $\bar\rho$ collapses to near-zero across all rewards ($+0.015$ under R1 vs.\ $+0.477$ on CheXpert R1), confirming that the dissociation signal depends on the model's beliefs straddling the active facet, exactly as Theorem~\ref{thm:facet-bridge} predicts.
 
 \paragraph{Implication for Predictive Audits.}
 A residual-expertise audit in the style of \citet{AlurEtAl2023,AlurRaghavanShah2024} would find substantial predictive value here (mean log-loss gain $0.387$ nats across all 25 pairs) and recommend deploying the readers.
 Under R3, $97.4\%$ of those same cases carry zero decision value.
 The \emph{estimand shift} from predictive to decisional complementarity is not a refinement; it changes the sign of the deployment recommendation.
-If this regime-conditional inversion is theorem-predicted, an ex ante $\BRhat$ score should inherit it: dominating reward-aware geometric proximity where boundary-regret mass is reachable, converging where it is not.
+If this regime-conditional inversion is theorem-predicted, an ex ante $\BRhat$ score should inherit it: dominating reward-aware geometric proximity where boundary-regret mass is reachable, converging with it where mass is absent.
 Section~\ref{sec:exp3} tests this directly.
 
 % ==============================================================
