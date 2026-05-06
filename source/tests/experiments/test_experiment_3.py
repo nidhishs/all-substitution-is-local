@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import numpy as np
-import pytest
+from click.testing import CliRunner as ClickTestRunner
 
 import core
-from experiments.experiment_2.rewards import R1, R2, R3
-from experiments.experiment_3 import policies
+from experiments.experiment_2.rewards import R1, R3
+from experiments.experiment_3 import allocation, policies, synthetic
 
 
 def _toy_arrays(rng: np.random.Generator, N: int = 200, K: int = 2):
@@ -87,9 +90,6 @@ def test_score_l2d_in_unit_interval():
     s = policies.score_l2d(b_x, y, b_xh, R1)
     assert s.shape == (b_x.shape[0],)
     assert ((s >= 0) & (s <= 1)).all()
-
-
-from experiments.experiment_3 import allocation
 
 
 def test_top_q_indices_correct_count():
@@ -172,9 +172,6 @@ def test_evaluate_budget_yields_expected_keys():
             assert key in entry
 
 
-from experiments.experiment_3 import synthetic
-
-
 def test_synthetic_configs_listed():
     names = synthetic.config_names()
     assert names == ("A_balanced", "A_low_signal", "A_off_threshold")
@@ -195,16 +192,16 @@ def test_generate_synthetic_pair_shapes():
     assert meta["n_classes"] == 2
 
 
-def test_synthetic_off_threshold_high_zero_br_under_r2():
-    """A_off_threshold under R2 should have very high zero-BR mass."""
+def test_synthetic_off_threshold_high_zero_br_under_r3():
+    """A_off_threshold under R3 should have very high zero-BR mass."""
     rng = np.random.default_rng(0)
     b_x, b_xh, _, _, _ = synthetic.generate_synthetic_pair(
         "A_off_threshold",
         n=2000,
         rng=rng,
     )
-    br = core.boundary_regret(b_x, b_xh, R2)
-    tol = core.reward_tolerance(R2)
+    br = core.boundary_regret(b_x, b_xh, R3)
+    tol = core.reward_tolerance(R3)
     assert (br <= tol).mean() > 0.85  # loose floor; geometry guarantees ~all-zero
 
 
@@ -234,12 +231,6 @@ def test_compute_scores_different_seeds_diverge_on_cv_policies():
         assert not np.array_equal(
             sa[k], sb[k]
         ), f"{k} did not change across seeds — CV folds are not seed-driven"
-
-
-import json
-from pathlib import Path
-
-from click.testing import CliRunner as ClickTestRunner
 
 
 def test_cli_synthetic_smoke(tmp_path: Path):

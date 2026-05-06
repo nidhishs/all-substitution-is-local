@@ -55,7 +55,7 @@ C3 & Strong null      & \text{n/a}   & 0.000 &  0.0 &  0.0 & \textbf{0.595} \\
 \end{table}
 
 The estimator separates predictive value from decision value.
-In C1, $\BRhat$ ranks true boundary regret well ($\rho=0.901$) across the 37.9\% of instances where crossings occur; per-configuration detail is in Appendix~\ref{app:exp1-detail}. In both nulls FPR is zero.
+In C1, $\BRhat$ ranks true boundary regret well ($\rho=0.901$) across the 37.9\% of instances where crossings occur; per-configuration details in Appendix~\ref{app:exp1-detail}. In both nulls FPR is zero.
 C3 is the critical case: the human signal achieves a log-loss improvement of 0.595 (the highest across all conditions), yet $\BRhat$ assigns zero boundary regret to every instance, because no posterior crosses the certified threshold.
 High predictive accuracy on task-relevant features does not imply decision value when a safe action dominates the reachable belief region.
 
@@ -65,57 +65,65 @@ High predictive accuracy on task-relevant features does not imply decision value
 \label{sec:exp2}
 
 \paragraph{Question.}
-Does residual predictive expertise track residual decision value, or do the two estimands dissociate as a function of reward geometry --- as Theorem~\ref{thm:facet-bridge} predicts?
+Does the correlation between residual predictive expertise and boundary regret invert across reward regimes on the same model, readers, and data?
 
 \paragraph{Setup.}
-We pair a pretrained DenseNet-121 chest X-ray classifier \citep{Huang2017,Cohen2022} with the five board-certified radiologists of the CheXpert reader study \citep{Irvin2019}, evaluated across the five official CheXpert competition conditions (Atelectasis, Cardiomegaly, Consolidation, Edema, Pleural Effusion) on 500 frontal radiographs, yielding $N=25$ reader--task pairs.
-The held-out label is the majority vote of these five readers' annotations; full protocol details are in Appendix~\ref{app:exp2-protocol}.
-Model beliefs are temperature-scaled per pair, and the human-augmented posterior $\bpost_{x,h}\approx P(Y=1\mid x,h)$ is estimated via 5-fold cross-fitted logistic regression on $[\operatorname{logit}(b_x),\,h,\,h{\cdot}\operatorname{logit}(b_x)]$, with folds stratified on $y$.
-Spearman correlations and bootstrap confidence intervals are computed over the 25 pairs.
+We pair a pretrained DenseNet-121 chest X-ray classifier \citep{Huang2017,Cohen2022} with five board-certified radiologists of the CheXpert reader study \citep{Irvin2019} across five official competition conditions (Atelectasis, Cardiomegaly, Consolidation, Edema, Pleural Effusion), yielding $N=25$ reader--task pairs on 500 frontal radiographs.
+For each pair, the ground-truth label $y$ is the majority vote of the \emph{remaining four} readers, which eliminates structural $h$--$y$ contamination and ensures $y \perp h$.
+Model beliefs $b_x$ are temperature-scaled per pair on a 30\% calibration split; evaluation uses the remaining 70\% (${\approx}350$ images per pair).
+The human-augmented posterior $\bpost_{x,h} \approx P(Y=1 \mid x, h)$ is estimated via 5-fold cross-fitted logistic regression on features $[\operatorname{logit}(b_x),\, h,\, h \cdot \operatorname{logit}(b_x)]$.
+Spearman correlations between residual predictive expertise (log-loss gain over $b_x$) and $\BRhat$ are reported across the 25 pairs under each reward regime; label protocol details in Appendix~\ref{app:exp2-protocol}.
 
 \paragraph{Reward Regimes.}
 We evaluate three reward matrices $r_{a,y}$.
-R1 is the identity ($+1$ for correct decisions, $0$ for errors), giving threshold $0.5$.
-R2 ($r_{0,0}=5$, $r_{1,1}=1$, errors $0$) penalises false positives five times as heavily as false negatives, shifting the threshold to $5/6\approx 0.833$.
-R3 mirrors R2 with the asymmetry reversed ($r_{0,0}=1$, $r_{1,1}=5$), threshold $1/6\approx 0.167$.
-These regimes are chosen to position the decision threshold in qualitatively different regions of the model belief distribution: R1 in the dense bulk, R3 below it, and R2 in the low-density upper tail.
-R2 and R3 are geometric probes of the theory's central prediction: as the threshold moves into the tail, facet crossings become rare, boundary-regret mass collapses, and predictive expertise decouples from decision value.
+R1 is the identity ($+1$ for correct decisions, $0$ for errors), with decision threshold $1/2$.
+R2 ($r_{0,0}=1$, $r_{1,1}=5$, errors $0$) penalises false negatives five times as heavily as false positives, shifting the threshold to $1/6\approx 0.167$.
+R3 mirrors R2 with the asymmetry reversed ($r_{0,0}=5$, $r_{1,1}=1$), threshold $5/6\approx 0.833$.
+Each threshold equals $r_{0,0}/(r_{0,0}+r_{1,1})$, the treatment threshold for the corresponding FP/FN cost ratio~\citep{PaukerKassirer1980}.
+These regimes position the decision threshold in distinct regions of the model belief distribution: R1 at the bulk (threshold $1/2$), R2 below the bulk (threshold $1/6$), and R3 above it in the sparse upper tail (threshold $5/6$).
+R3 is the critical negative control: the facet-activation bridge predicts that when the threshold sits in the upper tail, facet crossings become rare, boundary-regret mass collapses to near zero, and residual predictive expertise decouples from decision value regardless of how much the reader improves the model's log-loss.
 
-\begin{table}[t]
+\begin{table}[htbp]
 \centering
-\caption{Section~\ref{sec:exp2}: estimand-shift dissociation on $N=25$ reader--task pairs.
-  ``Top-decile'' $=$ 90th-percentile of model-reader disagreement $1-b_x[h]$.
-  ``$n$ valid'' excludes pairs where $\BRhat\equiv 0$ across the entire evaluation set.
-  Mean log-loss gain across all 25 pairs is $0.387$ nats.}
+\caption{Boundary-regret diagnostics on $N=25$ reader--task pairs.
+  $n_{\mathrm{v}}$: pairs where $\BRhat\not\equiv 0$;
+  Top-decile zero-$\BRhat$: fraction of 90th-percentile disagreement cases where $\BRhat=0$;
+  $\bar\rho_{\mathrm{facet}}$: mean Spearman between facet distance and $\BRhat$.
+  $n_{\mathrm{v}}$ falls and top-decile zero-$\BRhat$ rises from R1 to R3, both tracking the collapse of actionable boundary-regret mass.
+  $\bar\rho_{\mathrm{facet}}<0$ in all regimes: boundary regret concentrates near the active facet.}
 \label{tab:exp2}
 \small
-\begin{tabular}{@{}lrrrrr@{}}
+\begin{tabular}{@{}llrrrrr@{}}
 \toprule
-Reward & $\bar\rho(\mathrm{LL},\BRhat)$ & $\rho{>}0/n$ & $\bar\rho(\mathrm{facet},\BRhat)$ & Top-decile zero-$\BRhat$ & $n$ valid \\
+Reward & Role & $\bar\rho_{\mathrm{LL}}$ & $\rho{>}0/n_{\mathrm{v}}$ & $\bar\rho_{\mathrm{facet}}$ & Top-decile zero-$\BRhat$ & $n_{\mathrm{v}}$ \\
 \midrule
-R1 (thr.\ $0.500$) & $+0.477$ & $25/25$ & $-0.599$ & $11.2\%$          & $25$ \\
-R2 (thr.\ $0.833$) & $-0.112$ & $0/7$   & $-0.221$ & $\mathbf{97.4\%}$ & $7$  \\
-R3 (thr.\ $0.167$) & $-0.051$ & $15/25$ & $-0.866$ & $28.3\%$          & $25$ \\
+R1 (thr.\ $1/2$) & Primary result    & $\mathbf{+0.477}$ & $25/25$ & $-0.599$ & $11.2\%$          & $25$ \\
+R2 (thr.\ $1/6$) & Intermediate      & $-0.051$          & $15/25$ & $-0.866$ & $28.3\%$          & $25$ \\
+R3 (thr.\ $5/6$) & Negative control  & $\mathbf{-0.112}$ & $0/7$   & $-0.221$ & $\mathbf{97.4\%}$ & $7$  \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \paragraph{Reward-Conditional Dissociation.}
-The Spearman correlation between residual predictive expertise (log-loss gain over the model alone) and boundary regret inverts across reward regimes: $+0.477$ under R1 (all 25 pairs positive), $-0.112$ under R2 (all 7 valid pairs negative; the remaining 18 have $\BRhat\equiv 0$ across the entire R2 evaluation set --- no posterior update reaches the false-positive-penalty facet), and $-0.051$ under R3 (15 of 25 pairs positive).
-Same model, same readers, same conditions: only the reward changes.
-Under R2, $97.4\%$ of top-expertise-decile cases --- those where the model is most surprised by the reader's answer --- carry zero boundary regret: the model belief sits far from the false-positive-penalty facet and no single-reader update changes the deployed action.
-Under R1, the threshold $0.50$ sits in a dense region of model beliefs, so radiologist readings frequently push the posterior across a facet and predictive expertise aligns with decision value.
-Under R3 (threshold $0.167$), dissociation is intermediate ($28.3\%$ top-decile zero-$\BRhat$): the boundary sits closer to the tail than R1 but closer to the bulk than R2.
-This is \emph{reward-conditional dissociation}: a direct consequence of reward geometry, not a calibration failure or model breakdown.
-Facet distance correlates negatively with $\BRhat$ under every reward ($-0.599$, $-0.221$, $-0.866$ for R1, R2, R3) --- direct empirical confirmation of Theorem~\ref{thm:facet-bridge}: boundary regret concentrates near the active decision facet, independent of how predictive the reader is.
+The correlation between residual predictive expertise (log-loss gain over the model alone) and boundary regret inverts with the reward (Table~\ref{tab:exp2}): positive under R1 ($\bar\rho=+0.477$, 25/25 pairs), near zero under R2 ($\bar\rho=-0.051$, 15/25 positive), and negative under R3 ($\bar\rho=-0.112$, 0/7 positive; the remaining 18 of 25 pairs have $\BRhat\equiv 0$ across the entire R3 evaluation set).
+Same model, same readers, same data; only the reward changes.
+
+The mechanism is geometric.
+Under R1, the threshold $1/2$ sits in a dense region of model beliefs, so a single reader update routinely crosses a facet and predictive expertise aligns with decision value.
+Under R3 (threshold $5/6$), $97.4\%$ of top-expertise-decile cases (90th percentile of model--reader disagreement $1-b_x[h]$) carry zero boundary regret: the false-positive facet sits in the tail and no posterior update reaches it.
+R2 (threshold $1/6$) is intermediate ($28.3\%$ top-decile zero-$\BRhat$).
+Facet distance correlates negatively with $\BRhat$ under every reward ($-0.599$, $-0.866$, $-0.221$ for R1, R2, R3): boundary regret concentrates near the active facet independent of how predictive the reader is (Theorem~\ref{thm:facet-bridge}).
+We call this \emph{reward-conditional dissociation}: a consequence of reward geometry, not a calibration failure or model breakdown.
+
+Appendix~\ref{app:exp2-robustness} shows the dissociation holds across in- and off-domain pretrained checkpoints (varying the belief geometry) and readers not involved in ground-truth labelling.
+As a theory-confirming negative control, Appendix~\ref{app:exp2-cifar10h} evaluates CIFAR-10H: on highly accurate classifiers whose softmax probabilities rarely straddle a reward facet, $\bar\rho$ collapses to near-zero across all rewards ($+0.015$ under R1 vs.\ $+0.477$ on CheXpert R1), confirming that the dissociation signal depends on the model's beliefs straddling the active facet, exactly as Theorem~\ref{thm:facet-bridge} predicts.
 
 \paragraph{Implication for Predictive Audits.}
-A residual-expertise audit in the style of \citet{AlurEtAl2023,AlurRaghavanShah2024} would find substantial predictive value here --- mean log-loss gain is $0.387$ nats across all 25 pairs --- and recommend deploying the readers.
-Under R2, $97.4\%$ of those same cases carry zero decision value.
+A residual-expertise audit in the style of \citet{AlurEtAl2023,AlurRaghavanShah2024} would find substantial predictive value here (mean log-loss gain $0.387$ nats across all 25 pairs) and recommend deploying the readers.
+Under R3, $97.4\%$ of those same cases carry zero decision value.
 The \emph{estimand shift} from predictive to decisional complementarity is not a refinement; it changes the sign of the deployment recommendation.
 If this regime-conditional inversion is theorem-predicted, an ex ante $\BRhat$ score should inherit it: dominating reward-aware geometric proximity where boundary-regret mass is reachable, converging where it is not.
 Section~\ref{sec:exp3} tests this directly.
-Appendix~\ref{app:robustness} extends this analysis to all six DenseNet checkpoints and all eight readers (240 reader--task pairs); the direction of the dissociation is preserved.
 
 % ==============================================================
 
@@ -147,8 +155,8 @@ We compare $\BRhat$ against six baselines.
 \centering
 \caption{Section~\ref{sec:exp3}: mean utility gain over no-review baseline, $N\!=\!25$ reader--task pairs.
   W/L/T $=$ wins/losses/ties vs.\ Margin across the 25 pairs; decisive $=$ pairs where policies diverge.
-  R2 is reported at $q\!=\!20\%$ only as a \emph{negative control}; the full R2 table is in Appendix~\ref{app:exp3-r2}.
-  Under R1 (binary symmetric reward, threshold $0.5$), Margin and Entropy are rank-equivalent: both are strictly monotone in $|b_x - 0.5|$ for $K\!=\!2$, so they induce identical rankings and report identical gains.}
+  R3 is reported at $q\!=\!20\%$ only as a \emph{negative control}; the full R3 table is in Appendix~\ref{app:exp3-r3}.
+  Under R1 (binary symmetric reward, threshold $1/2$), Margin and Entropy are rank-equivalent: both are strictly monotone in $|b_x - 1/2|$ for $K\!=\!2$, so they induce identical rankings and report identical gains.}
 \label{tab:exp3}
 \footnotesize
 \begin{tabular}{@{}ll rrrrr r@{}}
@@ -160,40 +168,39 @@ R1 & $10\%$ & $\mathbf{+0.0893}$ & $+0.0743$ & $+0.0743$ & $+0.0465$ & $+0.0306$
 R1 & $20\%$ & $\mathbf{+0.1634}$ & $+0.1438$ & $+0.1438$ & $+0.0917$ & $+0.0714$ & $22/1/2\ (p<0.0001)$ \\
 R1 & $50\%$ & $\mathbf{+0.3337}$ & $+0.2797$ & $+0.2797$ & $+0.2545$ & $+0.2510$ & $25/0/0\ (p<0.0001)$ \\
 \midrule
-R3 & $5\%$  & $+0.0514$ & $+0.0490$ & $+0.0429$ & $+0.0317$ & $+0.0474$ & $3/0/22\ (p=0.25)$ \\
-R3 & $10\%$ & $+0.0992$ & $+0.0965$ & $+0.0768$ & $+0.0621$ & $+0.0944$ & $3/1/21\ (p=0.63)$ \\
-R3 & $20\%$ & $+0.1920$ & $+0.1889$ & $+0.1486$ & $+0.1270$ & $+0.1886$ & $3/1/21\ (p=0.63)$ \\
+R2 & $5\%$  & $+0.0514$ & $+0.0490$ & $+0.0429$ & $+0.0317$ & $+0.0474$ & $3/0/22\ (p=0.25)$ \\
+R2 & $10\%$ & $+0.0992$ & $+0.0965$ & $+0.0768$ & $+0.0621$ & $+0.0944$ & $3/1/21\ (p=0.63)$ \\
+R2 & $20\%$ & $+0.1920$ & $+0.1889$ & $+0.1486$ & $+0.1270$ & $+0.1886$ & $3/1/21\ (p=0.63)$ \\
 \midrule
-R2$^\dagger$ & $20\%$ & $+0.0026$ & $+0.0029$ & --- & --- & --- & $0/2/23$ (neg.\ control) \\
+R3$^\dagger$ & $20\%$ & $+0.0026$ & $+0.0029$ & --- & --- & --- & $0/2/23$ (neg.\ control) \\
 \bottomrule
 \end{tabular}
-{\footnotesize $^\dagger$R2 negative control: $\BRhat$ and Margin are statistically indistinguishable ($p\geq 0.5$, W/L/T $=0/2/23$ at $q\!=\!20\%$); full table in Appendix~\ref{app:exp3-r2}.}
+{\footnotesize $^\dagger$R3 negative control: $\BRhat$ and Margin are statistically indistinguishable ($p\geq 0.5$, W/L/T $=0/2/23$ at $q\!=\!20\%$); full table in Appendix~\ref{app:exp3-r3}.}
 \end{table}
 
 \paragraph{Regime-conditional inversion.}
 Three reward matrices, one model, twenty-five reader--task pairs.
-The same scoring rule produces a regime-conditional inversion of allocation advantage: $\BRhat$ dominates Margin under R1 at every budget (sign-test $p<0.0001$), converges to Margin under R2 (only 7 of 25 pairs carry non-zero mass), and is indistinguishable from Margin under R3 (sparse actionable mass at threshold $0.167$).
+The same scoring rule produces a regime-conditional inversion of allocation advantage: $\BRhat$ dominates Margin under R1 at every budget (sign-test $p<0.0001$), is indistinguishable from Margin under R2 (sparse actionable mass at threshold $1/6$), and converges to Margin under R3 (only 7 of 25 pairs carry non-zero mass).
 The pattern across rewards is the result; the wins are the evidence.
 
-\paragraph{R1 (symmetric reward, threshold $0.500$).}
+\paragraph{R1 (symmetric reward, threshold $1/2$).}
 $\BRhat$ wins decisively at every budget (sign-test $p<0.0001$ throughout).
 The four budget tallies $20/1/4$, $24/1/0$, $22/1/2$, $25/0/0$ yield decisive-win rates of $95\%$, $96\%$, $96\%$, $100\%$.
 At $q=50\%$, $\BRhat$ wins all 25 pairs; at lower budgets, ties occur where both policies select the same case set, and decisive-win rates remain $95$--$96\%$.
 
-\paragraph{R2 (FP-penalized reward, threshold $0.833$).}
-The reward boundary sits at $5/6\approx 0.833$, in the low-density tail of model beliefs.
-Eighteen of twenty-five pairs have $\BRhat\equiv 0$ across the entire evaluation set (no reachable boundary crossing under R2's reward); among the 7 pairs with non-zero mass, $\BRhat$ is statistically indistinguishable from Margin at every budget ($p\geq 0.5$ throughout), with mean utility gains within $0.0005$ of Margin's at each budget ($q=20\%$: $\BRhat=+0.0026$ vs.\ Margin $=+0.0029$).
-The geometry already isolates the only feasible boundary crossings; this is Theorem~\ref{thm:facet-bridge} confirmed, not contradicted.
-The full R2 table is in Appendix~\ref{app:exp3-r2}.
-
-\paragraph{R3 (FN-penalized reward, threshold $0.167$).}
-The reward boundary at $1/6\approx 0.167$ sits closer to the belief mode than R2 but further than R1.
+\paragraph{R2 (FN-penalized reward, threshold $1/6$).}
+The reward boundary at $1/6\approx 0.167$ sits closer to the belief mode than R3 but further than R1.
 $\BRhat$ is indistinguishable from Margin at all tested budgets ($3/0/22$ to $3/1/21$; sign-test $p\geq 0.25$).
-The near-null result reflects sparse actionable mass at threshold $0.167$: with LOO-corrected labels, the posterior updates that cross the R3 facet are too infrequent to produce a reliable allocation advantage over reward-aware Margin.
+The near-null result reflects sparse actionable mass at threshold $1/6$: with LOO-corrected labels, the posterior updates that cross the R2 facet are too infrequent to produce a reliable allocation advantage over reward-aware Margin.
+
+\paragraph{R3 (FP-penalized reward, threshold $5/6$).}
+The reward boundary sits at $5/6\approx 0.833$, in the low-density tail of model beliefs.
+Eighteen of twenty-five pairs have $\BRhat\equiv 0$ across the entire evaluation set (no reachable boundary crossing under R3's reward); among the 7 pairs with non-zero mass, $\BRhat$ is statistically indistinguishable from Margin at every budget ($p\geq 0.5$ throughout), with mean utility gains within $0.0005$ of Margin's at each budget ($q=20\%$: $\BRhat=+0.0026$ vs.\ Margin $=+0.0029$).
+The geometry already isolates the only feasible boundary crossings; this is Theorem~\ref{thm:facet-bridge} confirmed, not contradicted.
+The full R3 table is in Appendix~\ref{app:exp3-r3}.
 
 \paragraph{Human channel versus geometric proximity.}
 Reward-aware distance to the active facet is a strong baseline: it already identifies which cases are near the decision boundary.
 The $95$--$100\%$ paired wins over Margin under R1 (sign-test $p<0.0001$ at every budget) show that $\BRhat$'s estimate of $P(h\mid x)$ and $P(Y\mid x,h)$ adds reliable signal above that geometric distance where actionable mass is dense.
-Where mass is absent (R2) or sparse (R3), $\BRhat$ and Margin converge --- both outcomes predicted by Theorem~\ref{thm:facet-bridge}.
-A broader negative control extends this: on CIFAR-10H, highly accurate classifiers rarely straddle any reward facet, and $\BRhat$ allocation degenerates to near-random across all rewards and budgets (Appendix~\ref{app:exp3-cifar10h}).
-Appendix~\ref{app:exp3-robustness} extends the allocation experiment to all six DenseNet checkpoints (240 pairs); R1 dominance holds across models, while off-domain checkpoints produce denser R3 actionable mass and stronger $\BRhat$ wins at smaller budgets.
+Where mass is absent (R3) or sparse (R2), $\BRhat$ and Margin converge, both outcomes predicted by Theorem~\ref{thm:facet-bridge}.
+Appendix~\ref{app:exp3-robustness} extends the allocation experiment to all six DenseNet checkpoints (240 pairs); R1 dominance holds across models, while off-domain checkpoints produce denser R2 actionable mass and stronger $\BRhat$ wins at smaller budgets.

@@ -2,8 +2,8 @@
 
 Three binary (2-action, 2-state) rewards:
   R1 — symmetric:        equal cost for FP and FN.
-  R2 — FP-penalty (5x): rewards safe inaction when the pathology is absent.
-  R3 — FN-penalty (5x): mirror of R2; rewards aggressive detection.
+  R2 — FN-penalty (5x): rewards aggressive detection.
+  R3 — FP-penalty (5x): rewards safe inaction when the pathology is absent.
 
 All thresholds are derived from the reward matrices, not hand-set.
 """
@@ -14,8 +14,8 @@ import numpy as np
 
 # R[action, state]: R[0]=negative action, R[1]=positive action; state 0=absent, 1=present.
 R1: np.ndarray = np.array([[1.0, 0.0], [0.0, 1.0]], dtype=np.float64)
-R2: np.ndarray = np.array([[5.0, 0.0], [0.0, 1.0]], dtype=np.float64)
-R3: np.ndarray = np.array([[1.0, 0.0], [0.0, 5.0]], dtype=np.float64)
+R2: np.ndarray = np.array([[1.0, 0.0], [0.0, 5.0]], dtype=np.float64)
+R3: np.ndarray = np.array([[5.0, 0.0], [0.0, 1.0]], dtype=np.float64)
 
 REWARDS: dict[str, np.ndarray] = {"R1": R1, "R2": R2, "R3": R3}
 

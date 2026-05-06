@@ -3,7 +3,7 @@
 Each config tests a different geometric regime predicted by Theorem 2:
     A_balanced       : prior at threshold, strong signal -> BR_hat > Margin under R1
     A_low_signal     : prior at threshold, weak signal   -> all policies converge low
-    A_off_threshold  : prior far from threshold          -> ~100% zero-BR under R2
+    A_off_threshold  : prior far from threshold          -> ~100% zero-BR under R3
 
 Channels (M and H) are (S, K) matrices with M[s, k] = P(signal=s | state=k).
 For binary K=2 with diagonal-strength theta, M = [[theta, 1-theta], [1-theta, theta]].

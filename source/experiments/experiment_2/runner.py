@@ -34,11 +34,11 @@ def run_pairs_dir(
     for i, npz_path in enumerate(npz_paths, 1):
         b_x, b_xh, h, y, meta = utils.load_pair(npz_path)
         metrics = compute_pair_metrics(b_x, b_xh, h, y, rng)
-        r2 = metrics["R2"]
+        r3 = metrics["R3"]
         logger.info(
             f"[{i:2d}/{len(npz_paths)}] {npz_path.stem:<45s}  "
-            f"ρ_R2={r2['rho_ll_br']:+.3f}  "
-            f"zero_br={r2['top_decile_frac_br_zero']:.1%}"
+            f"ρ_R3={r3['rho_ll_br']:+.3f}  "
+            f"zero_br={r3['top_decile_frac_br_zero']:.1%}"
         )
         results.append({"tag": npz_path.stem, "metrics": metrics, "meta": meta})
     return results

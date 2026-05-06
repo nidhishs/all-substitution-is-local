@@ -55,11 +55,11 @@ def test_indifference_threshold_r1():
 
 
 def test_indifference_threshold_r2():
-    assert indifference_threshold(R2) == pytest.approx(5 / 6)
+    assert indifference_threshold(R2) == pytest.approx(1 / 6)
 
 
 def test_indifference_threshold_r3():
-    assert indifference_threshold(R3) == pytest.approx(1 / 6)
+    assert indifference_threshold(R3) == pytest.approx(5 / 6)
 
 
 def test_facet_thresholds_match_derived():
