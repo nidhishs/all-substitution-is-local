@@ -95,7 +95,7 @@ The three benchmark readers (\texttt{bc4}, \texttt{bc6}, \texttt{bc8}) were not 
 
 \paragraph{Model Belief and Calibration.}
 Model probabilities $b_x^{\mathrm{raw}}$ are produced by the \texttt{torchxrayvision} DenseNet-121 \citep{Huang2017,Cohen2022} with the standard X-ray preprocessing pipeline (8-bit normalisation, centre crop, $224{\times}224$ resize).
-The primary experiment uses the in-domain checkpoint \texttt{densenet121-res224-chex}; the robustness analyses below use all six publicly available checkpoints.
+The primary experiment uses the in-domain checkpoint \texttt{densenet121\allowbreak-res224\allowbreak-chex}; the robustness analyses below use all six publicly available checkpoints.
 For each (condition, reader) pair we apply per-pair logit-space temperature scaling: a stratified $30\%$ calibration split (seed $42$), with scalar $T$ found by NLL minimisation in $[0.1,10]$, gives the calibrated belief $b_x = \sigma(\operatorname{logit}(b_x^{\mathrm{raw}})/T)$.
 
 \paragraph{Human-Augmented Posterior.}
@@ -151,26 +151,26 @@ All 240 pairs                         & $\mathbf{+0.470}$ & $+0.196$ & $\mathbf{
 
 CIFAR-10H evaluates seven pretrained CIFAR-10 classifiers against 50 human annotators across 10 one-vs-rest binary tasks (3{,}500 reader--task pairs).
 Pretrained CIFAR-10 classifiers are highly accurate; their softmax probabilities rarely straddle a decision boundary for a given annotator's image subset.
-Theorem~\ref{thm:facet-bridge} therefore predicts near-zero actionable boundary-regret mass everywhere --- a prediction the data confirm: only 47.7\% of pairs have any non-zero $\BRhat$ signal at all, and ${\geq}94\%$ of top-disagreement-decile instances show $\BRhat=0$.
+Theorem~\ref{thm:facet-bridge} therefore predicts near-zero actionable boundary-regret mass everywhere.
 
-\begin{table}[ht]
+\begin{table}[htbp]
 \centering
-\caption{CIFAR-10H negative control: mean Spearman $\bar\rho$ between log-loss gain and $\BRhat$ by reward regime across 3{,}500 pairs (7 models $\times$ 500 annotator--class pairs).}
+\caption{CIFAR-10H negative control: mean Spearman $\bar\rho$ between log-loss gain and $\BRhat$ across $3{,}500$ reader--task pairs.}
 \label{tab:cifar10h}
 \small
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
 Reward & $\bar\rho$ (valid) & $\bar\rho$ (all) & $N$ valid & Top-decile $\BRhat=0$ \\
 \midrule
-R1 (thr.\ $0.500$) & $+0.015$ & $+0.007$ & 1{,}668 & $96.2\%$ \\
-R2 (thr.\ $0.167$) & $+0.044$ & $+0.024$ & 1{,}905 & $94.5\%$ \\
-R3 (thr.\ $0.833$) & $-0.008$ & $-0.004$ & 1{,}632 & $96.9\%$ \\
+R1 (thr.\ $0.500$) & $+0.015$ & $+0.007$ & $1{,}668$ & $96.2\%$ \\
+R2 (thr.\ $0.167$) & $+0.044$ & $+0.024$ & $1{,}905$ & $94.5\%$ \\
+R3 (thr.\ $0.833$) & $-0.008$ & $-0.004$ & $1{,}632$ & $96.9\%$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The R1 dissociation signal ($\bar\rho=+0.015$) is roughly 25$\times$ weaker than the weakest CheXpert model ($+0.392$).
-$\BRhat$ allocation correspondingly degenerates to near-random (${\approx}2\%$ win rate vs.\ Margin under R1), confirming that the allocation advantage in Section~\ref{sec:exp3} depends on the model's beliefs straddling reward facets --- a condition that high-accuracy CIFAR-10 classifiers rarely satisfy.
+The R1 dissociation signal ($\bar\rho=+0.015$) is ${\sim}32{\times}$ weaker than the primary CheXpert R1 result ($\bar\rho=+0.477$ across the $25$ in-domain reader--task pairs; Section~\ref{sec:exp2}) and ${\sim}30{\times}$ weaker than the $240$-pair robustness average ($+0.470$; Table~\ref{tab:robustness}).
+The collapse is the predicted consequence of dense actionable mass being absent, not a methods failure.
 
 % ============================================================
 \section{Allocation Advantage: Robustness}
@@ -180,7 +180,7 @@ $\BRhat$ allocation correspondingly degenerates to near-random (${\approx}2\%$ w
 Table~\ref{tab:exp3-robustness} extends the allocation experiment of Section~\ref{sec:exp3} to all six DenseNet checkpoints and all eight CheXpert radiologists ($240$ reader--task pairs).
 Three patterns reproduce the main result.
 Under R1 (dense actionable mass), $\BRhat$ dominates Margin at every budget ($p<0.0001$ for $q\geq 10\%$), confirming the advantage is not an artefact of the primary checkpoint.
-Under R2 (sparse but reachable mass), $\BRhat$ now also beats Margin at $q\in\{5\%,10\%,20\%\}$ ($p<0.0001$), an effect not visible on the $25$-pair primary benchmark; the dissociation table above explains why --- off-domain checkpoints concentrate more belief mass near the R2 facet at $1/6$, providing actionable mass that the in-domain checkpoint lacks.
+Under R2 (sparse but reachable mass), $\BRhat$ now also beats Margin at $q\in\{5\%,10\%,20\%\}$ ($p<0.0001$), an effect not visible on the $25$-pair primary benchmark; the dissociation table above explains why: off-domain checkpoints concentrate more belief mass near the R2 facet at $1/6$, providing actionable mass that the in-domain checkpoint lacks.
 Under R3 (no actionable mass), $\BRhat$ and Margin remain economically indistinguishable, with no systematic advantage in either direction (sign-test $p \geq 0.08$ at every budget; mean differences $\leq 0.0012$ at $q=5\%$ and $\leq 0.0004$ for $q \geq 10\%$), reproducing the no-mass prediction.
 
 \begin{table}[htbp]
