@@ -115,3 +115,25 @@ PYTHONPATH=. uv run python -m experiments experiment-3 real --dataset chexpert/a
 ```
 
 Outputs `results.json` to `results/experiment_3/run_<hex>/`.
+
+---
+
+## CIFAR-10H — Negative Control (Appendix B.2)
+
+CIFAR-10H is included as a theory-confirming negative control: pretrained CIFAR-10 classifiers are accurate enough that softmax probabilities rarely straddle a reward facet, so the dissociation signal collapses to near-zero across all rewards. Requires the CIFAR-10H prepare pipeline (`source/data/README.md`) for all 7 supported weights.
+
+### Experiment 2 — 3,500 pairs
+
+```bash
+PYTHONPATH=. uv run python -m experiments experiment-2 --dataset cifar10h
+```
+
+7 models × 10 classes × top-50 annotators = 3,500 pairs (with structurally degenerate pairs skipped at prepare time).
+
+### Experiment 3 — 3,500 pairs
+
+```bash
+PYTHONPATH=. uv run python -m experiments experiment-3 real --dataset cifar10h
+```
+
+Both write to `results/experiment_<n>/run_<hex>/`. Results are summarised in [`RESULTS.md`](RESULTS.md#cifar-10h-results).
