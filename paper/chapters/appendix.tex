@@ -86,7 +86,7 @@ C3 & 5 & 10 & 6 & -- & 0.000 & 0.0\% & 0.738 \\
 
 \paragraph{Reader study.}
 The five board-certified radiologists (bc1, bc2, bc3, bc5, bc7) provided binary disease-presence ratings under the official CheXpert five-condition protocol (Atelectasis, Cardiomegaly, Consolidation, Edema, Pleural Effusion) on the 500-image frontal-view validation set.
-The held-out label $y$ for each reader--task pair is computed by \emph{leave-one-out majority vote}: for GT reader $r_i$, $y = \mathbf{1}[\sum_{j \neq i} v_j \geq 3]$ where $v_j \in \{0,1\}$ are the remaining four GT readers' votes.
+The held-out label $y$ for each reader--task pair is computed by \emph{leave-one-out majority vote}: for GT reader $r_i$, $y = \Ind[\sum_{j \neq i} v_j \geq 3]$ where $v_j \in \{0,1\}$ are the remaining four GT readers' votes.
 This construction ensures $y \perp h$ by design: the test reader is never a voter in the ground truth they are evaluated against.
 Benchmark readers (bc4, bc6, bc8) were not voters in the original study, so their pairs use all five GT votes (equivalent to the official majority, no exclusion needed).
 

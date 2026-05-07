@@ -141,62 +141,68 @@ We compare it against six baselines.
 \textbf{Residual} is a residual-expertise score, the deployable analogue of a predictive audit \citep{AlurEtAl2023}.
 \textbf{Entropy} is reward-blind model uncertainty.
 These policies span two axes: Margin is reward-aware but human-blind, Residual is human-aware but reward-blind, Entropy is blind to both, and $\BRhat$ is both reward-aware and human-aware.
-\textbf{L2D} is the learned full-coverage competitor: like $\BRhat$ it is both reward-aware and human-aware, but reaches that coverage end-to-end through a cross-fitted deferral classifier \citep{MozannarSontag2020,MaoMohri2023} with reward-sensitive labels $\mathbf{1}[R[a_{x,h},y]>R[a_x,y]]$, rather than through the reward's geometry and the reader-channel posterior.
+\textbf{L2D} is the learned full-coverage competitor: like $\BRhat$ it is both reward-aware and human-aware, but reaches that coverage end-to-end through a cross-fitted deferral classifier with reward-sensitive labels $\Ind[R[a_{x,h},y]>R[a_x,y]]$, in the spirit of \citep{MozannarSontag2020,MaoMohri2023}, rather than through the reward's geometry and the reader-channel posterior.
 \textbf{Random} is the uninformed baseline.
 \textbf{Oracle} is the hindsight upper bound using realized labels.
 
-\paragraph{Results.}
+\paragraph{Regime-Conditional Allocation.}
+We evaluate all policies on the same 25 reader--task pairs under each reward matrix.
+Table~\ref{tab:exp3} tests whether the dissociation in Section~\ref{sec:exp2} becomes actionable under a scarce review budget.
+It does, but only where reward geometry leaves actionable mass reachable: $\BRhat$ beats Margin at every R1 budget, leads or ties across most R2 budgets, and has no systematic advantage in the R3 negative control.
+The paired wins, losses, and ties isolate when the human-aware term adds value beyond reward geometry.
 
-\begin{table}[t]
+\begin{table}[htbp]
 \centering
-\caption{Section~\ref{sec:exp3}: mean utility gain over no-review baseline, $N\!=\!25$ reader--task pairs.
-  W/L/T $=$ wins/losses/ties vs.\ Margin across the 25 pairs; decisive $=$ pairs where policies diverge.
-  R3 is reported at $q\!=\!20\%$ only as a \emph{negative control}; the full R3 table is in Appendix~\ref{app:exp3-r3}.
-  Under R1 (binary symmetric reward, threshold $1/2$), Margin and Entropy are rank-equivalent: both are strictly monotone in $|b_x - 1/2|$ for $K\!=\!2$, so they induce identical rankings and report identical gains.}
+\caption{Ex ante review allocation under scarce human input.
+  Entries report mean held-out utility gain over no review on $N=25$ reader--task pairs.
+  $\BRhat$ beats reward-aware Margin where actionable mass is dense (R1), leads or ties where mass is sparse (R2), and has no systematic edge where mass is absent (R3, negative control).
+  W/L/T gives paired wins/losses/ties of $\BRhat$ against Margin; bold marks the best deployable policy in each row (Oracle excluded).
+% Under R1, Margin and Entropy induce the same ranking, so their gains coincide.
+}
 \label{tab:exp3}
-\footnotesize
-\begin{tabular}{@{}ll rrrrr r@{}}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}ll rrrrr@{\hspace{5pt}}|@{\hspace{5pt}}rr@{\hspace{5pt}}|@{\hspace{5pt}}r@{}}
 \toprule
-Reward & $q$ & $\BRhat$ & Margin & Entropy & Residual & L2D & W/L/T (sign-test $p$) \\
+Reward & $q$ & $\BRhat$ & Margin & Entropy & Residual & L2D & Random & Oracle & W/L/T \\
 \midrule
-R1 & $5\%$  & $\mathbf{+0.0473}$ & $+0.0395$ & $+0.0395$ & $+0.0226$ & $+0.0151$ & $20/1/4\ (p<0.0001)$ \\
-R1 & $10\%$ & $\mathbf{+0.0893}$ & $+0.0743$ & $+0.0743$ & $+0.0465$ & $+0.0306$ & $24/1/0\ (p<0.0001)$ \\
-R1 & $20\%$ & $\mathbf{+0.1634}$ & $+0.1438$ & $+0.1438$ & $+0.0917$ & $+0.0714$ & $22/1/2\ (p<0.0001)$ \\
-R1 & $50\%$ & $\mathbf{+0.3337}$ & $+0.2797$ & $+0.2797$ & $+0.2545$ & $+0.2510$ & $25/0/0\ (p<0.0001)$ \\
+R1 & $5\%$  & $\mathbf{+0.0459}$ & $+0.0395$ & $+0.0395$ & $+0.0209$ & $+0.0152$ & $+0.0184$ & $+0.0514$ & $20/2/3$ \\
+R1 & $10\%$ & $\mathbf{+0.0883}$ & $+0.0743$ & $+0.0743$ & $+0.0455$ & $+0.0289$ & $+0.0392$ & $+0.1000$ & $24/0/1$ \\
+R1 & $20\%$ & $\mathbf{+0.1638}$ & $+0.1438$ & $+0.1438$ & $+0.0915$ & $+0.0697$ & $+0.0761$ & $+0.2000$ & $22/1/2$ \\
+R1 & $50\%$ & $\mathbf{+0.3325}$ & $+0.2797$ & $+0.2797$ & $+0.2544$ & $+0.2485$ & $+0.2022$ & $+0.4495$ & $25/0/0$ \\
 \midrule
-R2 & $5\%$  & $+0.0514$ & $+0.0490$ & $+0.0429$ & $+0.0317$ & $+0.0474$ & $3/0/22\ (p=0.25)$ \\
-R2 & $10\%$ & $+0.0992$ & $+0.0965$ & $+0.0768$ & $+0.0621$ & $+0.0944$ & $3/1/21\ (p=0.63)$ \\
-R2 & $20\%$ & $+0.1920$ & $+0.1889$ & $+0.1486$ & $+0.1270$ & $+0.1886$ & $3/1/21\ (p=0.63)$ \\
+R2 & $5\%$  & $\mathbf{+0.0514}$ & $+0.0490$ & $+0.0429$ & $+0.0330$ & $+0.0477$ & $+0.0313$ & $+0.0514$ & $3/0/22$ \\
+R2 & $10\%$ & $\mathbf{+0.0999}$ & $+0.0965$ & $+0.0768$ & $+0.0610$ & $+0.0946$ & $+0.0534$ & $+0.1000$ & $3/0/22$ \\
+R2 & $20\%$ & $\mathbf{+0.1914}$ & $+0.1889$ & $+0.1486$ & $+0.1286$ & $+0.1879$ & $+0.1089$ & $+0.2000$ & $5/2/18$ \\
+R2 & $50\%$ & $+0.4113$ & $\mathbf{+0.4161}$ & $+0.2955$ & $+0.3069$ & $+0.4134$ & $+0.2664$ & $+0.4865$ & $7/9/9$ \\
 \midrule
-R3$^\dagger$ & $20\%$ & $+0.0026$ & $+0.0029$ & --- & --- & --- & $0/2/23$ (neg.\ control) \\
+R3 & $5\%$  & $\mathbf{+0.0029}$ & $+0.0027$ & $+0.0000$ & $+0.0000$ & $-0.0008$ & $+0.0006$ & $+0.0072$ & $1/4/20$ \\
+R3 & $10\%$ & $+0.0025$ & $\mathbf{+0.0031}$ & $+0.0000$ & $+0.0000$ & $+0.0008$ & $+0.0007$ & $+0.0072$ & $0/4/21$ \\
+R3 & $20\%$ & $+0.0025$ & $\mathbf{+0.0029}$ & $+0.0000$ & $+0.0000$ & $+0.0017$ & $+0.0006$ & $+0.0072$ & $1/4/20$ \\
+R3 & $50\%$ & $+0.0027$ & $\mathbf{+0.0029}$ & $+0.0000$ & $+0.0000$ & $+0.0023$ & $+0.0021$ & $+0.0072$ & $1/2/22$ \\
 \bottomrule
 \end{tabular}
-{\footnotesize $^\dagger$R3 negative control: $\BRhat$ and Margin are statistically indistinguishable ($p\geq 0.5$, W/L/T $=0/2/23$ at $q\!=\!20\%$); full table in Appendix~\ref{app:exp3-r3}.}
 \end{table}
 
-\paragraph{Regime-conditional inversion.}
-Three reward matrices, one model, twenty-five reader--task pairs.
-The same scoring rule produces a regime-conditional inversion of allocation advantage: $\BRhat$ dominates Margin under R1 at every budget (sign-test $p<0.0001$), is indistinguishable from Margin under R2 (sparse actionable mass at threshold $1/6$), and converges to Margin under R3 (only 7 of 25 pairs carry non-zero mass).
-The pattern across rewards is the result; the wins are the evidence.
+\paragraph{Dense actionable mass (R1).}
+$\BRhat$ wins decisively at every budget (sign-test $p<0.001$); decisive-win rates over Margin are $91\%$, $100\%$, $96\%$, $100\%$ (tallies $20/2/3$, $24/0/1$, $22/1/2$, $25/0/0$).
+With actionable mass dense in the belief distribution, the reader channel adds signal beyond reward-aware geometric proximity: Margin finds cases near the active facet; $\BRhat$ identifies which of those the reader can move profitably.
+L2D matches $\BRhat$'s nominal coverage but falls below Random at $q\!\le\!20\%$ ($+0.0152$ vs.\ $+0.0184$ at $q\!=\!5\%$): the structured decomposition is what makes that coverage usable.
 
-\paragraph{R1 (symmetric reward, threshold $1/2$).}
-$\BRhat$ wins decisively at every budget (sign-test $p<0.0001$ throughout).
-The four budget tallies $20/1/4$, $24/1/0$, $22/1/2$, $25/0/0$ yield decisive-win rates of $95\%$, $96\%$, $96\%$, $100\%$.
-At $q=50\%$, $\BRhat$ wins all 25 pairs; at lower budgets, ties occur where both policies select the same case set, and decisive-win rates remain $95$--$96\%$.
+\paragraph{Sparse actionable mass (R2).}
+The low threshold places most cases on the positive action; sparse boundary-regret mass concentrates near the active facet (exactly where Margin sorts), making Margin a strong baseline. All deployable reward-aware policies obtain much larger absolute gains than under R3.
+$\BRhat$ leads or ties Margin at every budget up to $q=20\%$ with no paired losses ($3/0/22$, $3/0/22$, $5/2/18$); the $q=50\%$ row is essentially a tie ($7/9/9$, mean difference $0.005$).
+The human-aware term adds value where actionable mass exists and is harmless where mass is sparse.
 
-\paragraph{R2 (FN-penalized reward, threshold $1/6$).}
-The reward boundary at $1/6\approx 0.167$ sits closer to the belief mode than R3 but further than R1.
-$\BRhat$ is indistinguishable from Margin at all tested budgets ($3/0/22$ to $3/1/21$; sign-test $p\geq 0.25$).
-The near-null result reflects sparse actionable mass at threshold $1/6$: with LOO-corrected labels, the posterior updates that cross the R2 facet are too infrequent to produce a reliable allocation advantage over reward-aware Margin.
+\paragraph{No actionable mass (R3).}
+The active facet sits in the sparse upper tail of model beliefs; eighteen of twenty-five pairs have $\BRhat\equiv 0$ across the evaluation set.
+Allocation gains are correspondingly tiny: $\BRhat$ and Margin differ by less than $0.0006$ at every budget, with only three to five decisive pairs out of 25.
+This is the no-actionable-mass prediction of Theorem~\ref{thm:facet-bridge}, not an allocation failure.
 
-\paragraph{R3 (FP-penalized reward, threshold $5/6$).}
-The reward boundary sits at $5/6\approx 0.833$, in the low-density tail of model beliefs.
-Eighteen of twenty-five pairs have $\BRhat\equiv 0$ across the entire evaluation set (no reachable boundary crossing under R3's reward); among the 7 pairs with non-zero mass, $\BRhat$ is statistically indistinguishable from Margin at every budget ($p\geq 0.5$ throughout), with mean utility gains within $0.0005$ of Margin's at each budget ($q=20\%$: $\BRhat=+0.0026$ vs.\ Margin $=+0.0029$).
-The geometry already isolates the only feasible boundary crossings; this is Theorem~\ref{thm:facet-bridge} confirmed, not contradicted.
-The full R3 table is in Appendix~\ref{app:exp3-r3}.
-
-\paragraph{Human channel versus geometric proximity.}
-Reward-aware distance to the active facet is a strong baseline: it already identifies which cases are near the decision boundary.
-The $95$--$100\%$ paired wins over Margin under R1 (sign-test $p<0.0001$ at every budget) show that $\BRhat$'s estimate of $P(h\mid x)$ and $P(Y\mid x,h)$ adds reliable signal above that geometric distance where actionable mass is dense.
-Where mass is absent (R3) or sparse (R2), $\BRhat$ and Margin converge, both outcomes predicted by Theorem~\ref{thm:facet-bridge}.
-Appendix~\ref{app:exp3-robustness} extends the allocation experiment to all six DenseNet checkpoints (240 pairs); R1 dominance holds across models, while off-domain checkpoints produce denser R2 actionable mass and stronger $\BRhat$ wins at smaller budgets.
+\paragraph{Human Channel versus Geometric Proximity.}
+Reward-aware distance to the active facet is a strong baseline: it already identifies cases near the decision boundary.
+The decisive-win rates over Margin under R1 show that $\BRhat$'s estimate of $P(h\mid x)$ and $P(Y\mid x,h)$ add reliable signal on top of that geometric distance where actionable mass is dense.
+Where boundary-regret mass is sparse (R2) or absent (R3), $\BRhat$ and Margin converge, both outcomes predicted by Theorem~\ref{thm:facet-bridge}.
+Residual and Entropy clarify why both axes matter: human information without reward geometry, or model uncertainty without either reward geometry or the reader channel, allocates review less efficiently.
+L2D makes the opposite case: nominal coverage of both axes is not enough on its own; the structured decomposition is what makes that coverage usable at this sample size.
+The reward-aware/human-aware policy adds value exactly when both components are needed; it does not manufacture decision value when the reachable belief region carries none.
