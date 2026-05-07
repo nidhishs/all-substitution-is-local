@@ -1,12 +1,24 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We introduced boundary regret as the deployment estimand for human--AI complementarity, shifting the audit from ``does the human have residual predictive information?'' to ``does that information change the reward-relevant action?''
-The formal characterization---VoI equals expected boundary regret, with a Lean-verified geometric bridge---grounds this shift by making decision value local to the reward boundary induced by the deployed action set.
-On CheXpert across 25 reader--task pairs, residual expertise and decision value diverge in a reward-dependent manner precisely as the theory predicts: $97.4\%$ of top-expertise-decile cases carry zero decision value under a false-positive-penalty reward, and an ex ante boundary-regret score allocates review more efficiently than reward-aware and reward-agnostic baselines where boundary-regret mass is reachable, converging to reward-aware margin where it is not.
+The audit question for human--AI complementarity is not whether the human carries information the model lacks but whether that information would change the reward-relevant action.
+We named the missing estimand boundary regret and proved that it equals the value of consulting the human in any finite-action Bayesian decision problem; that quantity is strictly positive precisely when some reachable posterior crosses a decision facet.
+The plug-in score this identity yields behaves as the bridge predicts: it allocates scarce review where actionable mass is reachable and converges on reward-aware margin where it is not.
+No residual-expertise audit produces either behavior.
 
-\paragraph{Limitations and future work.}
-Both Section~\ref{sec:exp3} evaluations are retrospective; prospective evaluation with operational review protocols is required before deployment claims, and the L2D baseline is trained on accuracy not reward-specific utility, disadvantaging it under asymmetric rewards. Section~\ref{sec:exp2} covers a single dataset (CheXpert) and modality; generalization to other domains and human-signal types remains open. Boundary regret measures decision value available in $(x, h, y)$, not whether a deployed workflow can extract it---behavioral frictions \citep{Vaccaro2024,BucinaEtAl2021} require prospective studies. Two natural extensions are integration with learning-to-defer, using boundary regret as an interpretable diagnostic for what learned deferral policies exploit, and prospective studies that test whether interfaces can elicit and use the decision-relevant human signal.
+\paragraph{Limitations.}
+Boundary regret characterizes the reward-local decision value latent in the joint distribution of $(x, h, y)$.
+Whether a deployed workflow elicits and uses that value depends on the elicitation interface and on behavioral frictions \citep{Vaccaro2024,BucinaEtAl2021} the estimand is not designed to model.
+The deployed score is a plug-in estimate of an exact identity; calibration of the model belief and the human-augmented posterior controls the gap between the two.
 
-\paragraph{Code and data.}
-Lean~4 formalization and experiment code will be released upon publication. CheXpert data are publicly available \citep{Irvin2019}.
+\paragraph{Broader impact.}
+Routing scarce human review to cases that change the reward-relevant action raises operational efficiency in high-stakes settings such as clinical reading and triage; the same machinery, fed a misspecified or contested reward, will under-allocate review for populations whose decision facets it does not reach, so any operational use of $\BRhat$ should pair the score with reward elicitation and a subgroup audit of which populations it removes human review from.
+
+\paragraph{Outlook.}
+Boundary regret does not single out the human as the information source.
+The same identity prices any candidate channel---a second-opinion reader, an additional diagnostic test, a more expensive feature---by what it would change about the reward-relevant action.
+A reward-faithful training signal for learning-to-defer follows: replace accuracy-based deferral labels with the regret of not consulting, and the construction extends to multi-expert and sequential-elicitation policies.
+A prospective deployment that routes review on $\BRhat$ under operational rewards is the natural test of how much of that latent decision value a real workflow can extract.
+Complementarity is reward-relative; a signal can be informative under any proper scoring rule and leave the deployed action unchanged; the audit that ignores the boundary measures the wrong thing.
+
+
