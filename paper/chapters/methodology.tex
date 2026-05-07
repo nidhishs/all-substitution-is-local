@@ -37,6 +37,7 @@ Formally,
     \BR(x) \;=\; \E_{h \mid x}[\BR(x, h)].
 \label{eq:boundary-regret}
 \end{equation}
+We call $\BR(x,h)$ the \emph{oracle} boundary regret; $\BRhat$ denotes its plug-in estimate (\S\ref{par:estimation}).
 \end{definition}
 
 \subsection{Decision-Value Identity}
@@ -136,7 +137,7 @@ $\BR(x)$ is an information-theoretic ceiling on the per-instance decision value 
 To realize that value, a system still needs correct elicitation, calibrated posterior updating, and operator compliance \citep{Vaccaro2024,BucinaEtAl2021}.
 Boundary regret isolates the reward-local ceiling for any deferral policy or interface design.
 
-\paragraph{Estimation.}
+\paragraph{Estimation.}\label{par:estimation}
 The identities above are exact for ideal Bayesian beliefs: $b_x$ and $b_{x,h}$ are a coherent prior/posterior update pair.
 Empirically, we replace these objects with estimates.
 The estimated model belief determines $a_x$; a cross-fitted human-augmented model estimates the updated belief $\bpost_{x,h} \approx P(Y \mid x,h)$.
