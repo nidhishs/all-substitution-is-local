@@ -1,33 +1,31 @@
 \section{Related Work}
 \label{sec:related}
 
-Boundary regret sits at the intersection of several literatures: residual expertise, deferral and abstention, realized collaboration, and decision-theoretic information value.
+Four literatures bear most directly on boundary regret: residual human expertise, deferral and selective prediction, realized human--AI collaboration, and the decision-theoretic value of information.
 
 \paragraph{Residual Human Expertise Audits.}
-Residual-expertise audits ask whether human judgments retain predictive information that an algorithm has not already captured.
-\citet{AlurEtAl2023} test for residual expertise using conditional covariance, log-loss improvement, and conditional-independence checks. \citet{AlurRaghavanShah2024} give an algorithmic-indistinguishability account of human expertise in prediction.
+A line of work asks whether human judgments carry predictive information an algorithm has missed.
+\citet{AlurEtAl2023} test for residual expertise using conditional covariance, log-loss improvement, and conditional-independence checks; \citet{AlurRaghavanShah2024} give an algorithmic-indistinguishability account of the same question.
 \citet{KleinbergEtAl2018} formalize the selective-labels problem: when human labels are observed only on reviewed cases, estimating how outcomes depend on both the instance and the human judgment requires accounting for non-random review.
-\citet{GuoEtAl2025} decompose information value at the feature level via ILIV-SHAP, attributing each input feature's contribution to the agent-complementary VoI of an AI prediction.
-These works focus on whether humans have residual predictive information, or which features drive it. Boundary regret asks a different question: does that information change the reward-optimal action?
-Residual expertise can exist without any residual decision value, and ILIV-SHAP's feature-level decomposition does not reveal whether those features' predictive contributions cross a reward-induced decision facet.
+\citet{GuoEtAl2025} push the question to the feature level via ILIV-SHAP, attributing each input feature's contribution to the agent-complementary VoI of an AI prediction.
+What these papers ask is whether humans carry residual predictive information, and which features drive it. We ask something narrower and decision-relevant: whether that information actually changes the reward-optimal action. Residual expertise can sit comfortably alongside zero residual decision value, and a feature-level decomposition does not tell you whether any of its predictive contributions cross a reward-induced decision facet.
 
 \paragraph{Deferral, Selective Prediction, and Reject Options.}
 Learning-to-defer methods train systems to choose between acting automatically and handing an instance to a human expert \citep{MadraseEtAl2018,MozannarSontag2020,HemmerEtAl2023,MaoMohri2023}.
-Selective-prediction and reject-option methods similarly optimize when a classifier should abstain under a specified loss \citep{RamaswamyEtAl2018,FrancPrusa2023}, and cost-sensitive variants incorporate asymmetric penalties into the deferral objective \citep{AlvesEtAl2024}.
-These methods ask when to defer or abstain given a loss, an expert channel, and a collaboration protocol.
-Boundary regret measures something earlier in the stack: whether the human signal can move the deployed action across a reward-induced boundary, before any protocol is chosen.
+Selective-prediction and reject-option methods address the related problem of when a classifier should abstain under a specified loss \citep{RamaswamyEtAl2018,FrancPrusa2023}, and cost-sensitive variants fold asymmetric penalties into the deferral objective \citep{AlvesEtAl2024}.
+All of these decide \emph{when} to defer or abstain given a loss, an expert channel, and a collaboration protocol. The question we want to answer comes earlier: whether the human signal can move the deployed action across a reward-induced boundary at all, before any such protocol is on the table.
 
 \paragraph{Realized Human--AI Collaboration.}
-Work on realized human--AI collaboration asks when teams actually achieve complementarity.
-\citet{Vaccaro2024} synthesize evidence that human--AI combinations often fail to outperform the better standalone agent. \citet{SchoefferEtAl2024} show that explanations can change reliance without necessarily helping users identify correct advice.
-\citet{McLaughlinSpiess2024} model recommendation design for realized complementarity, and \citet{HemmerEtAl2025} organize evidence on when complementarity appears in human--AI collaboration.
-Related critiques emphasize that complementarity also depends on action-set design, evaluation metrics, and interaction design \citep{StraitouriEtAl2025}.
-These works ask whether a deployed team realizes value. Boundary regret asks a more local question: is reward-local value already present in the joint distribution, before behavioral frictions, interfaces, and incentives decide whether it shows up?
+A separate body of work studies when teams actually achieve complementarity in deployment.
+\citet{Vaccaro2024} synthesize evidence that human--AI combinations often fail to outperform the better standalone agent, and \citet{PengGargKleinberg2025} prove a structural counterpart: any deterministic strategy combining calibrated forecasts that does not always defer to one agent will sometimes underperform the least accurate agent.
+\citet{SchoefferEtAl2024} show that explanations can change reliance without necessarily helping users identify correct advice, while \citet{GuoEtAl2024reliance} propose a decision-theoretic framework that decomposes observed deployment loss into mis-reliance and signal-perception components.
+\citet{McLaughlinSpiess2024} model recommendation design for realized complementarity, and \citet{HemmerEtAl2025} organize the empirical evidence on when complementarity appears.
+A related critical strand argues that complementarity also turns on action-set design, evaluation metrics, and interaction design \citep{StraitouriEtAl2025}.
+That work is about teams once they are deployed: whether they realize value, what protocols are achievable in principle, how observed loss decomposes after the fact. Our question runs upstream of all of that. Is reward-local decision value in the joint distribution to begin with, before strategy choice, behavioral frictions, interfaces, and incentives have any chance to surface it or hide it?
 
 \paragraph{Value of Information, Decision Geometry, and Decision-Focused Learning.}
-The closest conceptual lineage is value-of-information theory and decision geometry.
-\citet{Blackwell1951} orders information structures by decision value. \citet{RadnerStiglitz1984} and \citet{DeLaraGossner2020} characterize when information value vanishes as posteriors remain inside action regions, and \citet{KamenicaGentzkow2011} expresses information value through convex value functions and induced decision regions.
+Conceptually we are closest to value-of-information theory and decision geometry.
+\citet{Blackwell1951} orders information structures by decision value. \citet{RadnerStiglitz1984} and \citet{DeLaraGossner2020} characterize when information value vanishes because posteriors stay inside a single action region, and \citet{KamenicaGentzkow2011} expresses information value through convex value functions and induced decision regions.
 Decision-focused learning makes the adjacent algorithmic point that prediction should be trained for downstream decisions rather than generic accuracy \citep{Elmachtoub2022,Wilder2019}, and decision calibration asks when predictions are indistinguishable to downstream best-response rules \citep{Zhao2021}.
-In clinical statistics, decision curve analysis \citep{Vickers2006} evaluates predictive models under threshold-encoded reward rather than generic accuracy, plotting net benefit across the full range of clinician decision thresholds; this established the principle that model utility should be assessed under its downstream loss.
-Those literatures ask how information, predictions, or training losses affect decisions in general, or how individual models perform under reward.
-Boundary regret turns that geometry into a human--AI audit. It is not a new deferral algorithm or a behavioral model of teamwork. It is a reward-local check on whether the human signal has decision value for the action that is actually being deployed --- the first such audit grounded in a Lean-formalized VoI identity.
+In clinical statistics, decision curve analysis \citep{Vickers2006} evaluates predictive models under threshold-encoded reward rather than generic accuracy, plotting net benefit across a range of clinician decision thresholds; that work established the principle that model utility should be assessed under its downstream loss.
+All of this is about decisions in the abstract, or about how a single model performs under reward. Our move is to take the same geometry and apply it as a human--AI audit: a reward-local check on whether the human signal has decision value for the action actually being deployed, with the underlying VoI identity verified in Lean.
