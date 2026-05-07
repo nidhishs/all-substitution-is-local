@@ -21,8 +21,6 @@ from paths import dataset_prepared
 
 from .labels import ALL_RADS, CONDITIONS, available_pairs, load_labels, loo_voters
 
-_PREPARED_ROOT = dataset_prepared("chexpert")
-
 logger = logging.getLogger("prepare")
 
 
@@ -88,6 +86,7 @@ def fit_pair(
     labels: pd.DataFrame,
     inference_df: pd.DataFrame,
     pairs_dir: Path,
+    dataset_name: str,
 ) -> Path:
     """Build and write the validated pair artefact for one (condition, h_rad).
 
@@ -100,6 +99,8 @@ def fit_pair(
         labels:       8-reader merged frame from load_labels().
         inference_df: Competition-format DataFrame after load_predictions(), indexed by study_id.
         pairs_dir:    Output directory for .npz/.json pair artefacts.
+        dataset_name: Slash-qualified dataset identifier (e.g. "chexpert/gt"),
+                      stored as meta["dataset"] in the written artefact.
 
     Returns:
         Path to the written .npz file.
@@ -120,8 +121,8 @@ def fit_pair(
     tag = f"{condition.replace(' ', '_')}__{h_rad}"
     meta = {
         "n_classes": 2,
-        "dataset": "chexpert",
-        "model": Path(pairs_dir).parent.name,
+        "dataset": dataset_name,
+        "model": pairs_dir.parent.name,
         "task": condition,
         "annotator_id": h_rad,
         "extra": {
@@ -135,17 +136,19 @@ def fit_pair(
 # fmt: off
 @click.command()
 @click.option("--predictions", required=True, type=click.Path(exists=True, path_type=Path), help="Path to a competition-format predictions CSV.")
-@click.option("--readers", type=click.Choice(["gt", "benchmark", "all"]), default="all", show_default=True, help="Which reader subset to produce pairs for.")
+@click.option("--readers", type=click.Choice(["gt", "bm", "all"]), default="all", show_default=True, help="Which reader subset to produce pairs for.")
 @click.option("--limit", type=int, default=None, help="Prepare only the first N pairs (for quick testing).")
 # fmt: on
 def main(
-    predictions: Path, readers: Literal["gt", "benchmark", "all"], limit: int | None
+    predictions: Path, readers: Literal["gt", "bm", "all"], limit: int | None
 ) -> None:
-    """Prepare pair artefacts from a predictions CSV. Writes to prepared/chexpert/<model>/pairs/."""
+    """Prepare pair artefacts from a predictions CSV. Writes to prepared/chexpert/<readers>/<model>/pairs/."""
+    dataset_name = f"chexpert/{readers}"
+    prepared_root = dataset_prepared(dataset_name)
     model = predictions.stem
-    pairs_dir = _PREPARED_ROOT / model / "pairs"
+    pairs_dir = prepared_root / model / "pairs"
     pairs_dir.mkdir(parents=True, exist_ok=True)
-    utils.setup_logging(_PREPARED_ROOT / model, "prepare")
+    utils.setup_logging(prepared_root / model, "prepare")
     utils.log_run_args(logger.info)
 
     labels = load_labels()
@@ -159,6 +162,6 @@ def main(
     for i, (condition, h_rad) in enumerate(pairs, 1):
         tag = f"{condition.replace(' ', '_')}__{h_rad}"
         logger.info(f"[{i:2d}/{n}] {tag}")
-        fit_pair(condition, h_rad, labels, inference_df, pairs_dir)
+        fit_pair(condition, h_rad, labels, inference_df, pairs_dir, dataset_name)
 
     logger.info(f"Done. {n} pair artefact(s) written to {pairs_dir}")

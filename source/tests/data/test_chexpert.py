@@ -168,7 +168,7 @@ def test_load_groundtruth(groundtruth):
 def test_available_pairs_count():
     assert len(available_pairs()) == len(CONDITIONS) * len(ALL_RADS)  # 40
     assert len(available_pairs(subset="gt")) == len(CONDITIONS) * len(GT_RADS)  # 25
-    assert len(available_pairs(subset="benchmark")) == len(CONDITIONS) * len(
+    assert len(available_pairs(subset="bm")) == len(CONDITIONS) * len(
         BENCHMARK_RADS
     )  # 15
 
@@ -269,6 +269,7 @@ def test_fit_pair_produces_valid_artefact(tmp_path, labels, synthetic_inference_
         labels=labels,
         inference_df=synthetic_inference_df,
         pairs_dir=tmp_path / "pairs",
+        dataset_name="chexpert/gt",
     )
     assert npz.exists()
     assert npz.with_suffix(".json").exists()
@@ -285,10 +286,11 @@ def test_fit_pair_metadata_contains_required_keys(
         labels=labels,
         inference_df=synthetic_inference_df,
         pairs_dir=pairs_dir,
+        dataset_name="chexpert/gt",
     )
     meta = json.loads(npz.with_suffix(".json").read_text())
     assert meta["n_classes"] == 2
-    assert meta["dataset"] == "chexpert"
+    assert meta["dataset"] == "chexpert/gt"
     assert meta["task"] == "Atelectasis"
     assert meta["annotator_id"] == "bc2"
     assert "T_opt" in meta["extra"]

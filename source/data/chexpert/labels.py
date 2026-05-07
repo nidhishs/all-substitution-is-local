@@ -32,22 +32,22 @@ def loo_voters(h_rad: str) -> list[str]:
 
 
 def available_pairs(
-    subset: Literal["gt", "benchmark", "all"] = "all",
+    subset: Literal["gt", "bm", "all"] = "all",
 ) -> list[tuple[str, str]]:
     """All (condition, h_rad) pairs for the requested subset.
 
     "gt"        -> 5 GT readers × 5 conditions = 25 pairs
-    "benchmark" -> 3 benchmark readers × 5 conditions = 15 pairs
+    "bm"        -> 3 benchmark readers × 5 conditions = 15 pairs
     "all"       -> 8 readers × 5 conditions = 40 pairs (default)
     """
     if subset == "gt":
         rads = GT_RADS
-    elif subset == "benchmark":
+    elif subset == "bm":
         rads = BENCHMARK_RADS
     elif subset == "all":
         rads = ALL_RADS
     else:
-        raise ValueError(f"Unknown subset {subset!r}. Valid: 'gt', 'benchmark', 'all'")
+        raise ValueError(f"Unknown subset {subset!r}. Valid: 'gt', 'bm', 'all'")
     return [(c, r) for c in CONDITIONS for r in rads]
 
 

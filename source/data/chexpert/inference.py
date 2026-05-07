@@ -97,7 +97,7 @@ def run_inference(
 def main(weights: str, batch_size: int, force: bool) -> None:
     """Run DenseNet on all 500 images and write a competition-format predictions CSV."""
     model_name = weights.replace("/", "--")
-    out_dir = _PREPARED_ROOT / model_name
+    out_dir = _PREPARED_ROOT / "predictions" / model_name
     out_dir.mkdir(parents=True, exist_ok=True)
     utils.setup_logging(out_dir, "inference")
     utils.log_run_args(logger.info)
