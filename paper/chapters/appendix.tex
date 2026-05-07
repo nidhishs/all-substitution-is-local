@@ -23,7 +23,7 @@ $\operatorname{regret}(a,b) \geq 0$ & Lem & \texttt{regret\_nonneg} & Regret \\
 $\operatorname{regret}=0 \Leftrightarrow a$ optimal & Lem & \texttt{regret\_eq\_zero\_iff} & Regret \\
 $\E[b_{\mathrm{post}}]=b$ & Lem & \texttt{prior\_eq\_weighted\_posterior} & Basics \\
 Jensen gap $\geq 0$ & Thm & \texttt{jensenGap\_nonneg} & JensenGap \\
-Thm~\ref{thm:voi-br} (VoI $=$ E[BR]) & Thm & \texttt{jensenGap\_eq\_weighted\_regret} & FacetActivation \\
+Thm~\ref{thm:voi-br} (VoI $=$ $\E[\BR]$) & Thm & \texttt{jensenGap\_eq\_weighted\_regret} & FacetActivation \\
 Thm~\ref{thm:facet-bridge} & Thm & \texttt{facet\_activation\_bridge} & FacetActivation \\
 \bottomrule
 \end{tabular}
@@ -40,96 +40,106 @@ The weighted-regret identity \texttt{jensenGap\_eq\_weighted\_regret} rewrites t
 The bridge theorem \texttt{facet\_activation\_bridge} states that this expected regret is strictly positive exactly when some reachable posterior strictly prefers a rival action.
 
 % ============================================================
-\section{Synthetic Validation: Full Tables}
+\section{Synthetic Validation: Per-Configuration Results}
 \label{app:exp1-detail}
 % ============================================================
 
-Table~\ref{tab:exp1-detail} reports per-configuration results across the three estimator-validation conditions.
+Table~\ref{tab:exp1-detail} reports per-configuration results across the three estimator-validation conditions of Section~\ref{sec:exp1}.
+False-positive rate is zero in every cell: across all 18 configurations the plug-in estimator never assigned positive boundary regret to an instance with $\BR(m,h)=0$.
+Under the positive control C1, $\rho(\BRhat,\BR)$ degrades smoothly as the action/state space grows ($G$ from $2$ to $5$, $K$ from $2$ to $10$, giving $0.969 \to 0.745$), reflecting harder channel estimation, not a failure of the identity.
+Under the strong null C3, the human signal is by construction strongly predictive ($\Delta\mathrm{LL}$ up to $0.738$), yet the estimator continues to assign zero boundary regret to every instance, the geometric prediction of Theorem~\ref{thm:facet-bridge}.
 
-\begin{table}[ht]
+\begin{table}[htbp]
 \centering
-\caption{Per-configuration results for synthetic estimator validation. $G$: decision groups; $K$: latent states; $|A|$: actions in the reward matrix. $\rho$ is omitted when true boundary regret is constant zero.}
+\caption{Per-configuration results for synthetic estimator validation. $G$: decision groups; $K$: latent states; $|A|$: actions in the reward matrix. FPR is zero in every cell and is omitted; $\rho$ is omitted when true boundary regret is constant zero (C2, C3).}
 \label{tab:exp1-detail}
 \small
-\begin{tabular}{@{}lrrrrrrr@{}}
+\begin{tabular}{@{}lrrrrrr@{}}
 \toprule
-Cond. & $G$ & $K$ & $|A|$ & $\rho(\BRhat,\BR)$ & FPR & \%$\BR>0$ & LL gain \\
+Condition. & $G$ & $K$ & $|A|$ & $\rho(\BRhat,\BR)$ & $\%\BR{>}0$ & $\Delta$LL \\
 \midrule
-C1 & 2 & 2 & 2 & 0.969 & 0.000 & 35.5\% & 0.226 \\
-C1 & 2 & 4 & 2 & 0.984 & 0.000 & 36.4\% & 0.230 \\
-C1 & 3 & 3 & 3 & 0.941 & 0.000 & 37.9\% & 0.403 \\
-C1 & 3 & 6 & 3 & 0.903 & 0.000 & 38.2\% & 0.420 \\
-C1 & 5 & 5 & 5 & 0.862 & 0.000 & 39.8\% & 0.577 \\
-C1 & 5 & 10 & 5 & 0.745 & 0.000 & 39.8\% & 0.592 \\
+C1 & 2 & 2  & 2 & 0.969      & 35.5 & 0.226 \\
+C1 & 2 & 4  & 2 & 0.984      & 36.4 & 0.230 \\
+C1 & 3 & 3  & 3 & 0.941      & 37.9 & 0.403 \\
+C1 & 3 & 6  & 3 & 0.903      & 38.2 & 0.420 \\
+C1 & 5 & 5  & 5 & 0.862      & 39.8 & 0.577 \\
+C1 & 5 & 10 & 5 & 0.745      & 39.8 & 0.592 \\
 \midrule
-C2 & 2 & 2 & 2 & -- & 0.000 & 0.0\% & 0.006 \\
-C2 & 2 & 4 & 2 & -- & 0.000 & 0.0\% & 0.006 \\
-C2 & 3 & 3 & 3 & -- & 0.000 & 0.0\% & 0.015 \\
-C2 & 3 & 6 & 3 & -- & 0.000 & 0.0\% & 0.019 \\
-C2 & 5 & 5 & 5 & -- & 0.000 & 0.0\% & 0.035 \\
-C2 & 5 & 10 & 5 & -- & 0.000 & 0.0\% & 0.033 \\
+C2 & 2 & 2  & 2 & \text{n/a} &  0.0 & 0.006 \\
+C2 & 2 & 4  & 2 & \text{n/a} &  0.0 & 0.006 \\
+C2 & 3 & 3  & 3 & \text{n/a} &  0.0 & 0.015 \\
+C2 & 3 & 6  & 3 & \text{n/a} &  0.0 & 0.019 \\
+C2 & 5 & 5  & 5 & \text{n/a} &  0.0 & 0.035 \\
+C2 & 5 & 10 & 5 & \text{n/a} &  0.0 & 0.033 \\
 \midrule
-C3 & 2 & 2 & 3 & -- & 0.000 & 0.0\% & 0.447 \\
-C3 & 2 & 4 & 3 & -- & 0.000 & 0.0\% & 0.458 \\
-C3 & 3 & 3 & 4 & -- & 0.000 & 0.0\% & 0.592 \\
-C3 & 3 & 6 & 4 & -- & 0.000 & 0.0\% & 0.613 \\
-C3 & 5 & 5 & 6 & -- & 0.000 & 0.0\% & 0.723 \\
-C3 & 5 & 10 & 6 & -- & 0.000 & 0.0\% & 0.738 \\
+C3 & 2 & 2  & 3 & \text{n/a} &  0.0 & 0.447 \\
+C3 & 2 & 4  & 3 & \text{n/a} &  0.0 & 0.458 \\
+C3 & 3 & 3  & 4 & \text{n/a} &  0.0 & 0.592 \\
+C3 & 3 & 6  & 4 & \text{n/a} &  0.0 & 0.613 \\
+C3 & 5 & 5  & 6 & \text{n/a} &  0.0 & 0.723 \\
+C3 & 5 & 10 & 6 & \text{n/a} &  0.0 & 0.738 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 % ============================================================
-\section{CheXpert Label Protocol}
+\section{CheXpert Protocol}
 \label{app:exp2-protocol}
 % ============================================================
 
-\paragraph{Reader study.}
-The five board-certified radiologists (bc1, bc2, bc3, bc5, bc7) provided binary disease-presence ratings under the official CheXpert five-condition protocol (Atelectasis, Cardiomegaly, Consolidation, Edema, Pleural Effusion) on the 500-image frontal-view validation set.
-The held-out label $y$ for each reader--task pair is computed by \emph{leave-one-out majority vote}: for GT reader $r_i$, $y = \Ind[\sum_{j \neq i} v_j \geq 3]$ where $v_j \in \{0,1\}$ are the remaining four GT readers' votes.
-This construction ensures $y \perp h$ by design: the test reader is never a voter in the ground truth they are evaluated against.
-Benchmark readers (bc4, bc6, bc8) were not voters in the original study, so their pairs use all five GT votes (equivalent to the official majority, no exclusion needed).
+\paragraph{Reader Study and Label Construction.}
+The five board-certified radiologists (\texttt{bc1}, \texttt{bc2}, \texttt{bc3}, \texttt{bc5}, \texttt{bc7}) provided binary disease-presence ratings under the official CheXpert five-condition protocol (Atelectasis, Cardiomegaly, Consolidation, Edema, Pleural Effusion) on the 500-image frontal-view validation set.
+For each (condition, ground-truth reader) pair, the held-out label $y$ is computed by \emph{leave-one-out majority vote}: for reader $r_i$, $y = \Ind[\sum_{j \neq i} v_j \geq 3]$, where $v_j \in \{0,1\}$ are the remaining four ground-truth readers' votes.
+This construction enforces $y \perp h$ structurally: the test reader is never a voter in their own ground truth.
+The three benchmark readers (\texttt{bc4}, \texttt{bc6}, \texttt{bc8}) were not voters in the original study, so their pairs use all five ground-truth votes (equivalent to the official majority).
 
-\paragraph{Model posterior.}
-Logit-space temperature scaling is applied per reader--task pair by minimising NLL on a 30\% held-out calibration split; the calibrated probability is used as $b_x$.
+\paragraph{Model Belief and Calibration.}
+Model probabilities $b_x^{\mathrm{raw}}$ are produced by the \texttt{torchxrayvision} DenseNet-121 \citep{Huang2017,Cohen2022} with the standard X-ray preprocessing pipeline (8-bit normalisation, centre crop, $224{\times}224$ resize).
+The primary experiment uses the in-domain checkpoint \texttt{densenet121-res224-chex}; the robustness analyses below use all six publicly available checkpoints.
+For each (condition, reader) pair we apply per-pair logit-space temperature scaling: a stratified $30\%$ calibration split (seed $42$), with scalar $T$ found by NLL minimisation in $[0.1,10]$, gives the calibrated belief $b_x = \sigma(\operatorname{logit}(b_x^{\mathrm{raw}})/T)$.
 
-\paragraph{Human-augmented posterior.}
-$\bpost_{x,h} \approx P(Y=1\mid x,h)$ is estimated via 5-fold cross-fitted logistic regression on the feature vector $[\operatorname{logit}(b_x),\,h,\,h\cdot\operatorname{logit}(b_x)]$, with folds stratified on $y$.
-The LOO label construction ensures structural $h$--$y$ independence; cross-fitting additionally ensures that the augmented-belief estimator and the held-out label are independent within each fold, avoiding estimator overfitting.
+\paragraph{Human-Augmented Posterior.}
+On the remaining $70\%$ evaluation split, we estimate $\bpost_{x,h} \approx P(Y=1\mid x,h)$ by $5$-fold cross-fitted logistic regression on features $[\operatorname{logit}(b_x),\,h,\,h\cdot\operatorname{logit}(b_x)]$, with folds stratified on $y$ (\texttt{StratifiedKFold}).
+The leave-one-out label construction makes $y \perp h$ structural; cross-fitting additionally makes the augmented-belief estimator independent of the held-out label within each fold, so plug-in $\BRhat$ is not contaminated by within-fold overfitting.
 
 \paragraph{Evaluation.}
-All correlations and boundary-regret estimates are computed on the held-out fold for each instance, then aggregated across folds.
-Pairs where $\BRhat\equiv 0$ across the entire evaluation set are excluded from the Spearman $\rho$ computation ($n$ valid).
+For each pair, all per-instance quantities ($\BRhat$, log-loss gain, facet distance) are computed on the held-out fold of each instance and aggregated across folds.
+Pair-level summaries (Spearman $\rho$ between log-loss gain and $\BRhat$, top-decile zero-mass fraction) are then aggregated across the $25$ pairs.
+Pairs with $\BRhat\equiv 0$ across the entire evaluation set are excluded from the $\rho$ computation; we report the count of valid pairs $n_{\mathrm{v}}$ alongside.
 
 % ============================================================
-\section{Dissociation Holds across Checkpoints}
+\section{Reward-Conditional Dissociation: Robustness}
 \label{app:exp2-robustness}
 % ============================================================
 
-Table~\ref{tab:robustness} extends the dissociation analysis of Section~\ref{sec:exp2} to all six DenseNet checkpoints and all eight CheXpert radiologists (240 reader--task pairs).
-The direction of the regime-conditional dissociation is preserved across checkpoints.
-Magnitude attenuates under off-domain pretraining (NIH, PadChest), consistent with calibration drift shifting model beliefs away from decision facets.
+Table~\ref{tab:robustness} extends the dissociation analysis of Section~\ref{sec:exp2} to all six publicly available DenseNet checkpoints and all eight CheXpert radiologists ($6 \times 8 \times 5 = 240$ reader--task pairs).
+The ordering R1${\gg}$R2${\geq}$R3 holds on every checkpoint individually: R1 is positive on every checkpoint ($+0.373$ to $+0.530$), R3 ranges from clearly negative (in-domain, $-0.117$ to $-0.040$) to essentially zero (off-domain NIH, $+0.007$), and R1 strictly dominates R2 throughout, with the gap compressing on off-domain pretraining.
+Off-domain pretraining (NIH, PadChest) attenuates the R1 signal and inflates R2, consistent with calibration drift moving belief mass toward the lower R2 facet at $1/6$.
+The direction of the dissociation, not its absolute magnitude, is the theory-relevant prediction.
 
-\begin{table}[ht]
+\begin{table}[htbp]
 \centering
-\caption{Reward-conditional dissociation robustness: mean Spearman $\bar\rho$ between log-loss gain and $\BRhat$ by reward regime, across 6 DenseNet checkpoints $\times$ 8 readers $\times$ 5 conditions $=$ 240 pairs.}
+\caption{Reward-conditional dissociation across $6$ DenseNet checkpoints $\times$ $8$ readers $\times$ $5$ conditions $=$ $240$ reader--task pairs.
+  Entries report $\bar\rho_{\mathrm{LL}}$, the mean per-pair Spearman correlation between log-loss gain and $\BRhat$, under each reward (R1: thr.\ $1/2$; R2: thr.\ $1/6$; R3: thr.\ $5/6$).
+  Bold marks the aggregate dissociation pattern across all $240$ pairs.
+}
 \label{tab:robustness}
 \small
 \begin{tabular}{@{}lrrr@{}}
 \toprule
-Checkpoint & R1 $\bar\rho$ & R2 $\bar\rho$ & R3 $\bar\rho$ \\
+Checkpoint & R1 $\bar\rho_{\mathrm{LL}}$ & R2 $\bar\rho_{\mathrm{LL}}$ & R3 $\bar\rho_{\mathrm{LL}}$ \\
 \midrule
 \multicolumn{4}{l}{\textit{In-domain pretraining}} \\
-\texttt{densenet121-res224-chex}     & $+0.489$ & $-0.008$ & $-0.117$ \\
-\texttt{densenet121-res224-mimic\_ch}& $+0.496$ & $+0.197$ & $-0.040$ \\
-\texttt{densenet121-res224-mimic\_nb}& $+0.495$ & $+0.210$ & $-0.042$ \\
-\texttt{densenet121-res224-all}      & $+0.530$ & $+0.151$ & $-0.082$ \\
+\texttt{densenet121-res224-chex}      & $+0.489$ & $-0.008$ & $-0.117$ \\
+\texttt{densenet121-res224-mimic\_ch} & $+0.496$ & $+0.197$ & $-0.040$ \\
+\texttt{densenet121-res224-mimic\_nb} & $+0.495$ & $+0.210$ & $-0.042$ \\
+\texttt{densenet121-res224-all}       & $+0.530$ & $+0.151$ & $-0.082$ \\
 \midrule
 \multicolumn{4}{l}{\textit{Off-domain pretraining}} \\
-\texttt{densenet121-res224-nih}      & $+0.373$ & $+0.313$ & $+0.007$ \\
-\texttt{densenet121-res224-pc}       & $+0.435$ & $+0.313$ & $-0.050$ \\
+\texttt{densenet121-res224-nih}       & $+0.373$ & $+0.313$ & $+0.007$ \\
+\texttt{densenet121-res224-pc}        & $+0.435$ & $+0.313$ & $-0.050$ \\
 \midrule
-All 240 pairs & $+0.470$ & $+0.196$ & $-0.056$ \\
+All 240 pairs                         & $\mathbf{+0.470}$ & $+0.196$ & $\mathbf{-0.056}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -163,64 +173,43 @@ The R1 dissociation signal ($\bar\rho=+0.015$) is roughly 25$\times$ weaker than
 $\BRhat$ allocation correspondingly degenerates to near-random (${\approx}2\%$ win rate vs.\ Margin under R1), confirming that the allocation advantage in Section~\ref{sec:exp3} depends on the model's beliefs straddling reward facets --- a condition that high-accuracy CIFAR-10 classifiers rarely satisfy.
 
 % ============================================================
-\section{R3 Negative Control: Full Results}
-\label{app:exp3-r3}
-% ============================================================
-
-Table~\ref{tab:exp3-r3} reports the complete allocation utility gain under the FP-penalized reward (R3, threshold $5/6\approx 0.833$) at all four review budgets.
-The reward boundary sits in the low-density tail of model beliefs: only 7 of the 25 reader--task pairs carry any non-zero $\BRhat$ mass.
-Within those 7 pairs, $\BRhat$ and Margin converge within bootstrap noise at every budget; this convergence is the predicted consequence of Theorem~\ref{thm:facet-bridge} in the low-mass regime.
-
-\begin{table}[ht]
-\centering
-\caption{R3 negative control (FP-penalized, threshold $0.833$): full allocation results across all four budgets. Utility gain over model-only baseline on the 25 reader--task pairs. W/L/T: wins/losses/ties of $\BRhat$ vs.\ Margin.}
-\label{tab:exp3-r3}
-\small
-\begin{tabular}{@{}lrrrrrr@{}}
-\toprule
-$q$ & $\BRhat$ & Margin & Entropy & Residual & L2D & W/L/T \\
-\midrule
-$5\%$  & $+0.0029$ & $+0.0027$ & $+0.0000$ & $+0.0000$ & $-0.0006$ & $1/3/21$ \\
-$10\%$ & $+0.0026$ & $+0.0031$ & $+0.0000$ & $+0.0000$ & $+0.0025$ & $1/3/21$ \\
-$20\%$ & $+0.0026$ & $+0.0029$ & $+0.0000$ & $+0.0000$ & $+0.0021$ & $0/2/23$ \\
-$50\%$ & $+0.0027$ & $+0.0029$ & $+0.0000$ & $+0.0000$ & $+0.0023$ & $0/1/24$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-% ============================================================
-\section{Allocation Advantage Holds across Checkpoints}
+\section{Allocation Advantage: Robustness}
 \label{app:exp3-robustness}
 % ============================================================
 
-Table~\ref{tab:exp3-robustness} extends the allocation experiment of Section~\ref{sec:exp3} to all six DenseNet checkpoints and all eight CheXpert radiologists (240 reader--task pairs).
-Under R1, $\BRhat$ dominates Margin at every budget ($p<0.0001$ at $q\geq 10\%$), confirming the allocation advantage is not specific to the primary checkpoint.
-Under R2, $\BRhat$ shows a significant advantage at $q=5$--$20\%$ ($p<0.0001$) not present in the primary 25-pair benchmark; the Exp.~\ref{sec:exp2} robustness table shows that off-domain checkpoints (NIH, PadChest) concentrate more probability mass near the R2 threshold at $0.167$, providing denser actionable mass than the in-domain \texttt{densenet121-res224-chex} model used in the main experiment.
-Under R3, $\BRhat$ and Margin are economically indistinguishable (mean gains within $0.0003$ at all budgets), consistent with near-zero boundary-regret mass under the high threshold.
+Table~\ref{tab:exp3-robustness} extends the allocation experiment of Section~\ref{sec:exp3} to all six DenseNet checkpoints and all eight CheXpert radiologists ($240$ reader--task pairs).
+Three patterns reproduce the main result.
+Under R1 (dense actionable mass), $\BRhat$ dominates Margin at every budget ($p<0.0001$ for $q\geq 10\%$), confirming the advantage is not an artefact of the primary checkpoint.
+Under R2 (sparse but reachable mass), $\BRhat$ now also beats Margin at $q\in\{5\%,10\%,20\%\}$ ($p<0.0001$), an effect not visible on the $25$-pair primary benchmark; the dissociation table above explains why --- off-domain checkpoints concentrate more belief mass near the R2 facet at $1/6$, providing actionable mass that the in-domain checkpoint lacks.
+Under R3 (no actionable mass), $\BRhat$ and Margin remain economically indistinguishable, with no systematic advantage in either direction (sign-test $p \geq 0.08$ at every budget; mean differences $\leq 0.0012$ at $q=5\%$ and $\leq 0.0004$ for $q \geq 10\%$), reproducing the no-mass prediction.
 
-\begin{table}[ht]
+\begin{table}[htbp]
 \centering
-\caption{Allocation robustness: mean utility gain over no-review baseline, 6 DenseNet checkpoints $\times$ 8 readers $\times$ 5 conditions $=$ 240 pairs. W/L/T: wins/losses/ties of $\BRhat$ vs.\ Margin; sign-test $p$ in parentheses.}
+\caption{Allocation robustness across $6$ DenseNet checkpoints $\times$ $8$ readers $\times$ $5$ conditions $=$ $240$ reader--task pairs.
+  Entries report mean held-out utility gain over no review.
+  W/L/T gives paired wins/losses/ties of $\BRhat$ against Margin; bold marks the best deployable policy in each row (Oracle excluded).
+}
 \label{tab:exp3-robustness}
-\footnotesize
-\begin{tabular}{@{}ll rrrrr r@{}}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}ll rrrrr@{\hspace{5pt}}|@{\hspace{5pt}}rr@{\hspace{5pt}}|@{\hspace{5pt}}r@{}}
 \toprule
-Reward & $q$ & $\BRhat$ & Margin & Entropy & Residual & L2D & W/L/T (sign-test $p$) \\
+Reward & $q$ & $\BRhat$ & Margin & Entropy & Residual & L2D & Random & Oracle & W/L/T \\
 \midrule
-R1 & $5\%$  & $+0.0409$ & $+0.0403$ & $+0.0403$ & $+0.0192$ & $+0.0103$ & $105/74/61\ (p=0.025)$ \\
-R1 & $10\%$ & $+0.0787$ & $+0.0763$ & $+0.0763$ & $+0.0406$ & $+0.0252$ & $133/66/41\ (p<0.0001)$ \\
-R1 & $20\%$ & $+0.1538$ & $+0.1444$ & $+0.1444$ & $+0.0936$ & $+0.0650$ & $176/45/19\ (p<0.0001)$ \\
-R1 & $50\%$ & $+0.3160$ & $+0.2936$ & $+0.2936$ & $+0.2651$ & $+0.2271$ & $201/19/20\ (p<0.0001)$ \\
+R1 & $5\%$  & $\mathbf{+0.0407}$ & $+0.0403$ & $+0.0403$ & $+0.0192$ & $+0.0101$ & $+0.0195$ & $+0.0513$ & $106/74/60$ \\
+R1 & $10\%$ & $\mathbf{+0.0787}$ & $+0.0763$ & $+0.0763$ & $+0.0413$ & $+0.0247$ & $+0.0393$ & $+0.0996$ & $134/71/35$ \\
+R1 & $20\%$ & $\mathbf{+0.1534}$ & $+0.1444$ & $+0.1444$ & $+0.0939$ & $+0.0647$ & $+0.0788$ & $+0.1931$ & $167/51/22$ \\
+R1 & $50\%$ & $\mathbf{+0.3160}$ & $+0.2936$ & $+0.2936$ & $+0.2653$ & $+0.2267$ & $+0.1947$ & $+0.4132$ & $198/25/17$ \\
 \midrule
-R2 & $5\%$  & $+0.0426$ & $+0.0350$ & $+0.0368$ & $+0.0175$ & $+0.0250$ & $117/23/100\ (p<0.0001)$ \\
-R2 & $10\%$ & $+0.0827$ & $+0.0665$ & $+0.0685$ & $+0.0387$ & $+0.0532$ & $127/22/91\ (p<0.0001)$ \\
-R2 & $20\%$ & $+0.1547$ & $+0.1252$ & $+0.1276$ & $+0.0863$ & $+0.1109$ & $138/27/75\ (p<0.0001)$ \\
-R2 & $50\%$ & $+0.3224$ & $+0.3052$ & $+0.2682$ & $+0.2426$ & $+0.2838$ & $105/95/40\ (p=0.52)$ \\
+R2 & $5\%$  & $\mathbf{+0.0429}$ & $+0.0350$ & $+0.0368$ & $+0.0186$ & $+0.0258$ & $+0.0215$ & $+0.0604$ & $112/25/103$ \\
+R2 & $10\%$ & $\mathbf{+0.0826}$ & $+0.0665$ & $+0.0685$ & $+0.0385$ & $+0.0541$ & $+0.0426$ & $+0.1078$ & $121/23/96$ \\
+R2 & $20\%$ & $\mathbf{+0.1557}$ & $+0.1252$ & $+0.1276$ & $+0.0870$ & $+0.1123$ & $+0.0849$ & $+0.2013$ & $132/22/86$ \\
+R2 & $50\%$ & $\mathbf{+0.3213}$ & $+0.3052$ & $+0.2682$ & $+0.2430$ & $+0.2826$ & $+0.2079$ & $+0.4399$ & $110/98/32$ \\
 \midrule
-R3 & $5\%$  & $+0.0041$ & $+0.0030$ & $+0.0001$ & $+0.0003$ & $+0.0019$ & $24/24/192\ (p=1.00)$ \\
-R3 & $10\%$ & $+0.0049$ & $+0.0048$ & $+0.0001$ & $+0.0010$ & $+0.0040$ & $16/28/196\ (p=0.10)$ \\
-R3 & $20\%$ & $+0.0055$ & $+0.0056$ & $+0.0001$ & $+0.0017$ & $+0.0043$ & $11/24/205\ (p=0.04)$ \\
-R3 & $50\%$ & $+0.0058$ & $+0.0057$ & $+0.0003$ & $+0.0024$ & $+0.0047$ & $9/20/211\ (p=0.06)$ \\
+R3 & $5\%$  & $\mathbf{+0.0042}$ & $+0.0030$ & $+0.0001$ & $+0.0008$ & $+0.0025$ & $+0.0002$ & $+0.0115$ & $22/31/187$ \\
+R3 & $10\%$ & $\mathbf{+0.0052}$ & $+0.0048$ & $+0.0001$ & $+0.0013$ & $+0.0043$ & $+0.0003$ & $+0.0120$ & $18/30/192$ \\
+R3 & $20\%$ & $+0.0055$ & $\mathbf{+0.0056}$ & $+0.0001$ & $+0.0020$ & $+0.0049$ & $+0.0005$ & $+0.0120$ & $13/23/204$ \\
+R3 & $50\%$ & $+0.0057$ & $\mathbf{+0.0057}$ & $+0.0003$ & $+0.0025$ & $+0.0050$ & $+0.0017$ & $+0.0120$ & $8/18/214$ \\
 \bottomrule
 \end{tabular}
 \end{table}

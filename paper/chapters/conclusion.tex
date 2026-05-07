@@ -3,7 +3,7 @@
 
 The audit question for human--AI complementarity is not whether the human carries information the model lacks but whether that information would change the reward-relevant action.
 We named the missing estimand boundary regret and proved that it equals the value of consulting the human in any finite-action Bayesian decision problem; that quantity is strictly positive precisely when some reachable posterior crosses a decision facet.
-The plug-in score this identity yields behaves as the bridge predicts: it allocates scarce review where actionable mass is reachable and converges on reward-aware margin where it is not.
+The plug-in score this identity yields behaves as the bridge predicts: it allocates scarce review where decision-relevant mass is reachable and converges on reward-aware margin where it is not.
 No residual-expertise audit produces either behavior.
 
 \paragraph{Limitations.}
@@ -12,13 +12,15 @@ Whether a deployed workflow elicits and uses that value depends on the elicitati
 The deployed score is a plug-in estimate of an exact identity; calibration of the model belief and the human-augmented posterior controls the gap between the two.
 
 \paragraph{Broader impact.}
-Routing scarce human review to cases that change the reward-relevant action raises operational efficiency in high-stakes settings such as clinical reading and triage; the same machinery, fed a misspecified or contested reward, will under-allocate review for populations whose decision facets it does not reach, so any operational use of $\BRhat$ should pair the score with reward elicitation and a subgroup audit of which populations it removes human review from.
+Routing scarce human review to cases that change the reward-relevant action raises operational efficiency in high-stakes settings such as clinical reading and triage.
+But the same machinery, fed a misspecified or contested reward, will under-allocate review for populations whose decision facets it does not reach.
+Any operational use of $\BRhat$ should pair the score with reward elicitation and a subgroup audit of which populations it removes human review from.
 
 \paragraph{Outlook.}
 Boundary regret does not single out the human as the information source.
-The same identity prices any candidate channel---a second-opinion reader, an additional diagnostic test, a more expensive feature---by what it would change about the reward-relevant action.
+The same identity prices any candidate channel (a second-opinion reader, an additional diagnostic test, a more expensive feature) by what it would change about the reward-relevant action.
 A reward-faithful training signal for learning-to-defer follows: replace accuracy-based deferral labels with the regret of not consulting, and the construction extends to multi-expert and sequential-elicitation policies.
-A prospective deployment that routes review on $\BRhat$ under operational rewards is the natural test of how much of that latent decision value a real workflow can extract.
-Complementarity is reward-relative; a signal can be informative under any proper scoring rule and leave the deployed action unchanged; the audit that ignores the boundary measures the wrong thing.
+A prospective deployment routing review on $\BRhat$ under operational rewards is the direct test of how much latent decision value a real workflow can extract.
+Complementarity is reward-relative. A signal can be informative under any proper scoring rule and leave the deployed action unchanged. The audit that ignores the boundary measures the wrong thing.
 
 
