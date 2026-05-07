@@ -4,10 +4,6 @@ import Mathlib
 # Regret and Terminal Value
 
 The PWLC terminal value `V(b) = max_a r_a · b` and regret `Regret(a, b) = V(b) - r_a · b`.
-
-## References
-
-- Shah, Mandal, Azhar, *All Substitution Is Local*.
 -/
 
 open Finset BigOperators

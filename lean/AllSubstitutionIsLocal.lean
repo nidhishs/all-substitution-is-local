@@ -1,4 +1,0 @@
-import AllSubstitutionIsLocal.Basics
-import AllSubstitutionIsLocal.JensenGap
-import AllSubstitutionIsLocal.Regret
-import AllSubstitutionIsLocal.FacetActivation

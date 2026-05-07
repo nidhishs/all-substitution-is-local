@@ -1,14 +1,10 @@
-import AllSubstitutionIsLocal.Basics
+import ResidualExpertiseNotDecisionValue.Basics
 
 /-!
 # Jensen Gap and Belief Convexity
 
 The Jensen gap `E[f(b_post)] - f(b)` for Bayesian posterior lotteries,
 Jensen's inequality via `BeliefConvexOn`, and a bridge to Mathlib's `ConvexOn`.
-
-## References
-
-- Shah, Mandal, Azhar, *All Substitution Is Local*.
 -/
 
 open Finset BigOperators

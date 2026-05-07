@@ -1,5 +1,5 @@
-import AllSubstitutionIsLocal.JensenGap
-import AllSubstitutionIsLocal.Regret
+import ResidualExpertiseNotDecisionValue.JensenGap
+import ResidualExpertiseNotDecisionValue.Regret
 
 /-!
 # Facet-Activation Bridge Lemma
@@ -16,9 +16,6 @@ equivalent to the human signal crossing a reward-induced decision boundary.
 - `jensenGap_terminalValue_zero_of_posteriors_optimal` : Theorem 1 direction.
 - `boundary_crossing_of_strict_jensenGap_terminalValue` : Theorem 2 direction.
 
-## References
-
-- Shah, Mandal, Azhar, *All Substitution Is Local*.
 -/
 
 open Finset BigOperators

@@ -6,7 +6,7 @@
 % ============================================================
 
 All formal results used in the paper are verified in Lean~4 using Mathlib.
-The development contains five modules: \texttt{Basics.lean}, \texttt{Regret.lean}, \texttt{JensenGap.lean}, \texttt{FacetActivation.lean}, and the umbrella import \texttt{AllSubstitutionIsLocal.lean}.
+The development contains five modules: \texttt{Basics.lean}, \texttt{Regret.lean}, \texttt{JensenGap.lean}, \texttt{FacetActivation.lean}, and the umbrella import \texttt{ResidualExpertiseNotDecisionValue.lean}.
 Table~\ref{tab:lean-map} maps the paper's claims to Lean declarations.
 
 \begin{table}[ht]
@@ -34,7 +34,7 @@ Thm~\ref{thm:facet-bridge} & Thm & \texttt{facet\_activation\_bridge} & FacetAct
 \texttt{Regret.lean} defines \texttt{terminalValue} and \texttt{regret} and proves non-negativity and the zero-regret optimality characterization.
 \texttt{JensenGap.lean} defines Jensen gaps over posterior lotteries and proves non-negativity for belief-convex functions.
 
-\paragraph{Paper theorems.}
+\paragraph{Paper Theorems.}
 \texttt{FacetActivation.lean} contains the two formal claims used in the text.
 The weighted-regret identity \texttt{jensenGap\_eq\_weighted\_regret} rewrites the value of information as expected regret of retaining the prior-optimal action after the posterior update.
 The bridge theorem \texttt{facet\_activation\_bridge} states that this expected regret is strictly positive exactly when some reachable posterior strictly prefers a rival action.
