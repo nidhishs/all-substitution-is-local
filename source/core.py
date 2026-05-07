@@ -47,10 +47,13 @@ def model_action(b: np.ndarray, R: np.ndarray) -> np.ndarray:
 
 
 def reward_tolerance(R: np.ndarray) -> float:
-    """Scale-aware tolerance for "BR is essentially zero" decisions.
+    """Scale-aware tolerance for boundary-regret near-zero comparisons.
 
-    Returns max(1e-12, 1e-8 * reward_range) so that callers comparing per-instance
-    BR against `tol` get the same threshold regardless of the reward matrix scale.
+    Args:
+        R: Reward matrix of shape (|A|, K).
+
+    Returns:
+        max(1e-12, 1e-8 * reward_range), consistent across reward scales.
     """
     return max(1e-12, 1e-8 * float(R.max() - R.min()))
 
@@ -281,12 +284,8 @@ def spearman_bootstrap_ci(
 ) -> tuple[float, float]:
     """BCa bootstrap CI for Spearman rho, vectorized.
 
-    Equivalent to bootstrap_ci(lambda a, b: spearman_corr(a, b)[0], x, y, ...) for
-    non-tied data. For tied data the bootstrap replicates use ordinal ranking while
-    the point estimate uses average ranking — the two may diverge slightly.
-    Generates all bootstrap index rows in one call and computes Pearson r on
-    re-ranked samples in batch. Jackknife LOO correlations are computed via a
-    rank-adjustment matrix rather than N sequential scipy calls.
+    For tied data, bootstrap replicates use ordinal ranking while the point
+    estimate uses average ranking; the two may diverge slightly.
 
     Args:
         x: First array of shape (N,).
@@ -339,12 +338,7 @@ def mean_bootstrap_ci(
     ci: float = 0.95,
     rng: np.random.Generator | None = None,
 ) -> tuple[float, float]:
-    """BCa bootstrap CI for the mean of x, fully vectorized.
-
-    Drop-in replacement for bootstrap_ci(lambda a: float(a.mean()), x, ...).
-    Bootstrap means are computed in one matrix operation. The LOO jackknife
-    mean has a closed form — jack[i] = (N·mean - x[i]) / (N-1) — so the
-    N-iteration loop is eliminated entirely.
+    """BCa bootstrap CI for the mean, fully vectorized.
 
     Args:
         x: Input array of shape (N,).

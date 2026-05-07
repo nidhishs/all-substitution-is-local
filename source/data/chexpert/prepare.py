@@ -27,12 +27,12 @@ logger = logging.getLogger("prepare")
 def load_predictions(path: Path) -> pd.DataFrame:
     """Read a competition-format inference CSV and rename columns for downstream use.
 
-    Expected input columns: Study, Atelectasis, Cardiomegaly, Consolidation,
-    Edema, Pleural Effusion.
+    Args:
+        path: Path to the predictions CSV. Expected columns: Study, and one
+            probability column per condition.
 
-    Returns a DataFrame with:
-        study_id, b_x_raw_Atelectasis, b_x_raw_Cardiomegaly,
-        b_x_raw_Consolidation, b_x_raw_Edema, b_x_raw_Pleural Effusion
+    Returns:
+        DataFrame with study_id and b_x_raw_<condition> columns.
     """
     df = pd.read_csv(Path(path))
     rename_map: dict[str, str] = {"Study": "study_id"}

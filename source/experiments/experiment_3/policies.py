@@ -34,10 +34,7 @@ def _hx_features(b_x: np.ndarray) -> np.ndarray:
 
 
 def _yxh_features(b_x: np.ndarray, h: np.ndarray) -> np.ndarray:
-    """P(y | b_x, h) features: [logit(b_x[:, 1]), h, logit(b_x[:, 1]) * h].
-
-    Mirrors data.preparation.fit_augmented_beliefs feature set exactly.
-    """
+    """P(y | b_x, h) features: [logit(b_x[:, 1]), h, logit(b_x[:, 1]) * h]."""
     z = logit(b_x[:, 1])
     h_f = h.astype(float)
     return np.stack([z, h_f, z * h_f], axis=1)
@@ -48,13 +45,15 @@ def fit_scoring_models(
 ) -> tuple[LogisticRegression, LogisticRegression]:
     """Fit P(h | b_x) and P(y | b_x, h) on a training fold.
 
-    Returns (h_model, y_model). Both are sklearn LogisticRegression(max_iter=1000).
-    The y_model uses features identical to data.preparation.fit_augmented_beliefs.
+    A per-fold single-class h will raise a sklearn fit-time error.
 
-    Raises sklearn.exceptions on single-class training data; the upstream
-    KFold/StratifiedKFold guard in compute_scores covers globally-constant y,
-    but a per-fold constant h is left to surface as a fit-time error rather
-    than masked.
+    Args:
+        b_x_train: (N, K) model-only beliefs for the training fold.
+        h_train: (N,) human signal for the training fold.
+        y_train: (N,) labels for the training fold.
+
+    Returns:
+        Tuple (h_model, y_model) of fitted LogisticRegression instances.
     """
     h_model = LogisticRegression(max_iter=1000)
     h_model.fit(_hx_features(b_x_train), h_train)

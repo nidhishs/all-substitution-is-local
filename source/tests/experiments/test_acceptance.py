@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 
 import pytest
+
 from paths import experiment_results
 
 pytestmark = pytest.mark.acceptance

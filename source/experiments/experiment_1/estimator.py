@@ -34,9 +34,17 @@ def estimate_br(
 ) -> dict:
     """Cross-fitted plug-in BR̂ alongside oracle BR under the true model.
 
-    Draws n samples from the generative model, then for each fold estimates
-    prior, M, H from training instances and computes posteriors on test instances.
-    The oracle uses the true prior and channels on the same (m, h) realization.
+    Draws n samples, estimates prior, M, H from training folds, and computes
+    posteriors on test folds. The oracle uses the true distribution on the
+    same (m, h) realizations.
+
+    Args:
+        problem: DecisionProblem with prior and reward matrix.
+        M: Model signal channel.
+        H: Human signal channel.
+        n: Number of samples to draw.
+        rng: NumPy random generator.
+        n_folds: Number of cross-fitting folds.
 
     Returns:
         Dict with keys: br_hat, br_oracle, b_x_oracle, b_xh_oracle, y, m, h.

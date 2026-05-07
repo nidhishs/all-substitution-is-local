@@ -120,9 +120,13 @@ def validate_pair_array(npz_path: Path, json_path: Path) -> None:
 def load_pair(
     npz_path: Path,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, dict]:
-    """Load a pair artefact written by write_pair_file. Returns (b_x, b_xh, h, y, meta).
+    """Load a validated pair artefact from disk.
 
-    Assumes the artefact is already valid (validated at write time by write_pair_file).
+    Args:
+        npz_path: Path to the .npz file; a corresponding .json must exist alongside it.
+
+    Returns:
+        Tuple (b_x, b_xh, h, y, meta).
     """
     data = np.load(npz_path)
     meta = json.loads(npz_path.with_suffix(".json").read_text())
@@ -139,7 +143,15 @@ def logit(p: np.ndarray) -> np.ndarray:
 
 
 def make_run_dir(experiment_name: str, output_dir: Path | None) -> Path:
-    """Return <override or RESULTS/<experiment_name>>/run_<hex6>. Does not mkdir."""
+    """Return a new run directory path without creating it.
+
+    Args:
+        experiment_name: Used as the subdirectory under RESULTS when output_dir is None.
+        output_dir: If given, overrides the default RESULTS/<experiment_name> base.
+
+    Returns:
+        Path of the form <base>/run_<hex6>.
+    """
     base = (
         experiment_results(experiment_name) if output_dir is None else Path(output_dir)
     )
@@ -147,9 +159,17 @@ def make_run_dir(experiment_name: str, output_dir: Path | None) -> Path:
 
 
 def start_run(out_dir: Path, logger_name: str, label: str) -> logging.Logger:
-    """mkdir + setup_logging + log experiment header + log_run_args. Returns the logger.
+    """Create run directory, initialize logger, and log experiment header.
 
-    Must be called from inside a Click command context (log_run_args reads it).
+    Must be called from inside a Click command context.
+
+    Args:
+        out_dir: Run directory; created if absent.
+        logger_name: Logger name and log filename stem.
+        label: Header label written as the first log line.
+
+    Returns:
+        Configured logger at INFO level.
     """
     out_dir.mkdir(parents=True, exist_ok=True)
     logger = setup_logging(out_dir, logger_name)
@@ -159,7 +179,15 @@ def start_run(out_dir: Path, logger_name: str, label: str) -> logging.Logger:
 
 
 def finalize_run(out_dir: Path, payload: dict, logger: logging.Logger) -> None:
-    """Write payload as results.json (no numpy fallback — caller must cast), update latest."""
+    """Write payload as results.json and update the latest symlink.
+
+    Caller must cast all numpy types before passing — no automatic JSON fallback.
+
+    Args:
+        out_dir: Run directory where results.json is written.
+        payload: JSON-serializable dict.
+        logger: Logger for progress messages.
+    """
     results_path = out_dir / "results.json"
     results_path.write_text(json.dumps(payload, indent=2))
     logger.info(f"Results written to {results_path}")

@@ -1,7 +1,6 @@
 """Dataset-agnostic pair-preparation helpers.
 
-All functions operate on plain numpy arrays and are called by dataset-specific
-pipeline modules (e.g. data.chexpert). Nothing here knows which dataset it is.
+All functions operate on plain numpy arrays and are dataset-agnostic.
 
 Paper-fixed constants:
     CAL_FRAC: calibration fraction: 30% of studies per pair
@@ -117,9 +116,20 @@ def write_pair_file(
 ) -> Path:
     """Write validated pair artefacts to out_dir/<tag>.{npz,json}.
 
-    Scalar probabilities are written as (N, 2) arrays [1-p, p]; meta must
-    include 'n_classes'. Only evaluation rows (b_xh not NaN) are written.
-    Self-validates via validate_pair_array before returning.
+    Scalar b_x and b_xh are stored as (N, 2) arrays [1-p, p]. Only rows
+    where b_xh is not NaN are written. Self-validates before returning.
+
+    Args:
+        out_dir: Output directory; created if absent.
+        tag: Filename stem for the .npz and .json files.
+        b_x: (N,) model beliefs.
+        b_xh: (N,) augmented beliefs; NaN rows are excluded.
+        h: (N,) human signal, integer.
+        y: (N,) labels, integer.
+        meta: Metadata dict; must include 'n_classes'.
+
+    Returns:
+        Path to the written .npz file.
     """
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)

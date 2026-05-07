@@ -11,9 +11,6 @@ dependencies = [
     "matplotlib>=3.7",
     "scikit-image>=0.21",
     "pillow>=10.0",
-    "torch>=2.0",
-    "torchvision>=0.15",
-    "torchxrayvision>=1.0",
     "tabulate>=0.10.0",
 ]
 
@@ -22,6 +19,11 @@ dev = [
     "black>=26.3.1",
     "isort>=8.0.1",
     "pytest>=8.0",
+]
+inference = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "torchxrayvision>=1.0",
 ]
 
 [tool.pytest.ini_options]

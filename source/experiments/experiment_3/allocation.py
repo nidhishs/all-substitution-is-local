@@ -56,7 +56,7 @@ def utility_gain(per_instance_gain: np.ndarray, selected: np.ndarray) -> float:
 
 
 def _make_folds(n: int, y: np.ndarray, n_folds: int, seed: int) -> list:
-    """Stratified on y when >=2 classes, else plain KFold (matches data.preparation.fit_augmented_beliefs)."""
+    """Stratified on y when >=2 classes present, else plain KFold."""
     arange = np.arange(n)
     if len(np.unique(y)) < 2:
         return list(
@@ -78,10 +78,19 @@ def compute_scores(
     rng: np.random.Generator,
     n_folds: int = _N_FOLDS,
 ) -> dict[str, np.ndarray]:
-    """5-fold cross-fitted scoring for BR_hat, Residual, L2D; direct otherwise.
+    """5-fold cross-fitted scoring for BR_hat, Residual, L2D; direct for all others.
 
-    Folds are stratified on y to match data.preparation.fit_augmented_beliefs.
-    Returns dict {policy_name: (N,) score array}.
+    Args:
+        b_x: (N, K) model-only beliefs.
+        b_xh: (N, K) augmented beliefs.
+        h: (N,) human signal, integer.
+        y: (N,) labels, integer.
+        R: Reward matrix of shape (|A|, K).
+        rng: NumPy random generator for the Random policy and CV seed.
+        n_folds: Number of cross-fitting folds.
+
+    Returns:
+        Dict mapping policy name to an (N,) score array.
     """
     n = len(y)
 
