@@ -122,21 +122,26 @@ Section~\ref{sec:exp3} tests this directly.
 \label{sec:exp3}
 
 \paragraph{Question.}
-Section~\ref{sec:exp2} established that residual predictive expertise and boundary regret invert across reward regimes, exactly as Theorem~\ref{thm:facet-bridge} predicts.
-We now test whether this inversion is actionable: an ex ante $\BRhat$ score should dominate reward-aware geometric proximity where boundary-regret mass is reachable and converge with it where it is not.
+Given a fixed human-review budget, can an ex ante boundary-regret score identify the cases where reader input will improve realized decision utility, rather than improve prediction or flag model uncertainty?
+The prediction is regime-conditional: it should beat reward-aware but human-blind boundary proximity when reader updates can cross reward-relevant decision boundaries, and converge to it when such crossings are sparse or absent.
 
 
 \paragraph{Setup.}
 We use the same 25 reader--task pairs as in Section~\ref{sec:exp2}.
-For each review budget $q\in\{5\%,\,10\%,\,20\%,\,50\%\}$, a policy ranks cases using only pre-review ($x$-available) scores; reviewed cases take the human-updated action $\argmax_a r_a\cdot\bpost_{x,h}$, while unreviewed cases retain $a_x$.
-Utility is evaluated on held-out labels under each reward matrix, with policy scores 5-fold cross-fitted on the same fold structure used to estimate $\bpost_{x,h}$.
+For each case, the model-only belief $b_x$ induces a model-only action $a_x$.
+For each review budget $q\in\{5\%,\,10\%,\,20\%,\,50\%\}$, a policy ranks cases using only pre-review information.
+Reviewed cases observe the reader response $h$ and take the human-updated action $\argmax_a r_a\cdot\bpost_{x,h}$; unreviewed cases retain $a_x$.
+Utility gain is the held-out realized reward improvement over this no-review baseline.
+All learned policy scores are 5-fold cross-fitted on the same fold structure used to estimate $\bpost_{x,h}$, so review priority is always computed out of fold.
 
-\paragraph{Baselines.}
-We compare $\BRhat$ against six baselines.
-\textbf{Margin} (reward-aware distance to the active decision facet) is the primary comparison baseline: it captures reward geometry without any estimate of the human signal $P(h\mid x)$.
+\paragraph{Policies.}
+The proposed policy, $\BRhat$, is an ex ante boundary-regret score: it predicts possible reader responses from $x$, predicts the corresponding human-updated posterior, and scores a case by the expected decision value of that update under the current reward.
+We compare it against six baselines.
+\textbf{Margin} is a reward-aware distance to the active decision facet, our primary comparison baseline: it captures reward geometry without estimating the human signal $P(h\mid x)$.
+\textbf{Residual} is a residual-expertise score, the deployable analogue of a predictive audit \citep{AlurEtAl2023}.
 \textbf{Entropy} is reward-blind model uncertainty.
-\textbf{Residual} is a residual-expertise score --- the deployable analogue of a predictive audit in the style of \citet{AlurEtAl2023}.
-\textbf{L2D} is a cross-fitted learning-to-defer classifier \citep{MozannarSontag2020,MaoMohri2023} with reward-sensitive deferral labels $\mathbf{1}[R[a_{x,h},y]>R[a_x,y]]$, matching the reward structure of the experiment.
+These policies span two axes: Margin is reward-aware but human-blind, Residual is human-aware but reward-blind, Entropy is blind to both, and $\BRhat$ is both reward-aware and human-aware.
+\textbf{L2D} is the learned full-coverage competitor: like $\BRhat$ it is both reward-aware and human-aware, but reaches that coverage end-to-end through a cross-fitted deferral classifier \citep{MozannarSontag2020,MaoMohri2023} with reward-sensitive labels $\mathbf{1}[R[a_{x,h},y]>R[a_x,y]]$, rather than through the reward's geometry and the reader-channel posterior.
 \textbf{Random} is the uninformed baseline.
 \textbf{Oracle} is the hindsight upper bound using realized labels.
 
